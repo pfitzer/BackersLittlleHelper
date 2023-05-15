@@ -89,6 +89,16 @@ function getShipDetails(name) {
             card_title.setAttribute('class', 'card-title h5 d-block text-darker')
             card_title.innerHTML = data.shops.data[i].name_raw
             body.appendChild(card_title)
+            if (data.shops.data[i].items.data[0].buyable) {
+                const price = document.createElement('span')
+                price.innerHTML = 'Kaufpreis: ' + data.shops.data[i].items.data[0].base_price
+                body.appendChild(price)
+            }
+            if (data.shops.data[i].items.data[0].rentable) {
+                const price = document.createElement('span')
+                price.innerHTML = 'Mietpreis ab: ' + data.shops.data[i].items.data[0].rental_price_days[1]
+                body.appendChild(price)
+            }
             card.appendChild(body)
             col.appendChild(card)
             ship_prices.appendChild(col)

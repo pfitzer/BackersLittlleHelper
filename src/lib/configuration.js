@@ -1,14 +1,18 @@
 const fs = require('fs')
+const getDirName = require('path').dirname;
 
 function createDefaultConfig(path)
 {
     let c = {appPath: ''}
     let jsonString = JSON.stringify(c)
-    fs.writeFile(path, jsonString, err => {
-        if (err) {
-            return console.log(err);
-        }
-    })
+    fs.mkdir(getDirName(path), { recursive: true}, function (err) {
+        if (err) return console.log(err);
+        fs.writeFile(path, jsonString, err => {
+            if (err) {
+                return console.log(err);
+            }
+        })
+    });
 }
 
 function readConfig(path)

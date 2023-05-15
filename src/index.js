@@ -4,14 +4,14 @@ const remote = require('@electron/remote/main');
 remote.initialize();
 const fs = require('fs')
 const template = require('./menu');
-const settingsPath = path.join(process.env.APPDATA, 'backerslittlehelper', 'settings.json')
+const settingsPath = path.join(process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share"), 'backerslittlehelper', 'settings.json')
 const {createDefaultConfig, readConfig} = require('./lib/configuration')
 
 if (!fs.existsSync(settingsPath)) {
   createDefaultConfig(settingsPath);
 }
 
-const config = require(settingsPath);
+//const config = require(settingsPath);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
