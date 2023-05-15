@@ -22,7 +22,8 @@
     "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
     "config": "^3.3.9",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "fs-extra": "^11.1.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
