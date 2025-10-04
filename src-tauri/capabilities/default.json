@@ -11,6 +11,7 @@
     "fs:allow-app-read",
     "fs:allow-app-write",
     "fs:allow-app-read-recursive",
-    "fs:allow-app-write-recursive"
+    "fs:allow-app-write-recursive",
+    "core:path:default"
   ]
 }

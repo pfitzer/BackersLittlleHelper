@@ -27,37 +27,19 @@
           </div>
         </div>
 
-        <div class="form-control mb-4">
-          <label class="label" for="user-dir">
-            <span class="label-text">{{ $t('settings.userDir') }}</span>
-          </label>
-          <div class="join">
-            <input
-              id="user-dir"
-              v-model="settings.userDirectory"
-              type="text"
-              class="input input-bordered join-item flex-1 bg-base-100/50"
-              @change="saveSettings"
-            />
-            <button @click="selectDirectory('userDirectory')" class="btn btn-primary join-item">
-              {{ $t('settings.browse') }}
-            </button>
-          </div>
-        </div>
-
         <div class="form-control">
-          <label class="label" for="shader-dir">
-            <span class="label-text">{{ $t('settings.shaderDir') }}</span>
+          <label class="label" for="backup-dir">
+            <span class="label-text">{{ $t('settings.backupDir') }}</span>
           </label>
           <div class="join">
             <input
-              id="shader-dir"
-              v-model="settings.shaderDirectory"
+              id="backup-dir"
+              v-model="settings.backupDirectory"
               type="text"
               class="input input-bordered join-item flex-1 bg-base-100/50"
               @change="saveSettings"
             />
-            <button @click="selectDirectory('shaderDirectory')" class="btn btn-primary join-item">
+            <button @click="selectDirectory('backupDirectory')" class="btn btn-primary join-item">
               {{ $t('settings.browse') }}
             </button>
           </div>
@@ -142,13 +124,13 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { open } from '@tauri-apps/plugin-dialog'
 import { BaseDirectory, writeTextFile, readTextFile, exists, mkdir } from '@tauri-apps/plugin-fs'
+import { homeDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
 const settings = ref({
   installationDirectory: '',
-  userDirectory: '',
-  shaderDirectory: '',
+  backupDirectory: '',
   theme: 'dark',
   enableNotifications: true,
   autoStart: false
@@ -158,8 +140,7 @@ const saveMessage = ref('')
 
 const defaultSettings = {
   installationDirectory: '',
-  userDirectory: '',
-  shaderDirectory: '',
+  backupDirectory: '',
   theme: 'dark',
   enableNotifications: true,
   autoStart: false
@@ -176,6 +157,10 @@ onMounted(async () => {
 async function loadSettings() {
   try {
     console.log('Loading settings from:', SETTINGS_FILE)
+
+    // Get default home directory first
+    const defaultBackupDir = await homeDir()
+
     const fileExists = await exists(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
     console.log('Settings file exists:', fileExists)
     if (fileExists) {
@@ -188,6 +173,11 @@ async function loadSettings() {
       console.log('Settings loaded:', settings.value)
     } else {
       console.log('No settings file found, using defaults')
+    }
+
+    // Always show default backup directory if not set
+    if (!settings.value.backupDirectory) {
+      settings.value.backupDirectory = defaultBackupDir
     }
   } catch (error) {
     console.error('Error loading settings:', error)
