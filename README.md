@@ -9,13 +9,17 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 - **Multi-language Support**: Automatically detects OS language (English and German supported)
 - **Settings Management**:
   - Installation Directory configuration
-  - User Directory configuration
-  - Shader Directory configuration
-  - Theme selection (Light, Dark, Auto)
+  - Backup Directory configuration
+  - Theme selection (Light, Dark, Night)
   - Notifications toggle
   - Auto-start on system startup
+- **Tools & Directory Management**:
+  - **Backup Directory**: Delete backup contents
+  - **User Directory**: Backup, restore, and delete user data
+  - **Shader Directory**: Delete shader cache
+  - **Log Directory**: Delete logs with automatic size calculation and display
 - **Cross-platform**: Built with Tauri 2 for Windows, macOS, and Linux
-- **Modern UI**: Vue 3 with Composition API
+- **Modern UI**: Vue 3 with Composition API and DaisyUI Synthwave theme
 
 ## Prerequisites
 
@@ -78,21 +82,30 @@ The built application will be available in `src-tauri/target/release`.
 
 ```
 BackersLittleHelper2/
-├── src/                    # Vue.js frontend source
-│   ├── components/         # Vue components
-│   │   └── Settings.vue   # Settings page component
-│   ├── App.vue            # Main app component
-│   ├── main.js            # Vue app entry point
-│   ├── i18n.js            # Internationalization configuration
-│   └── style.css          # Global styles
-├── src-tauri/             # Tauri backend
-│   ├── src/               # Rust source code
-│   ├── icons/             # Application icons
-│   ├── Cargo.toml         # Rust dependencies
-│   └── tauri.conf.json    # Tauri configuration
-├── index.html             # HTML entry point
-├── vite.config.js         # Vite configuration
-└── package.json           # Node.js dependencies
+├── src/                        # Vue.js frontend source
+│   ├── components/             # Vue components
+│   │   ├── __tests__/         # Component tests
+│   │   │   ├── Settings.test.js
+│   │   │   └── Tools.test.js
+│   │   ├── Settings.vue       # Settings page component
+│   │   ├── Tools.vue          # Tools & directory management component
+│   │   ├── News.vue           # News component
+│   │   ├── ShipSearch.vue     # Ship search component
+│   │   └── Start.vue          # Start page component
+│   ├── App.vue                # Main app component
+│   ├── main.js                # Vue app entry point
+│   ├── i18n.js                # Internationalization configuration
+│   └── style.css              # Global styles
+├── src-tauri/                 # Tauri backend
+│   ├── src/                   # Rust source code
+│   ├── icons/                 # Application icons
+│   ├── capabilities/          # Tauri security capabilities
+│   ├── Cargo.toml             # Rust dependencies
+│   └── tauri.conf.json        # Tauri configuration
+├── index.html                 # HTML entry point
+├── vite.config.js             # Vite configuration
+├── vitest.config.js           # Vitest test configuration
+└── package.json               # Node.js dependencies
 ```
 
 ## Technologies
