@@ -1,5 +1,7 @@
 # Backers Little Helper 2
 
+[![Run Tests](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml/badge.svg)](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml)
+
 A desktop application built with Tauri 2 and Vue.js for managing Star Citizen game configurations and settings.
 
 ## Features
