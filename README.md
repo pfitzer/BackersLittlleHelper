@@ -42,6 +42,26 @@ Run the application in development mode:
 npm run tauri dev
 ```
 
+## Testing
+
+Run the test suite:
+
+```bash
+npm test
+```
+
+Run tests with UI:
+
+```bash
+npm run test:ui
+```
+
+Run tests in watch mode:
+
+```bash
+npm test -- --watch
+```
+
 ## Building
 
 Build the application for production:
@@ -77,7 +97,8 @@ BackersLittleHelper2/
 
 - **Frontend**: Vue 3, Vite, vue-i18n
 - **Backend**: Tauri 2, Rust
-- **UI Framework**: Custom CSS
+- **UI Framework**: Tailwind CSS, DaisyUI (Synthwave theme)
+- **Testing**: Vitest, Vue Test Utils
 - **File System**: Tauri FS Plugin
 - **Dialogs**: Tauri Dialog Plugin
 
