@@ -48,34 +48,38 @@
       </div>
     </div>
 
-    <!-- Shader Directory Tools -->
-    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('tools.shaderDir') }}</h3>
-        <p class="text-sm opacity-70 mb-4">{{ settings.shaderDirectory || $t('tools.noPathSet') }}</p>
-        <div class="flex gap-2 flex-wrap">
-          <button @click="deleteDirectory('shader')" class="btn btn-error btn-sm" :disabled="!settings.shaderDirectory">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-            {{ $t('tools.delete') }}
-          </button>
+    <!-- Shader and Log Directory Tools Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Shader Directory Tools -->
+      <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+        <div class="card-body">
+          <h3 class="card-title text-secondary mb-4">{{ $t('tools.shaderDir') }}</h3>
+          <p class="text-sm opacity-70 mb-4">{{ settings.shaderDirectory || $t('tools.noPathSet') }}</p>
+          <div class="flex gap-2 flex-wrap">
+            <button @click="deleteDirectory('shader')" class="btn btn-error btn-sm" :disabled="!settings.shaderDirectory">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              {{ $t('tools.delete') }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Log Directory Tools -->
-    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('tools.logDir') }}</h3>
-        <p class="text-sm opacity-70 mb-4">{{ settings.logDirectory || $t('tools.noPathSet') }}</p>
-        <div class="flex gap-2 flex-wrap">
-          <button @click="deleteDirectory('log')" class="btn btn-error btn-sm" :disabled="!settings.logDirectory">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-            {{ $t('tools.delete') }}
-          </button>
+      <!-- Log Directory Tools -->
+      <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+        <div class="card-body">
+          <h3 class="card-title text-secondary mb-4">{{ $t('tools.logDir') }}</h3>
+          <p class="text-sm opacity-70 mb-4">{{ settings.logDirectory || $t('tools.noPathSet') }}</p>
+          <div class="flex gap-2 flex-wrap items-center">
+            <button @click="deleteDirectory('log')" class="btn btn-error btn-sm" :disabled="!settings.logDirectory">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              {{ $t('tools.delete') }}
+            </button>
+            <span v-if="logSize" class="badge badge-neutral">{{ logSize }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -115,6 +119,10 @@ const SETTINGS_FILE = 'settings.json'
 
 onMounted(async () => {
   await loadSettings()
+  // Calculate log size only if not in test environment
+  if (import.meta.env.MODE !== 'test') {
+    await calculateLogSize()
+  }
 })
 
 async function loadSettings() {
@@ -263,6 +271,54 @@ async function restoreDirectory(type) {
   }
 }
 
+async function calculateDirectorySize(path) {
+  let totalSize = 0
+
+  try {
+    const dirExists = await exists(path)
+    if (!dirExists) return 0
+
+    const entries = await readDir(path)
+
+    for (const entry of entries) {
+      const entryPath = `${path}\\${entry.name}`
+
+      if (entry.isDirectory) {
+        totalSize += await calculateDirectorySize(entryPath)
+      } else {
+        try {
+          const fileStat = await stat(entryPath)
+          totalSize += fileStat.size
+        } catch (e) {
+          console.error('Error getting file size:', e)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error calculating directory size:', error)
+  }
+
+  return totalSize
+}
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
+async function calculateLogSize() {
+  try {
+    const sizeInBytes = await calculateDirectorySize(settings.value.logDirectory)
+    logSize.value = formatBytes(sizeInBytes)
+  } catch (error) {
+    console.error('Error calculating log size:', error)
+    logSize.value = ''
+  }
+}
+
 async function deleteDirectory(type) {
   const path = getDirectoryPath(type)
   if (!path) return
@@ -288,6 +344,11 @@ async function deleteDirectory(type) {
     statusMessage.value = $t('tools.deleteSuccess')
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
+
+    // Recalculate log size if log directory was deleted
+    if (type === 'log' && settings.value.logDirectory) {
+      await calculateLogSize()
+    }
   } catch (error) {
     console.error('Delete error:', error)
     statusMessage.value = $t('tools.deleteError') + ': ' + error.message

@@ -12,12 +12,14 @@ vi.mock('@tauri-apps/plugin-fs', () => ({
   mkdir: vi.fn(),
   copyFile: vi.fn(),
   readDir: vi.fn(),
-  remove: vi.fn()
+  remove: vi.fn(),
+  stat: vi.fn()
 }))
 
 vi.mock('@tauri-apps/api/path', () => ({
   homeDir: vi.fn(),
-  dirname: vi.fn()
+  dirname: vi.fn(),
+  localDataDir: vi.fn()
 }))
 
 const i18n = createI18n({
@@ -29,6 +31,8 @@ const i18n = createI18n({
         title: 'Tools',
         backupDir: 'Backup Directory',
         userDir: 'User Directory',
+        shaderDir: 'Shader Directory',
+        logDir: 'Log Directory',
         noPathSet: 'No path configured',
         backup: 'Backup',
         restore: 'Restore',
@@ -50,8 +54,19 @@ const i18n = createI18n({
 })
 
 describe('Tools.vue', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
+
+    // Set up default mocks for all tests to prevent infinite loops in calculateDirectorySize
+    const { exists, readDir, stat, readTextFile } = await import('@tauri-apps/plugin-fs')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
+
+    exists.mockResolvedValue(false) // By default, directories don't exist
+    readDir.mockResolvedValue([]) // By default, return empty array
+    stat.mockResolvedValue({ size: 0 }) // By default, files have 0 size
+    readTextFile.mockResolvedValue(JSON.stringify({})) // By default, empty settings
+    homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
   })
 
   it('renders tools page with title', () => {
@@ -83,7 +98,7 @@ describe('Tools.vue', () => {
 
   it('loads settings on mount', async () => {
     const { exists, readTextFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -91,6 +106,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
 
     const wrapper = mount(Tools, {
       global: {
@@ -107,13 +123,14 @@ describe('Tools.vue', () => {
 
   it('uses default backup directory when not set', async () => {
     const { exists, readTextFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
       installationDirectory: 'C:\\test\\install'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
 
     const wrapper = mount(Tools, {
       global: {
@@ -129,7 +146,7 @@ describe('Tools.vue', () => {
 
   it('performs backup operation', async () => {
     const { exists, readTextFile, mkdir, readDir, copyFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -137,6 +154,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     // Mock readDir to return empty array for subdirectories to prevent infinite recursion
     readDir.mockImplementation((path) => {
       if (path.includes('folder1')) {
@@ -168,13 +186,14 @@ describe('Tools.vue', () => {
 
   it('shows error when backup directory not set', async () => {
     const { exists, readTextFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
       installationDirectory: 'C:\\test\\install'
     }))
     homeDir.mockResolvedValue('')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
 
     const wrapper = mount(Tools, {
       global: {
@@ -194,7 +213,7 @@ describe('Tools.vue', () => {
 
   it('performs restore operation', async () => {
     const { exists, readTextFile, mkdir, readDir, copyFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir, dirname } = await import('@tauri-apps/api/path')
+    const { homeDir, dirname, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -202,6 +221,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     dirname.mockResolvedValue('C:\\test\\install\\StarCitizen\\LIVE')
     readDir.mockResolvedValue([
       { name: 'file1.txt', isDirectory: false }
@@ -227,7 +247,7 @@ describe('Tools.vue', () => {
 
   it('shows error when restore backup not found', async () => {
     const { exists, readTextFile } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValueOnce(true) // settings file exists
       .mockResolvedValueOnce(false) // backup doesn't exist
@@ -236,6 +256,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
 
     const wrapper = mount(Tools, {
       global: {
@@ -254,7 +275,7 @@ describe('Tools.vue', () => {
 
   it('deletes backup directory contents', async () => {
     const { exists, readTextFile, readDir, remove } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -262,6 +283,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     readDir.mockResolvedValue([
       { name: 'user', isDirectory: true },
       { name: 'file.txt', isDirectory: false }
@@ -290,7 +312,7 @@ describe('Tools.vue', () => {
 
   it('deletes user directory completely', async () => {
     const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -298,6 +320,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     remove.mockResolvedValue()
 
     // Mock window.confirm
@@ -321,7 +344,7 @@ describe('Tools.vue', () => {
 
   it('cancels delete when confirmation is rejected', async () => {
     const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
-    const { homeDir } = await import('@tauri-apps/api/path')
+    const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -329,6 +352,7 @@ describe('Tools.vue', () => {
       backupDirectory: 'C:\\test\\backup'
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
+    localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     remove.mockResolvedValue()
 
     // Mock window.confirm to return false
