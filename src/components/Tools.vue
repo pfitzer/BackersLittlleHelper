@@ -63,9 +63,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from "vue-i18n"
-import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove } from '@tauri-apps/plugin-fs'
-import { Command } from '@tauri-apps/plugin-shell'
-import { homeDir } from '@tauri-apps/api/path'
+import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, create } from '@tauri-apps/plugin-fs'
+import { homeDir, dirname } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
@@ -93,7 +92,7 @@ async function loadSettings() {
       const contents = await readTextFile(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
       const loadedSettings = JSON.parse(contents)
       settings.value = {
-        userDirectory: loadedSettings.installationDirectory || '',
+        userDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}\\StarCitizen\\LIVE\\user` : '',
         backupDirectory: loadedSettings.backupDirectory || ''
       }
     }
@@ -115,6 +114,27 @@ function getDirectoryPath(type) {
   }
 }
 
+async function copyDirectoryRecursive(sourcePath, destPath) {
+  // Create destination directory
+  await mkdir(destPath, { recursive: true })
+
+  // Read source directory contents
+  const entries = await readDir(sourcePath)
+
+  for (const entry of entries) {
+    const sourceFile = `${sourcePath}\\${entry.name}`
+    const destFile = `${destPath}\\${entry.name}`
+
+    if (entry.isDirectory) {
+      // Recursively copy subdirectories
+      await copyDirectoryRecursive(sourceFile, destFile)
+    } else {
+      // Copy file
+      await copyFile(sourceFile, destFile)
+    }
+  }
+}
+
 async function backupDirectory(type) {
   const path = getDirectoryPath(type)
   if (!path) return
@@ -123,12 +143,24 @@ async function backupDirectory(type) {
   statusType.value = 'info'
 
   try {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const backupPath = `${path}_backup_${timestamp}`
+    let backupPath
+    if (type === 'user') {
+      // For user directory, copy to backup directory with 'user' folder name
+      backupPath = `${settings.value.backupDirectory}\\user`
+      if (!settings.value.backupDirectory) {
+        statusMessage.value = $t('tools.backupError') + ': No backup directory set'
+        statusType.value = 'error'
+        setTimeout(() => { statusMessage.value = '' }, 5000)
+        return
+      }
+    } else {
+      // For other directories, create timestamped backup
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      backupPath = `${path}_backup_${timestamp}`
+    }
 
-    // Use system command to copy directory
-    const command = Command.create('cp', ['-r', path, backupPath])
-    await command.execute()
+    // Copy directory recursively using filesystem API
+    await copyDirectoryRecursive(path, backupPath)
 
     statusMessage.value = $t('tools.backupSuccess')
     statusType.value = 'success'
@@ -142,21 +174,47 @@ async function backupDirectory(type) {
 }
 
 async function restoreDirectory(type) {
-  const path = getDirectoryPath(type)
-  if (!path) return
+  const userPath = getDirectoryPath(type) + '\\..';
+  if (!userPath) return
 
   statusMessage.value = $t('tools.restoring')
   statusType.value = 'info'
 
   try {
-    // Find most recent backup
-    const parentDir = path.substring(0, path.lastIndexOf('/'))
-    const dirName = path.substring(path.lastIndexOf('/') + 1)
+    if (type === 'user') {
+      // For user directory, restore from backup directory
+      const backupPath = `${settings.value.backupDirectory}\\user`
 
-    // This is a placeholder - actual implementation would need directory listing
-    statusMessage.value = $t('tools.restoreNotImplemented')
-    statusType.value = 'error'
-    setTimeout(() => { statusMessage.value = '' }, 3000)
+      if (!settings.value.backupDirectory) {
+        statusMessage.value = $t('tools.restoreError') + ': No backup directory set'
+        statusType.value = 'error'
+        setTimeout(() => { statusMessage.value = '' }, 5000)
+        return
+      }
+
+      // Check if backup exists
+      const backupExists = await exists(backupPath)
+      if (!backupExists) {
+        statusMessage.value = $t('tools.restoreError') + ': No backup found'
+        statusType.value = 'error'
+        setTimeout(() => { statusMessage.value = '' }, 5000)
+        return
+      }
+
+      // Get parent directory using Tauri's dirname function
+      const parentPath = await dirname(userPath)
+
+      // Copy from backup to parent directory
+      await copyDirectoryRecursive(backupPath, parentPath)
+
+      statusMessage.value = $t('tools.restoreSuccess')
+      statusType.value = 'success'
+      setTimeout(() => { statusMessage.value = '' }, 3000)
+    } else {
+      statusMessage.value = $t('tools.restoreNotImplemented')
+      statusType.value = 'error'
+      setTimeout(() => { statusMessage.value = '' }, 3000)
+    }
   } catch (error) {
     console.error('Restore error:', error)
     statusMessage.value = $t('tools.restoreError') + ': ' + error.message
@@ -175,7 +233,17 @@ async function deleteDirectory(type) {
   statusType.value = 'info'
 
   try {
-    await remove(path, { recursive: true })
+    if (type === 'backup') {
+      // For backup directory, delete all contents but keep the directory
+      const entries = await readDir(path)
+      for (const entry of entries) {
+        const entryPath = `${path}\\${entry.name}`
+        await remove(entryPath, { recursive: true })
+      }
+    } else {
+      // For other directories, delete the entire directory
+      await remove(path, { recursive: true })
+    }
 
     statusMessage.value = $t('tools.deleteSuccess')
     statusType.value = 'success'

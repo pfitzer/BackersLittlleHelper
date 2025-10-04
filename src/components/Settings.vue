@@ -124,7 +124,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { open } from '@tauri-apps/plugin-dialog'
 import { BaseDirectory, writeTextFile, readTextFile, exists, mkdir } from '@tauri-apps/plugin-fs'
-import { homeDir } from '@tauri-apps/api/path'
+import { homeDir, appDataDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
@@ -228,9 +228,19 @@ async function selectDirectory(field) {
   console.log('selectDirectory called for:', field)
   try {
     console.log('Opening dialog...')
+
+    // Set default directory - use backup directory for installation directory, home for backup directory
+    let defaultPath
+    if (field === 'installationDirectory') {
+      defaultPath = settings.value.backupDirectory || await homeDir()
+    } else if (field === 'backupDirectory') {
+      defaultPath = await homeDir()
+    }
+
     const selected = await open({
       directory: true,
       multiple: false,
+      defaultPath: defaultPath,
       title: `Select ${field.replace(/([A-Z])/g, ' $1').trim()}`
     })
 
