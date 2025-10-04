@@ -27,37 +27,19 @@
           </div>
         </div>
 
-        <div class="form-control mb-4">
-          <label class="label" for="user-dir">
-            <span class="label-text">{{ $t('settings.userDir') }}</span>
-          </label>
-          <div class="join">
-            <input
-              id="user-dir"
-              v-model="settings.userDirectory"
-              type="text"
-              class="input input-bordered join-item flex-1 bg-base-100/50"
-              @change="saveSettings"
-            />
-            <button @click="selectDirectory('userDirectory')" class="btn btn-primary join-item">
-              {{ $t('settings.browse') }}
-            </button>
-          </div>
-        </div>
-
         <div class="form-control">
-          <label class="label" for="shader-dir">
-            <span class="label-text">{{ $t('settings.shaderDir') }}</span>
+          <label class="label" for="backup-dir">
+            <span class="label-text">{{ $t('settings.backupDir') }}</span>
           </label>
           <div class="join">
             <input
-              id="shader-dir"
-              v-model="settings.shaderDirectory"
+              id="backup-dir"
+              v-model="settings.backupDirectory"
               type="text"
               class="input input-bordered join-item flex-1 bg-base-100/50"
               @change="saveSettings"
             />
-            <button @click="selectDirectory('shaderDirectory')" class="btn btn-primary join-item">
+            <button @click="selectDirectory('backupDirectory')" class="btn btn-primary join-item">
               {{ $t('settings.browse') }}
             </button>
           </div>
@@ -74,10 +56,10 @@
           <label class="label" for="theme">
             <span class="label-text">{{ $t('settings.theme') }}</span>
           </label>
-          <select id="theme" v-model="settings.theme" @change="saveSettings" class="select select-bordered bg-base-100/50">
+          <select id="theme" v-model="settings.theme" @change="changeTheme" class="select select-bordered bg-base-100/50">
             <option value="light">{{ $t('settings.themeLight') }}</option>
             <option value="dark">{{ $t('settings.themeDark') }}</option>
-            <option value="auto">{{ $t('settings.themeAuto') }}</option>
+            <option value="night">{{ $t('settings.themeNight') }}</option>
           </select>
         </div>
       </div>
@@ -142,13 +124,13 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { open } from '@tauri-apps/plugin-dialog'
 import { BaseDirectory, writeTextFile, readTextFile, exists, mkdir } from '@tauri-apps/plugin-fs'
+import { homeDir, appDataDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
 const settings = ref({
   installationDirectory: '',
-  userDirectory: '',
-  shaderDirectory: '',
+  backupDirectory: '',
   theme: 'dark',
   enableNotifications: true,
   autoStart: false
@@ -158,8 +140,7 @@ const saveMessage = ref('')
 
 const defaultSettings = {
   installationDirectory: '',
-  userDirectory: '',
-  shaderDirectory: '',
+  backupDirectory: '',
   theme: 'dark',
   enableNotifications: true,
   autoStart: false
@@ -169,11 +150,17 @@ const SETTINGS_FILE = 'settings.json'
 
 onMounted(async () => {
   await loadSettings()
+  // Apply theme from settings
+  applyTheme(settings.value.theme)
 })
 
 async function loadSettings() {
   try {
     console.log('Loading settings from:', SETTINGS_FILE)
+
+    // Get default home directory first
+    const defaultBackupDir = await homeDir()
+
     const fileExists = await exists(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
     console.log('Settings file exists:', fileExists)
     if (fileExists) {
@@ -186,6 +173,11 @@ async function loadSettings() {
       console.log('Settings loaded:', settings.value)
     } else {
       console.log('No settings file found, using defaults')
+    }
+
+    // Always show default backup directory if not set
+    if (!settings.value.backupDirectory) {
+      settings.value.backupDirectory = defaultBackupDir
     }
   } catch (error) {
     console.error('Error loading settings:', error)
@@ -223,13 +215,32 @@ function resetSettings() {
   saveSettings()
 }
 
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+}
+
+function changeTheme() {
+  applyTheme(settings.value.theme)
+  saveSettings()
+}
+
 async function selectDirectory(field) {
   console.log('selectDirectory called for:', field)
   try {
     console.log('Opening dialog...')
+
+    // Set default directory - use backup directory for installation directory, home for backup directory
+    let defaultPath
+    if (field === 'installationDirectory') {
+      defaultPath = settings.value.backupDirectory || await homeDir()
+    } else if (field === 'backupDirectory') {
+      defaultPath = await homeDir()
+    }
+
     const selected = await open({
       directory: true,
       multiple: false,
+      defaultPath: defaultPath,
       title: `Select ${field.replace(/([A-Z])/g, ' $1').trim()}`
     })
 

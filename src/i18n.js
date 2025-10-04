@@ -3,9 +3,10 @@ import { createI18n } from 'vue-i18n'
 const messages = {
   en: {
     app: {
-      title: 'Backers Little Helper 2',
+      title: 'Backers Little Helper',
       home: 'Home',
-      settings: 'Settings'
+      settings: 'Settings',
+      tools: 'Tools'
     },
     home: {
       welcome: 'Welcome to Tauri + Vue!',
@@ -16,14 +17,14 @@ const messages = {
       title: 'Settings',
       directories: 'Directories',
       installationDir: 'Installation Directory',
-      userDir: 'User Directory',
+      backupDir: 'Backup Directory',
       shaderDir: 'Shader Directory',
       browse: 'Browse',
       appearance: 'Appearance',
       theme: 'Theme',
       themeLight: 'Light',
       themeDark: 'Dark',
-      themeAuto: 'Auto',
+      themeNight: 'Night',
       advanced: 'Advanced',
       enableNotifications: 'Enable Notifications',
       autoStart: 'Start on System Startup',
@@ -31,31 +32,55 @@ const messages = {
       saveSettings: 'Save Settings',
       savedSuccessfully: 'Settings saved successfully!',
       errorSaving: 'Error saving settings'
+    },
+    tools: {
+      title: 'Tools',
+      installationDir: 'Installation Directory',
+      userDir: 'User Directory',
+      backupDir: 'Backup Directory',
+      shaderDir: 'Shader Directory',
+      logDir: 'Log Directory',
+      noPathSet: 'No path configured',
+      backup: 'Backup',
+      restore: 'Restore',
+      delete: 'Delete',
+      backingUp: 'Creating backup...',
+      backupSuccess: 'Backup created successfully!',
+      backupError: 'Error creating backup',
+      restoring: 'Restoring from backup...',
+      restoreSuccess: 'Restored successfully!',
+      restoreError: 'Error restoring',
+      restoreNotImplemented: 'Restore feature coming soon',
+      deleting: 'Deleting directory...',
+      deleteSuccess: 'Directory deleted successfully!',
+      deleteError: 'Error deleting directory',
+      confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!'
     }
   },
   de: {
     app: {
-      title: 'Backers Little Helper 2',
+      title: 'Backers Little Helper',
       home: 'Startseite',
-      settings: 'Einstellungen'
+      settings: 'Einstellungen',
+      tools: 'Werkzeuge'
     },
     home: {
-      welcome: 'Willkommen zu Tauri + Vue!',
-      description: 'Klicken Sie auf die Schaltfläche unten, um einen Tauri-Befehl aufzurufen',
+      welcome: 'Willkommen zu Backers Little Helper',
+      description: 'Ein paar einfache Tools um die das Verwalten von Star Citizen zu vereinfachen',
       greet: 'Grüßen'
     },
     settings: {
       title: 'Einstellungen',
       directories: 'Verzeichnisse',
       installationDir: 'Installationsverzeichnis',
-      userDir: 'Benutzerverzeichnis',
+      backupDir: 'Sicherungsverzeichnis',
       shaderDir: 'Shader-Verzeichnis',
       browse: 'Durchsuchen',
       appearance: 'Aussehen',
       theme: 'Design',
       themeLight: 'Hell',
       themeDark: 'Dunkel',
-      themeAuto: 'Automatisch',
+      themeNight: 'Nacht',
       advanced: 'Erweitert',
       enableNotifications: 'Benachrichtigungen aktivieren',
       autoStart: 'Beim Systemstart starten',
@@ -63,6 +88,29 @@ const messages = {
       saveSettings: 'Einstellungen speichern',
       savedSuccessfully: 'Einstellungen erfolgreich gespeichert!',
       errorSaving: 'Fehler beim Speichern der Einstellungen'
+    },
+    tools: {
+      title: 'Werkzeuge',
+      installationDir: 'Installationsverzeichnis',
+      userDir: 'Benutzerverzeichnis',
+      backupDir: 'Sicherungsverzeichnis',
+      shaderDir: 'Shader-Verzeichnis',
+      logDir: 'Log-Verzeichnis',
+      noPathSet: 'Kein Pfad konfiguriert',
+      backup: 'Sichern',
+      restore: 'Wiederherstellen',
+      delete: 'Löschen',
+      backingUp: 'Erstelle Sicherung...',
+      backupSuccess: 'Sicherung erfolgreich erstellt!',
+      backupError: 'Fehler beim Erstellen der Sicherung',
+      restoring: 'Stelle wieder her...',
+      restoreSuccess: 'Erfolgreich wiederhergestellt!',
+      restoreError: 'Fehler beim Wiederherstellen',
+      restoreNotImplemented: 'Wiederherstellungsfunktion kommt bald',
+      deleting: 'Lösche Verzeichnis...',
+      deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
+      deleteError: 'Fehler beim Löschen des Verzeichnisses',
+      confirmDelete: 'Sind Sie sicher, dass Sie dieses Verzeichnis löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!'
     }
   }
 }

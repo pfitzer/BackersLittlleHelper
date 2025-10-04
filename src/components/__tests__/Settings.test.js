@@ -16,6 +16,11 @@ vi.mock('@tauri-apps/plugin-fs', () => ({
   mkdir: vi.fn()
 }))
 
+vi.mock('@tauri-apps/api/path', () => ({
+  homeDir: vi.fn(),
+  appDataDir: vi.fn()
+}))
+
 const i18n = createI18n({
   legacy: false,
   locale: 'en',
@@ -25,14 +30,13 @@ const i18n = createI18n({
         title: 'Settings',
         directories: 'Directories',
         installationDir: 'Installation Directory',
-        userDir: 'User Directory',
-        shaderDir: 'Shader Directory',
+        backupDir: 'Backup Directory',
         browse: 'Browse',
         appearance: 'Appearance',
         theme: 'Theme',
         themeLight: 'Light',
         themeDark: 'Dark',
-        themeAuto: 'Auto',
+        themeNight: 'Night',
         advanced: 'Advanced',
         enableNotifications: 'Enable Notifications',
         autoStart: 'Auto Start',
@@ -66,8 +70,7 @@ describe('Settings.vue', () => {
       }
     })
     expect(wrapper.find('#installation-dir').exists()).toBe(true)
-    expect(wrapper.find('#user-dir').exists()).toBe(true)
-    expect(wrapper.find('#shader-dir').exists()).toBe(true)
+    expect(wrapper.find('#backup-dir').exists()).toBe(true)
   })
 
   it('renders theme selector', () => {
@@ -82,7 +85,7 @@ describe('Settings.vue', () => {
     expect(options).toHaveLength(3)
     expect(options[0].text()).toBe('Light')
     expect(options[1].text()).toBe('Dark')
-    expect(options[2].text()).toBe('Auto')
+    expect(options[2].text()).toBe('Night')
   })
 
   it('renders notification and auto-start checkboxes', () => {

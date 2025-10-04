@@ -9,12 +9,17 @@
     "beforeBuildCommand": "npm run build",
     "frontendDist": "dist"
   },
+  "plugins": {
+    "shell": {
+      "open": true
+    }
+  },
   "app": {
     "windows": [
       {
-        "title": "Backers Little Helper 2",
-        "width": 800,
-        "height": 600
+        "title": "Backers Little Helper",
+        "width": 1200,
+        "height": 800
       }
     ],
     "security": {

@@ -1,16 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-    require('daisyui'),
-  ],
-  daisyui: {
-    themes: ["synthwave", "night", "cyberpunk"],
-  },
+    content: [
+        "./index.html",
+        "./src/**/*.{vue,js,ts,jsx,tsx,txt}",
+    ],
+    theme: {
+        extend: {
+        },
+    },
+    plugins: [
+        require('daisyui'),
+    ],
+    daisyui: {
+        themes: ["light", "dark", "cyberpunk", "synthwave", "dracula", "night"],
+    },
 }

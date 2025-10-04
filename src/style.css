@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-base-200;
-    background-image:
-      radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(120, 200, 255, 0.1) 0%, transparent 50%);
-    background-attachment: fixed;
-  }
+#background {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('./assets/img/MadeByTheCommunity_black.png');
+    background-size: 50%;
+    background-repeat: no-repeat;
+    background-position: 50% 75%;
+    opacity: 0.1;
 }
