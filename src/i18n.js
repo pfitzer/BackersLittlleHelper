@@ -3,7 +3,7 @@ import { createI18n } from 'vue-i18n'
 const messages = {
   en: {
     app: {
-      title: 'Backers Little Helper 2',
+      title: 'Backers Little Helper',
       home: 'Home',
       settings: 'Settings',
       tools: 'Tools'
@@ -59,14 +59,14 @@ const messages = {
   },
   de: {
     app: {
-      title: 'Backers Little Helper 2',
+      title: 'Backers Little Helper',
       home: 'Startseite',
       settings: 'Einstellungen',
       tools: 'Werkzeuge'
     },
     home: {
-      welcome: 'Willkommen zu Tauri + Vue!',
-      description: 'Klicken Sie auf die Schaltfläche unten, um einen Tauri-Befehl aufzurufen',
+      welcome: 'Willkommen zu Backers Little Helper',
+      description: 'Ein paar einfache Tools um die das Verwalten von Star Citizen zu vereinfachen',
       greet: 'Grüßen'
     },
     settings: {

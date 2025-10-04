@@ -31,7 +31,7 @@
     </div>
 
     <!-- Content -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-1 py-1">
       <div v-if="currentView === 'home'" class="hero min-h-[80vh]">
         <div class="hero-content text-center">
           <div class="max-w-md">
@@ -39,18 +39,6 @@
               {{ $t('home.welcome') }}
             </h2>
             <p class="text-lg mb-6 text-base-content/80">{{ $t('home.description') }}</p>
-            <button @click="greet" class="btn btn-primary btn-lg gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              {{ $t('home.greet') }}
-            </button>
-            <div v-if="greetMsg" class="alert alert-success mt-4 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ greetMsg }}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -67,11 +55,7 @@ import Settings from './components/Settings.vue'
 import Tools from './components/Tools.vue'
 
 const currentView = ref('home')
-const greetMsg = ref('')
 
-async function greet() {
-  greetMsg.value = 'Hello from Tauri!'
-}
 </script>
 
 <style scoped>
