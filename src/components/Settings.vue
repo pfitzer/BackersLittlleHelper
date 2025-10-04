@@ -74,10 +74,10 @@
           <label class="label" for="theme">
             <span class="label-text">{{ $t('settings.theme') }}</span>
           </label>
-          <select id="theme" v-model="settings.theme" @change="saveSettings" class="select select-bordered bg-base-100/50">
+          <select id="theme" v-model="settings.theme" @change="changeTheme" class="select select-bordered bg-base-100/50">
             <option value="light">{{ $t('settings.themeLight') }}</option>
             <option value="dark">{{ $t('settings.themeDark') }}</option>
-            <option value="auto">{{ $t('settings.themeAuto') }}</option>
+            <option value="night">{{ $t('settings.themeNight') }}</option>
           </select>
         </div>
       </div>
@@ -169,6 +169,8 @@ const SETTINGS_FILE = 'settings.json'
 
 onMounted(async () => {
   await loadSettings()
+  // Apply theme from settings
+  applyTheme(settings.value.theme)
 })
 
 async function loadSettings() {
@@ -220,6 +222,15 @@ async function saveSettings() {
 
 function resetSettings() {
   settings.value = { ...defaultSettings }
+  saveSettings()
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+}
+
+function changeTheme() {
+  applyTheme(settings.value.theme)
   saveSettings()
 }
 

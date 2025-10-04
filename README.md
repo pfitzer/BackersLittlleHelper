@@ -1,4 +1,4 @@
-# Backers Little Helper 2
+# Backers Little Helper
 
 [![Run Tests](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml/badge.svg)](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml)
 

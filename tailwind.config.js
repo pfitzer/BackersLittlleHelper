@@ -2,7 +2,7 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./src/**/*.{vue,js,ts,jsx,tsx,txt}",
   ],
   theme: {
     extend: {},
@@ -11,6 +11,6 @@ export default {
     require('daisyui'),
   ],
   daisyui: {
-    themes: ["synthwave", "night", "cyberpunk"],
+    themes: ["light", "dark", "cyberpunk", "synthwave", "dracula", "night"],
   },
 }

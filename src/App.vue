@@ -1,8 +1,5 @@
 <template>
-  <div class="min-h-screen" data-theme="synthwave">
-    <!-- Starfield background -->
-    <div class="stars"></div>
-    <div class="twinkling"></div>
+  <div class="min-h-screen">
 
     <!-- Navigation -->
     <div class="navbar bg-base-300/50 backdrop-blur-md border-b border-primary/30">
