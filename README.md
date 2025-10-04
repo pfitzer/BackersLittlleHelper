@@ -89,9 +89,6 @@ BackersLittleHelper2/
 │   │   │   └── Tools.test.js
 │   │   ├── Settings.vue       # Settings page component
 │   │   ├── Tools.vue          # Tools & directory management component
-│   │   ├── News.vue           # News component
-│   │   ├── ShipSearch.vue     # Ship search component
-│   │   └── Start.vue          # Start page component
 │   ├── App.vue                # Main app component
 │   ├── main.js                # Vue app entry point
 │   ├── i18n.js                # Internationalization configuration
