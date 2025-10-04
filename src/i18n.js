@@ -5,7 +5,8 @@ const messages = {
     app: {
       title: 'Backers Little Helper 2',
       home: 'Home',
-      settings: 'Settings'
+      settings: 'Settings',
+      tools: 'Tools'
     },
     home: {
       welcome: 'Welcome to Tauri + Vue!',
@@ -31,13 +32,35 @@ const messages = {
       saveSettings: 'Save Settings',
       savedSuccessfully: 'Settings saved successfully!',
       errorSaving: 'Error saving settings'
+    },
+    tools: {
+      title: 'Tools',
+      installationDir: 'Installation Directory',
+      userDir: 'User Directory',
+      shaderDir: 'Shader Directory',
+      noPathSet: 'No path configured',
+      backup: 'Backup',
+      restore: 'Restore',
+      delete: 'Delete',
+      backingUp: 'Creating backup...',
+      backupSuccess: 'Backup created successfully!',
+      backupError: 'Error creating backup',
+      restoring: 'Restoring from backup...',
+      restoreSuccess: 'Restored successfully!',
+      restoreError: 'Error restoring',
+      restoreNotImplemented: 'Restore feature coming soon',
+      deleting: 'Deleting directory...',
+      deleteSuccess: 'Directory deleted successfully!',
+      deleteError: 'Error deleting directory',
+      confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!'
     }
   },
   de: {
     app: {
       title: 'Backers Little Helper 2',
       home: 'Startseite',
-      settings: 'Einstellungen'
+      settings: 'Einstellungen',
+      tools: 'Werkzeuge'
     },
     home: {
       welcome: 'Willkommen zu Tauri + Vue!',
@@ -63,6 +86,27 @@ const messages = {
       saveSettings: 'Einstellungen speichern',
       savedSuccessfully: 'Einstellungen erfolgreich gespeichert!',
       errorSaving: 'Fehler beim Speichern der Einstellungen'
+    },
+    tools: {
+      title: 'Werkzeuge',
+      installationDir: 'Installationsverzeichnis',
+      userDir: 'Benutzerverzeichnis',
+      shaderDir: 'Shader-Verzeichnis',
+      noPathSet: 'Kein Pfad konfiguriert',
+      backup: 'Sichern',
+      restore: 'Wiederherstellen',
+      delete: 'Löschen',
+      backingUp: 'Erstelle Sicherung...',
+      backupSuccess: 'Sicherung erfolgreich erstellt!',
+      backupError: 'Fehler beim Erstellen der Sicherung',
+      restoring: 'Stelle wieder her...',
+      restoreSuccess: 'Erfolgreich wiederhergestellt!',
+      restoreError: 'Fehler beim Wiederherstellen',
+      restoreNotImplemented: 'Wiederherstellungsfunktion kommt bald',
+      deleting: 'Lösche Verzeichnis...',
+      deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
+      deleteError: 'Fehler beim Löschen des Verzeichnisses',
+      confirmDelete: 'Sind Sie sicher, dass Sie dieses Verzeichnis löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!'
     }
   }
 }

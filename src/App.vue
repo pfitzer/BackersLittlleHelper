@@ -21,6 +21,12 @@
         >
           {{ $t('app.settings') }}
         </button>
+        <button
+            @click="currentView = 'tools'"
+            :class="['btn btn-sm', currentView === 'tools' ? 'btn-primary' : 'btn-ghost']"
+        >
+          {{ $t('app.tools') }}
+        </button>
       </div>
     </div>
 
@@ -50,6 +56,7 @@
       </div>
 
       <Settings v-if="currentView === 'settings'" />
+      <Tools v-if="currentView === 'tools'" />
     </div>
   </div>
 </template>
@@ -57,6 +64,7 @@
 <script setup>
 import { ref } from 'vue'
 import Settings from './components/Settings.vue'
+import Tools from './components/Tools.vue'
 
 const currentView = ref('home')
 const greetMsg = ref('')
