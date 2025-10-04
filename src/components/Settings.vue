@@ -1,95 +1,139 @@
 <template>
-  <div class="settings-container">
-    <h2>{{ $t('settings.title') }}</h2>
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-4xl font-bold mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+      {{ $t('settings.title') }}
+    </h2>
 
-    <div class="settings-section">
-      <h3>{{ $t('settings.directories') }}</h3>
-      <div class="setting-item">
-        <label for="installation-dir">{{ $t('settings.installationDir') }}</label>
-        <div class="path-input-group">
-          <input
-            id="installation-dir"
-            v-model="settings.installationDirectory"
-            type="text"
-            @change="saveSettings"
-          />
-          <button @click="selectDirectory('installationDirectory')" class="btn-browse">
-            {{ $t('settings.browse') }}
-          </button>
+    <!-- Directories Section -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('settings.directories') }}</h3>
+
+        <div class="form-control mb-4">
+          <label class="label" for="installation-dir">
+            <span class="label-text">{{ $t('settings.installationDir') }}</span>
+          </label>
+          <div class="join">
+            <input
+              id="installation-dir"
+              v-model="settings.installationDirectory"
+              type="text"
+              class="input input-bordered join-item flex-1 bg-base-100/50"
+              @change="saveSettings"
+            />
+            <button @click="selectDirectory('installationDirectory')" class="btn btn-primary join-item">
+              {{ $t('settings.browse') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label" for="user-dir">
+            <span class="label-text">{{ $t('settings.userDir') }}</span>
+          </label>
+          <div class="join">
+            <input
+              id="user-dir"
+              v-model="settings.userDirectory"
+              type="text"
+              class="input input-bordered join-item flex-1 bg-base-100/50"
+              @change="saveSettings"
+            />
+            <button @click="selectDirectory('userDirectory')" class="btn btn-primary join-item">
+              {{ $t('settings.browse') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label class="label" for="shader-dir">
+            <span class="label-text">{{ $t('settings.shaderDir') }}</span>
+          </label>
+          <div class="join">
+            <input
+              id="shader-dir"
+              v-model="settings.shaderDirectory"
+              type="text"
+              class="input input-bordered join-item flex-1 bg-base-100/50"
+              @change="saveSettings"
+            />
+            <button @click="selectDirectory('shaderDirectory')" class="btn btn-primary join-item">
+              {{ $t('settings.browse') }}
+            </button>
+          </div>
         </div>
       </div>
-      <div class="setting-item">
-        <label for="user-dir">{{ $t('settings.userDir') }}</label>
-        <div class="path-input-group">
-          <input
-            id="user-dir"
-            v-model="settings.userDirectory"
-            type="text"
-            @change="saveSettings"
-          />
-          <button @click="selectDirectory('userDirectory')" class="btn-browse">
-            {{ $t('settings.browse') }}
-          </button>
-        </div>
-      </div>
-      <div class="setting-item">
-        <label for="shader-dir">{{ $t('settings.shaderDir') }}</label>
-        <div class="path-input-group">
-          <input
-            id="shader-dir"
-            v-model="settings.shaderDirectory"
-            type="text"
-            @change="saveSettings"
-          />
-          <button @click="selectDirectory('shaderDirectory')" class="btn-browse">
-            {{ $t('settings.browse') }}
-          </button>
+    </div>
+
+    <!-- Appearance Section -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('settings.appearance') }}</h3>
+
+        <div class="form-control">
+          <label class="label" for="theme">
+            <span class="label-text">{{ $t('settings.theme') }}</span>
+          </label>
+          <select id="theme" v-model="settings.theme" @change="saveSettings" class="select select-bordered bg-base-100/50">
+            <option value="light">{{ $t('settings.themeLight') }}</option>
+            <option value="dark">{{ $t('settings.themeDark') }}</option>
+            <option value="auto">{{ $t('settings.themeAuto') }}</option>
+          </select>
         </div>
       </div>
     </div>
 
-    <div class="settings-section">
-      <h3>{{ $t('settings.appearance') }}</h3>
-      <div class="setting-item">
-        <label for="theme">{{ $t('settings.theme') }}</label>
-        <select id="theme" v-model="settings.theme" @change="saveSettings">
-          <option value="light">{{ $t('settings.themeLight') }}</option>
-          <option value="dark">{{ $t('settings.themeDark') }}</option>
-          <option value="auto">{{ $t('settings.themeAuto') }}</option>
-        </select>
+    <!-- Advanced Section -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('settings.advanced') }}</h3>
+
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input
+              type="checkbox"
+              v-model="settings.enableNotifications"
+              @change="saveSettings"
+              class="checkbox checkbox-primary"
+            />
+            <span class="label-text">{{ $t('settings.enableNotifications') }}</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input
+              type="checkbox"
+              v-model="settings.autoStart"
+              @change="saveSettings"
+              class="checkbox checkbox-primary"
+            />
+            <span class="label-text">{{ $t('settings.autoStart') }}</span>
+          </label>
+        </div>
       </div>
     </div>
 
-    <div class="settings-section">
-      <h3>{{ $t('settings.advanced') }}</h3>
-      <div class="setting-item">
-        <label>
-          <input
-            type="checkbox"
-            v-model="settings.enableNotifications"
-            @change="saveSettings"
-          />
-          {{ $t('settings.enableNotifications') }}
-        </label>
-      </div>
-      <div class="setting-item">
-        <label>
-          <input
-            type="checkbox"
-            v-model="settings.autoStart"
-            @change="saveSettings"
-          />
-          {{ $t('settings.autoStart') }}
-        </label>
-      </div>
+    <!-- Action Buttons -->
+    <div class="flex gap-4 justify-end">
+      <button @click="resetSettings" class="btn btn-ghost">
+        {{ $t('settings.resetDefaults') }}
+      </button>
+      <button @click="saveSettings" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+        </svg>
+        {{ $t('settings.saveSettings') }}
+      </button>
     </div>
 
-    <div class="settings-actions">
-      <button @click="resetSettings" class="btn-secondary">{{ $t('settings.resetDefaults') }}</button>
-      <button @click="saveSettings" class="btn-primary">{{ $t('settings.saveSettings') }}</button>
+    <!-- Save Message -->
+    <div v-if="saveMessage" class="alert alert-success mt-4 shadow-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ saveMessage }}</span>
     </div>
-
-    <div v-if="saveMessage" class="save-message">{{ saveMessage }}</div>
   </div>
 </template>
 
@@ -205,126 +249,5 @@ async function selectDirectory(field) {
 </script>
 
 <style scoped>
-.settings-container {
-  padding: 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-h2 {
-  font-size: 1.8rem;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid #646cff;
-  padding-bottom: 0.5rem;
-}
-
-h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #646cff;
-}
-
-.settings-section {
-  margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 8px;
-}
-
-.setting-item {
-  margin-bottom: 1rem;
-}
-
-.setting-item:last-child {
-  margin-bottom: 0;
-}
-
-.setting-item label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.setting-item input[type="text"],
-.setting-item select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #444;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  color: inherit;
-  font-size: 1rem;
-}
-
-.path-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.path-input-group input {
-  flex: 1;
-}
-
-.btn-browse {
-  padding: 0.5rem 1rem;
-  background-color: #646cff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.btn-browse:hover {
-  background-color: #535bf2;
-}
-
-.setting-item input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
-
-.settings-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background-color: #646cff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #535bf2;
-}
-
-.btn-secondary {
-  background-color: #444;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #555;
-}
-
-.save-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #4caf50;
-  color: white;
-  border-radius: 4px;
-  text-align: center;
-}
+/* Additional space-themed styling if needed */
 </style>
