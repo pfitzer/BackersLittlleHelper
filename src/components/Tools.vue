@@ -48,6 +48,38 @@
       </div>
     </div>
 
+    <!-- Shader Directory Tools -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('tools.shaderDir') }}</h3>
+        <p class="text-sm opacity-70 mb-4">{{ settings.shaderDirectory || $t('tools.noPathSet') }}</p>
+        <div class="flex gap-2 flex-wrap">
+          <button @click="deleteDirectory('shader')" class="btn btn-error btn-sm" :disabled="!settings.shaderDirectory">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            {{ $t('tools.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Directory Tools -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('tools.logDir') }}</h3>
+        <p class="text-sm opacity-70 mb-4">{{ settings.logDirectory || $t('tools.noPathSet') }}</p>
+        <div class="flex gap-2 flex-wrap">
+          <button @click="deleteDirectory('log')" class="btn btn-error btn-sm" :disabled="!settings.logDirectory">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            {{ $t('tools.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Status Messages -->
     <div v-if="statusMessage" :class="['alert shadow-lg', statusType === 'success' ? 'alert-success' : statusType === 'error' ? 'alert-error' : 'alert-info']">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -63,16 +95,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from "vue-i18n"
-import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, create } from '@tauri-apps/plugin-fs'
-import { homeDir, dirname } from '@tauri-apps/api/path'
+import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, create, stat } from '@tauri-apps/plugin-fs'
+import { homeDir, dirname, localDataDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
 const settings = ref({
   userDirectory: '',
-  backupDirectory: ''
+  backupDirectory: '',
+  shaderDirectory: '',
+  logDirectory: ''
 })
 
+const logSize = ref('')
 const statusMessage = ref('')
 const statusType = ref('info')
 
@@ -86,6 +121,7 @@ async function loadSettings() {
   try {
     // Get default directories
     const defaultBackupDir = await homeDir()
+    const localDataPath = await localDataDir()
 
     const fileExists = await exists(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
     if (fileExists) {
@@ -93,7 +129,9 @@ async function loadSettings() {
       const loadedSettings = JSON.parse(contents)
       settings.value = {
         userDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}\\StarCitizen\\LIVE\\user` : '',
-        backupDirectory: loadedSettings.backupDirectory || ''
+        backupDirectory: loadedSettings.backupDirectory || '',
+        shaderDirectory: `${localDataPath}\\Star Citizen`,
+        logDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}\\StarCitizen\\LIVE\\logs` : ''
       }
     }
 
@@ -110,6 +148,8 @@ function getDirectoryPath(type) {
   switch(type) {
     case 'user': return settings.value.userDirectory
     case 'backup': return settings.value.backupDirectory
+    case 'shader': return settings.value.shaderDirectory
+    case 'log': return settings.value.logDirectory
     default: return ''
   }
 }

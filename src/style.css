@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#background {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('./assets/img/MadeByTheCommunity_black.png');
+    background-size: 50%;
+    background-repeat: no-repeat;
+    background-position: 50% 75%;
+    opacity: 0.1;
+}
