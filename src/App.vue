@@ -16,6 +16,12 @@
           {{ $t('app.home') }}
         </button>
         <button
+          @click="currentView = 'vehicles'"
+          :class="['btn btn-sm', currentView === 'vehicles' ? 'btn-primary' : 'btn-ghost']"
+        >
+          {{ $t('app.vehicles') }}
+        </button>
+        <button
           @click="currentView = 'settings'"
           :class="['btn btn-sm', currentView === 'settings' ? 'btn-primary' : 'btn-ghost']"
         >
@@ -34,6 +40,7 @@
     <div class="flex-1 overflow-y-auto">
       <div class="container mx-auto px-1 py-1">
         <Home v-if="currentView === 'home'" />
+        <Vehicles v-if="currentView === 'vehicles'" />
         <Settings v-if="currentView === 'settings'" />
         <Tools v-if="currentView === 'tools'" />
       </div>
@@ -46,6 +53,7 @@ import { ref } from 'vue'
 import Home from './components/Home.vue'
 import Settings from './components/Settings.vue'
 import Tools from './components/Tools.vue'
+import Vehicles from './components/Vehicles.vue'
 
 const currentView = ref('home')
 
