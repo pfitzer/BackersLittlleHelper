@@ -6,6 +6,10 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 
 ## Features
 
+- **Home Dashboard**:
+  - Latest Comm-Links from Star Citizen Wiki API
+  - Live RSI Server Status from official status feed
+  - Beautiful gradient UI with space-themed background
 - **Multi-language Support**: Automatically detects OS language (English and German supported)
 - **Settings Management**:
   - Installation Directory configuration
@@ -87,6 +91,7 @@ BackersLittleHelper2/
 │   │   ├── __tests__/         # Component tests
 │   │   │   ├── Settings.test.js
 │   │   │   └── Tools.test.js
+│   │   ├── Home.vue           # Home dashboard with Comm-Links and server status
 │   │   ├── Settings.vue       # Settings page component
 │   │   ├── Tools.vue          # Tools & directory management component
 │   ├── App.vue                # Main app component
@@ -111,8 +116,12 @@ BackersLittleHelper2/
 - **Backend**: Tauri 2, Rust
 - **UI Framework**: Tailwind CSS, DaisyUI (Synthwave theme)
 - **Testing**: Vitest, Vue Test Utils
-- **File System**: Tauri FS Plugin
-- **Dialogs**: Tauri Dialog Plugin
+- **APIs**: Star Citizen Wiki API, RSI Status Feed (XML)
+- **Tauri Plugins**:
+  - FS (File System operations)
+  - Dialog (File/folder selection)
+  - HTTP (CORS-free API requests)
+  - Shell (External links)
 
 ## Configuration
 

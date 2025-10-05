@@ -9,6 +9,14 @@
     "dialog:allow-save",
     "core:path:default",
     "shell:allow-open",
+    "http:default",
+    {
+      "identifier": "http:allow-fetch",
+      "allow": [
+        { "url": "https://api.star-citizen.wiki/*" },
+        { "url": "https://status.robertsspaceindustries.com/*" }
+      ]
+    },
     {
       "identifier": "fs:default",
       "allow": [
