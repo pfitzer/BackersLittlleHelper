@@ -3,7 +3,26 @@
 @tailwind utilities;
 
 html {
-    font-size: 70%;
+    font-size: clamp(70%, 0.5vw + 0.5vh, 100%);
+}
+
+/* Fallback for different window sizes */
+@media (min-height: 900px) {
+    html {
+        font-size: 80%;
+    }
+}
+
+@media (min-height: 1000px) {
+    html {
+        font-size: 90%;
+    }
+}
+
+@media (min-height: 1200px) {
+    html {
+        font-size: 100%;
+    }
 }
 
 #background {
