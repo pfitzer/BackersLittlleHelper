@@ -52,7 +52,23 @@ Run the application in development mode:
 npm run tauri dev
 ```
 
-## Testing
+## Code Quality
+
+### Linting
+
+Run ESLint to check code quality:
+
+```bash
+npm run lint
+```
+
+Auto-fix linting issues:
+
+```bash
+npm run lint:fix
+```
+
+### Testing
 
 Run the test suite:
 
@@ -89,6 +105,7 @@ BackersLittleHelper2/
 ├── src/                        # Vue.js frontend source
 │   ├── components/             # Vue components
 │   │   ├── __tests__/         # Component tests
+│   │   │   ├── Home.test.js
 │   │   │   ├── Settings.test.js
 │   │   │   └── Tools.test.js
 │   │   ├── Home.vue           # Home dashboard with Comm-Links and server status
@@ -97,7 +114,7 @@ BackersLittleHelper2/
 │   ├── App.vue                # Main app component
 │   ├── main.js                # Vue app entry point
 │   ├── i18n.js                # Internationalization configuration
-│   └── style.css              # Global styles
+│   └── style.css              # Global styles with dynamic font sizing
 ├── src-tauri/                 # Tauri backend
 │   ├── src/                   # Rust source code
 │   ├── icons/                 # Application icons
@@ -115,6 +132,7 @@ BackersLittleHelper2/
 - **Frontend**: Vue 3, Vite, vue-i18n
 - **Backend**: Tauri 2, Rust
 - **UI Framework**: Tailwind CSS, DaisyUI (Synthwave theme)
+- **Code Quality**: ESLint, eslint-plugin-vue
 - **Testing**: Vitest, Vue Test Utils
 - **APIs**: Star Citizen Wiki API, RSI Status Feed (XML)
 - **Tauri Plugins**:
