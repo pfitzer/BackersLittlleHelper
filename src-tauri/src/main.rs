@@ -42,6 +42,16 @@ fn show_error_dialog(app: &tauri::AppHandle, message: &str) {
     .show(|_| {});
 }
 
+/// Opens the GitHub repository in the default web browser.
+///
+/// # Arguments
+/// * `app` - The Tauri application handle
+fn open_github_repository(app: &tauri::AppHandle) {
+    use tauri_plugin_shell::ShellExt;
+    let shell = app.shell();
+    let _ = shell.open("https://github.com/pfitzer/BackersLittlleHelper", None);
+}
+
 /// Launches the Star Citizen game launcher.
 ///
 /// Reads the installation directory from the application settings file and
@@ -132,13 +142,10 @@ fn main() {
                 app,
                 "Help",
                 true,
-                &[&MenuItem::with_id(
-                    app,
-                    "about",
-                    "About",
-                    true,
-                    None::<&str>,
-                )?],
+                &[
+                    &MenuItem::with_id(app, "github", "GitHub Repository", true, None::<&str>)?,
+                    &MenuItem::with_id(app, "about", "About", true, None::<&str>)?,
+                ],
             )?;
 
             menu.append(&file_menu)?;
@@ -152,6 +159,7 @@ fn main() {
         .on_menu_event(|app, event| {
             match event.id().as_ref() {
                 "about" => show_about_dialog(app),
+                "github" => open_github_repository(app),
                 "launch_sc" => launch_star_citizen(app),
                 _ => {}
             }
