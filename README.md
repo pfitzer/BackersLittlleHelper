@@ -27,7 +27,7 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Node.js](https://nodejs.org/) (v20.19+ or v22.12+)
 - [Rust](https://www.rust-lang.org/) (v1.90.0 or higher)
 - npm or yarn package manager
 
