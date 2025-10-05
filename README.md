@@ -10,6 +10,15 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
   - Latest Comm-Links from Star Citizen Wiki API
   - Live RSI Server Status from official status feed
   - Beautiful gradient UI with space-themed background
+- **Vehicle Database**:
+  - Search Star Citizen vehicles with live API integration
+  - View detailed vehicle specifications (manufacturer, type, size, crew, dimensions, mass)
+  - Browse available shops and pricing information
+  - Multilingual support (English/German)
+- **Application Menu**:
+  - Quick launch Star Citizen from configured installation directory
+  - GitHub repository access
+  - About dialog with copyright information
 - **Multi-language Support**: Automatically detects OS language (English and German supported)
 - **Settings Management**:
   - Installation Directory configuration
@@ -98,6 +107,7 @@ npm run tauri build
 
 The built application will be available in `src-tauri/target/release`.
 
+
 ## Project Structure
 
 ```
@@ -107,16 +117,19 @@ BackersLittleHelper/
 │   │   ├── __tests__/         # Component tests
 │   │   │   ├── Home.test.js
 │   │   │   ├── Settings.test.js
-│   │   │   └── Tools.test.js
+│   │   │   ├── Tools.test.js
+│   │   │   └── Vehicles.test.js
 │   │   ├── Home.vue           # Home dashboard with Comm-Links and server status
 │   │   ├── Settings.vue       # Settings page component
 │   │   ├── Tools.vue          # Tools & directory management component
+│   │   └── Vehicles.vue       # Vehicle search and details component
 │   ├── App.vue                # Main app component
 │   ├── main.js                # Vue app entry point
 │   ├── i18n.js                # Internationalization configuration
 │   └── style.css              # Global styles with dynamic font sizing
 ├── src-tauri/                 # Tauri backend
 │   ├── src/                   # Rust source code
+│   │   └── main.rs            # Main Rust backend with menu system
 │   ├── icons/                 # Application icons
 │   ├── capabilities/          # Tauri security capabilities
 │   ├── Cargo.toml             # Rust dependencies
@@ -139,7 +152,8 @@ BackersLittleHelper/
   - FS (File System operations)
   - Dialog (File/folder selection)
   - HTTP (CORS-free API requests)
-  - Shell (External links)
+  - Opener (External links and URLs)
+  - Shell (Process execution)
 
 ## Configuration
 
