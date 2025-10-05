@@ -124,7 +124,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { open } from '@tauri-apps/plugin-dialog'
 import { BaseDirectory, writeTextFile, readTextFile, exists, mkdir } from '@tauri-apps/plugin-fs'
-import { homeDir, appDataDir } from '@tauri-apps/api/path'
+import { homeDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
@@ -168,6 +168,7 @@ async function loadSettings() {
       console.log('Settings contents:', contents)
       const loadedSettings = JSON.parse(contents)
       // Filter out any old fields that no longer exist
+      // eslint-disable-next-line no-unused-vars
       const { appName, ...validSettings } = loadedSettings
       settings.value = { ...defaultSettings, ...validSettings }
       console.log('Settings loaded:', settings.value)

@@ -99,7 +99,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from "vue-i18n"
-import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, create, stat } from '@tauri-apps/plugin-fs'
+import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, stat } from '@tauri-apps/plugin-fs'
 import { homeDir, dirname, localDataDir } from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
