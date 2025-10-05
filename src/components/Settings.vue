@@ -156,24 +156,17 @@ onMounted(async () => {
 
 async function loadSettings() {
   try {
-    console.log('Loading settings from:', SETTINGS_FILE)
-
     // Get default home directory first
     const defaultBackupDir = await homeDir()
 
     const fileExists = await exists(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
-    console.log('Settings file exists:', fileExists)
     if (fileExists) {
       const contents = await readTextFile(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
-      console.log('Settings contents:', contents)
       const loadedSettings = JSON.parse(contents)
       // Filter out any old fields that no longer exist
       // eslint-disable-next-line no-unused-vars
       const { appName, ...validSettings } = loadedSettings
       settings.value = { ...defaultSettings, ...validSettings }
-      console.log('Settings loaded:', settings.value)
-    } else {
-      console.log('No settings file found, using defaults')
     }
 
     // Always show default backup directory if not set
@@ -190,9 +183,8 @@ async function saveSettings() {
     // Ensure the directory exists
     try {
       await mkdir('', { baseDir: BaseDirectory.AppData, recursive: true })
-    } catch (mkdirError) {
+    } catch {
       // Directory might already exist, ignore error
-      console.log('Directory creation skipped:', mkdirError)
     }
 
     await writeTextFile(SETTINGS_FILE, JSON.stringify(settings.value, null, 2), {
@@ -226,10 +218,7 @@ function changeTheme() {
 }
 
 async function selectDirectory(field) {
-  console.log('selectDirectory called for:', field)
   try {
-    console.log('Opening dialog...')
-
     // Set default directory - use backup directory for installation directory, home for backup directory
     let defaultPath
     if (field === 'installationDirectory') {
@@ -245,7 +234,6 @@ async function selectDirectory(field) {
       title: `Select ${field.replace(/([A-Z])/g, ' $1').trim()}`
     })
 
-    console.log('Selected:', selected)
     if (selected) {
       settings.value[field] = selected
       saveSettings()

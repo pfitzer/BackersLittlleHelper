@@ -157,8 +157,7 @@ async function fetchCommLinks() {
     } else {
       throw new Error('Invalid response format')
     }
-  } catch (err) {
-    console.error('Error fetching comm-links:', err)
+  } catch {
     error.value = $t('home.errorLoadingNews')
   } finally {
     loading.value = false
@@ -193,8 +192,7 @@ async function fetchServerStatus() {
     } else {
       throw new Error('No status items found')
     }
-  } catch (err) {
-    console.error('Error fetching server status:', err)
+  } catch {
     statusError.value = $t('home.errorLoadingStatus')
   } finally {
     statusLoading.value = false

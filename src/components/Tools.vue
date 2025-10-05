@@ -147,8 +147,8 @@ async function loadSettings() {
     if (!settings.value.backupDirectory) {
       settings.value.backupDirectory = defaultBackupDir
     }
-  } catch (error) {
-    console.error('Error loading settings:', error)
+  } catch {
+    // Settings file doesn't exist or is invalid, use defaults
   }
 }
 
@@ -214,8 +214,7 @@ async function backupDirectory(type) {
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
   } catch (error) {
-    console.error('Backup error:', error)
-    statusMessage.value = $t('tools.backupError') + ': ' + error.message
+    statusMessage.value = $t('tools.backupError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   }
@@ -264,8 +263,7 @@ async function restoreDirectory(type) {
       setTimeout(() => { statusMessage.value = '' }, 3000)
     }
   } catch (error) {
-    console.error('Restore error:', error)
-    statusMessage.value = $t('tools.restoreError') + ': ' + error.message
+    statusMessage.value = $t('tools.restoreError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   }
@@ -289,13 +287,13 @@ async function calculateDirectorySize(path) {
         try {
           const fileStat = await stat(entryPath)
           totalSize += fileStat.size
-        } catch (e) {
-          console.error('Error getting file size:', e)
+        } catch {
+          // Skip files we can't stat
         }
       }
     }
-  } catch (error) {
-    console.error('Error calculating directory size:', error)
+  } catch {
+    // Error calculating size, return 0
   }
 
   return totalSize
@@ -313,8 +311,7 @@ async function calculateLogSize() {
   try {
     const sizeInBytes = await calculateDirectorySize(settings.value.logDirectory)
     logSize.value = formatBytes(sizeInBytes)
-  } catch (error) {
-    console.error('Error calculating log size:', error)
+  } catch {
     logSize.value = ''
   }
 }
@@ -350,8 +347,7 @@ async function deleteDirectory(type) {
       await calculateLogSize()
     }
   } catch (error) {
-    console.error('Delete error:', error)
-    statusMessage.value = $t('tools.deleteError') + ': ' + error.message
+    statusMessage.value = $t('tools.deleteError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   }
