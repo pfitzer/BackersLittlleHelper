@@ -61,7 +61,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 2. Clone your fork:
    ```bash
    git clone git@github.com:your-username/BackersLittlleHelper.git
-   cd BackersLittleHelper2
+   cd BackersLittleHelper
    ```
 
 3. Install dependencies:

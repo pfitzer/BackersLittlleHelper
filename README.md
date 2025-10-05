@@ -36,7 +36,7 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 1. Clone the repository:
 ```bash
 git clone git@github.com:pfitzer/BackersLittlleHelper.git
-cd BackersLittleHelper2
+cd BackersLittleHelper
 ```
 
 2. Install dependencies:
@@ -101,7 +101,7 @@ The built application will be available in `src-tauri/target/release`.
 ## Project Structure
 
 ```
-BackersLittleHelper2/
+BackersLittleHelper/
 ├── src/                        # Vue.js frontend source
 │   ├── components/             # Vue components
 │   │   ├── __tests__/         # Component tests
@@ -144,9 +144,9 @@ BackersLittleHelper2/
 ## Configuration
 
 Settings are stored in the application data directory:
-- **Windows**: `%APPDATA%\com.backerslittlehelper2.app\settings.json`
-- **macOS**: `~/Library/Application Support/com.backerslittlehelper2.app/settings.json`
-- **Linux**: `~/.config/com.backerslittlehelper2.app/settings.json`
+- **Windows**: `%APPDATA%\com.backerslittlehelper.app\settings.json`
+- **macOS**: `~/Library/Application Support/com.backerslittlehelper.app/settings.json`
+- **Linux**: `~/.config/com.backerslittlehelper.app/settings.json`
 
 ## License
 
