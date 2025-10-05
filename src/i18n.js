@@ -69,6 +69,7 @@ const messages = {
     vehicles: {
       title: 'Vehicles',
       search: 'Search vehicles...',
+      searchHint: 'Enter at least 3 characters to search for a vehicle',
       startSearching: 'Start typing to search for vehicles',
       noResults: 'No vehicles found',
       manufacturer: 'Manufacturer',
@@ -162,6 +163,7 @@ const messages = {
     vehicles: {
       title: 'Fahrzeuge',
       search: 'Fahrzeuge suchen...',
+      searchHint: 'Geben Sie mindestens 3 Zeichen ein, um nach einem Fahrzeug zu suchen',
       startSearching: 'Beginnen Sie mit der Eingabe, um Fahrzeuge zu suchen',
       noResults: 'Keine Fahrzeuge gefunden',
       manufacturer: 'Hersteller',

@@ -7,6 +7,9 @@
     <!-- Search Field -->
     <div class="mb-6 relative">
       <div class="form-control">
+        <label class="label">
+          <span class="label-text">{{ $t('vehicles.searchHint') }}</span>
+        </label>
         <div class="input-group">
           <input
             v-model="searchQuery"
