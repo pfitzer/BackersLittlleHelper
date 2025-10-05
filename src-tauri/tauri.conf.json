@@ -1,13 +1,13 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0",
   "productName": "BackersLittleHelper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.backerslittlehelper.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:5175",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "dist"
+    "frontendDist": "../dist"
   },
   "plugins": {},
   "app": {
