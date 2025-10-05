@@ -47,9 +47,8 @@ fn show_error_dialog(app: &tauri::AppHandle, message: &str) {
 /// # Arguments
 /// * `app` - The Tauri application handle
 fn open_github_repository(app: &tauri::AppHandle) {
-    use tauri_plugin_shell::ShellExt;
-    let shell = app.shell();
-    let _ = shell.open("https://github.com/pfitzer/BackersLittlleHelper", None);
+    use tauri_plugin_opener::OpenerExt;
+    let _ = app.opener().open_url("https://github.com/pfitzer/BackersLittlleHelper", None::<&str>);
 }
 
 /// Launches the Star Citizen game launcher.
@@ -114,6 +113,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let menu = Menu::new(app)?;
 

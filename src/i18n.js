@@ -5,6 +5,7 @@ const messages = {
     app: {
       title: 'Backers Little Helper',
       home: 'Home',
+      vehicles: 'Vehicles',
       settings: 'Settings',
       tools: 'Tools'
     },
@@ -64,12 +65,40 @@ const messages = {
       deleteSuccess: 'Directory deleted successfully!',
       deleteError: 'Error deleting directory',
       confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!'
+    },
+    vehicles: {
+      title: 'Vehicles',
+      search: 'Search vehicles...',
+      startSearching: 'Start typing to search for vehicles',
+      noResults: 'No vehicles found',
+      manufacturer: 'Manufacturer',
+      type: 'Type',
+      size: 'Size',
+      crew: 'Crew',
+      length: 'Length',
+      beam: 'Beam',
+      height: 'Height',
+      mass: 'Mass',
+      components: 'Components',
+      componentType: 'Type',
+      componentName: 'Name',
+      componentSize: 'Size',
+      componentManufacturer: 'Manufacturer',
+      hardpoints: 'Hardpoints',
+      hardpointName: 'Name',
+      hardpointType: 'Type',
+      hardpointSize: 'Size',
+      shops: 'Available at Shops',
+      price: 'Price',
+      viewDetails: 'View Details',
+      errorLoading: 'Failed to load vehicles. Please try again later.'
     }
   },
   de: {
     app: {
       title: 'Backers Little Helper',
       home: 'Startseite',
+      vehicles: 'Fahrzeuge',
       settings: 'Einstellungen',
       tools: 'Werkzeuge'
     },
@@ -129,6 +158,33 @@ const messages = {
       deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
       deleteError: 'Fehler beim Löschen des Verzeichnisses',
       confirmDelete: 'Sind Sie sicher, dass Sie dieses Verzeichnis löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!'
+    },
+    vehicles: {
+      title: 'Fahrzeuge',
+      search: 'Fahrzeuge suchen...',
+      startSearching: 'Beginnen Sie mit der Eingabe, um Fahrzeuge zu suchen',
+      noResults: 'Keine Fahrzeuge gefunden',
+      manufacturer: 'Hersteller',
+      type: 'Typ',
+      size: 'Größe',
+      crew: 'Besatzung',
+      length: 'Länge',
+      beam: 'Breite',
+      height: 'Höhe',
+      mass: 'Masse',
+      components: 'Komponenten',
+      componentType: 'Typ',
+      componentName: 'Name',
+      componentSize: 'Größe',
+      componentManufacturer: 'Hersteller',
+      hardpoints: 'Hardpoints',
+      hardpointName: 'Name',
+      hardpointType: 'Typ',
+      hardpointSize: 'Größe',
+      shops: 'Verfügbar in Geschäften',
+      price: 'Preis',
+      viewDetails: 'Details anzeigen',
+      errorLoading: 'Fahrzeuge konnten nicht geladen werden. Bitte versuchen Sie es später erneut.'
     }
   }
 }
