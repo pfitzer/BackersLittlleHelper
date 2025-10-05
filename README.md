@@ -107,6 +107,29 @@ npm run tauri build
 
 The built application will be available in `src-tauri/target/release`.
 
+### Running Unsigned Applications on Windows
+
+If you're distributing unsigned builds, users will see Windows SmartScreen warnings. Here's how to bypass them:
+
+**When downloading:**
+1. Download the installer/executable
+2. If browser warns about the file, click "Keep" or "Keep anyway"
+
+**When running the installer/app:**
+1. Double-click the executable
+2. Windows SmartScreen will show "Windows protected your PC"
+3. Click **"More info"** link
+4. Click **"Run anyway"** button
+
+**Alternative method (for .exe files):**
+1. Right-click the executable
+2. Select **Properties**
+3. Check **"Unblock"** checkbox at the bottom
+4. Click **Apply** → **OK**
+5. Run the application normally
+
+**Note:** These warnings appear because the application isn't code-signed.
+
 
 ## Project Structure
 
