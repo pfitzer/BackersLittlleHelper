@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+    font-size: 70%;
+}
+
 #background {
     position: fixed;
     height: 100vh;
@@ -11,4 +15,15 @@
     background-repeat: no-repeat;
     background-position: 50% 75%;
     opacity: 0.1;
+    z-index: -1;
+}
+
+#background2 {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    background-size: 150%;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(90deg,rgba(2, 0, 36, 1) 5%, rgba(45, 12, 232, 1) 77%, rgba(218, 220, 227, 1) 100%);
+    z-index: -1;
 }

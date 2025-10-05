@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen">
+  <div class="h-screen flex flex-col overflow-hidden">
 
     <!-- Navigation -->
-    <div class="navbar bg-base-300/50 backdrop-blur-md border-b border-primary/30">
+    <div class="navbar bg-base-300/50 backdrop-blur-md border-b border-primary/30 flex-shrink-0">
       <div class="flex-1">
         <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {{ $t('app.title') }}
@@ -31,26 +31,19 @@
     </div>
 
     <!-- Content -->
-    <div class="container mx-auto px-1 py-1">
-      <div v-if="currentView === 'home'" class="hero min-h-[80vh]">
-        <div class="hero-content text-center">
-          <div class="max-w-md">
-            <h2 class="text-5xl font-bold mb-4 bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-              {{ $t('home.welcome') }}
-            </h2>
-            <p class="text-lg mb-6 text-base-content/80">{{ $t('home.description') }}</p>
-          </div>
-        </div>
+    <div class="flex-1 overflow-y-auto">
+      <div class="container mx-auto px-1 py-1">
+        <Home v-if="currentView === 'home'" />
+        <Settings v-if="currentView === 'settings'" />
+        <Tools v-if="currentView === 'tools'" />
       </div>
-
-      <Settings v-if="currentView === 'settings'" />
-      <Tools v-if="currentView === 'tools'" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import Home from './components/Home.vue'
 import Settings from './components/Settings.vue'
 import Tools from './components/Tools.vue'
 

@@ -9,9 +9,18 @@ const messages = {
       tools: 'Tools'
     },
     home: {
-      welcome: 'Welcome to Tauri + Vue!',
-      description: 'Click the button below to invoke a Tauri command',
-      greet: 'Greet'
+      welcome: 'Welcome to Backers Little Helper!',
+      description: 'Your Star Citizen companion tool',
+      serverStatus: 'Server Status',
+      latestNews: 'Latest News',
+      readMore: 'Read More',
+      viewDetails: 'View Details',
+      errorLoadingNews: 'Failed to load news. Please try again later.',
+      errorLoadingStatus: 'Failed to load server status.',
+      statusOperational: 'Operational',
+      statusDegraded: 'Degraded',
+      statusDown: 'Down',
+      statusUnknown: 'Unknown'
     },
     settings: {
       title: 'Settings',
@@ -65,9 +74,18 @@ const messages = {
       tools: 'Werkzeuge'
     },
     home: {
-      welcome: 'Willkommen zu Backers Little Helper',
-      description: 'Ein paar einfache Tools um die das Verwalten von Star Citizen zu vereinfachen',
-      greet: 'Grüßen'
+      welcome: 'Willkommen bei Backers Little Helper!',
+      description: 'Dein Star Citizen Begleiter-Tool',
+      serverStatus: 'Serverstatus',
+      latestNews: 'Neueste Nachrichten',
+      readMore: 'Weiterlesen',
+      viewDetails: 'Details anzeigen',
+      errorLoadingNews: 'Nachrichten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.',
+      errorLoadingStatus: 'Serverstatus konnte nicht geladen werden.',
+      statusOperational: 'Betriebsbereit',
+      statusDegraded: 'Eingeschränkt',
+      statusDown: 'Ausgefallen',
+      statusUnknown: 'Unbekannt'
     },
     settings: {
       title: 'Einstellungen',
