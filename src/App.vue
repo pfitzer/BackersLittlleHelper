@@ -22,6 +22,12 @@
           {{ $t('app.vehicles') }}
         </button>
         <button
+            @click="currentView = 'commlink'"
+            :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'commlink' ? 'rsi-nav-active' : 'rsi-nav-btn']"
+        >
+          {{ $t('app.commlink') }}
+        </button>
+        <button
           @click="currentView = 'settings'"
           :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'settings' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
@@ -41,6 +47,7 @@
       <div class="container mx-auto px-1 py-1">
         <Home v-if="currentView === 'home'" />
         <Vehicles v-if="currentView === 'vehicles'" />
+        <Commlink v-if="currentView === 'commlink'" />
         <Settings v-if="currentView === 'settings'" />
         <Tools v-if="currentView === 'tools'" />
       </div>
@@ -54,6 +61,7 @@ import Home from './components/Home.vue'
 import Settings from './components/Settings.vue'
 import Tools from './components/Tools.vue'
 import Vehicles from './components/Vehicles.vue'
+import Commlink from "./components/Commlink.vue";
 
 const currentView = ref('home')
 

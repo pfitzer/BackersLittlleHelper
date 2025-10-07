@@ -276,8 +276,6 @@ async function searchVehiclesList(query) {
 
     // Search for vehicles matching the query using POST
     const url = `https://api.star-citizen.wiki/api/v2/vehicles/search?locale=${apiLocale}`
-    console.log('Search vehicles list URL:', url)
-    console.log('Search query payload:', { query })
 
     const response = await fetch(url, {
       method: 'POST',

@@ -6,8 +6,17 @@ const messages = {
       title: 'Backers Little Helper',
       home: 'Home',
       vehicles: 'Vehicles',
+      commlink: 'Comm-Link',
       settings: 'Settings',
       tools: 'Tools'
+    },
+    common: {
+      loading: 'Loading...',
+      readMore: 'Read More',
+      showLess: 'Show Less'
+    },
+    commlink: {
+      title: 'Comm-Link News'
     },
     home: {
       welcome: 'A Backers Work Is Never Done!',
@@ -100,8 +109,17 @@ const messages = {
       title: 'Backers Little Helper',
       home: 'Startseite',
       vehicles: 'Fahrzeuge',
+      commlink: 'Comm-Link',
       settings: 'Einstellungen',
       tools: 'Werkzeuge'
+    },
+    common: {
+      loading: 'Lädt...',
+      readMore: 'Weiterlesen',
+      showLess: 'Weniger anzeigen'
+    },
+    commlink: {
+      title: 'Comm-Link Nachrichten'
     },
     home: {
       welcome: 'A Backers Work Is Never Done!',
