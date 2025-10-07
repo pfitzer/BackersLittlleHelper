@@ -30,3 +30,6 @@ jobs:
 
       - name: Run tests
         run: npm test -- --run
+
+      - name: Perform Scan
+        uses: ShiftLeftSecurity/scan-action@master
