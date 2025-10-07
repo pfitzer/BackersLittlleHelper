@@ -64,6 +64,12 @@
       "allow": [
         { "path": "$APPDATA/**" }
       ]
+    },
+    {
+      "identifier": "fs:allow-stat",
+      "allow": [
+        { "path": "**" }
+      ]
     }
   ]
 }

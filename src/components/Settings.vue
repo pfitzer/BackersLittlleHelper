@@ -47,55 +47,6 @@
       </div>
     </div>
 
-    <!-- Appearance Section -->
-    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('settings.appearance') }}</h3>
-
-        <div class="form-control">
-          <label class="label" for="theme">
-            <span class="label-text">{{ $t('settings.theme') }}</span>
-          </label>
-          <select id="theme" v-model="settings.theme" @change="changeTheme" class="select select-bordered bg-base-100/50">
-            <option value="light">{{ $t('settings.themeLight') }}</option>
-            <option value="dark">{{ $t('settings.themeDark') }}</option>
-            <option value="night">{{ $t('settings.themeNight') }}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Advanced Section -->
-    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('settings.advanced') }}</h3>
-
-        <div class="form-control">
-          <label class="label cursor-pointer justify-start gap-4">
-            <input
-              type="checkbox"
-              v-model="settings.enableNotifications"
-              @change="saveSettings"
-              class="checkbox checkbox-primary"
-            />
-            <span class="label-text">{{ $t('settings.enableNotifications') }}</span>
-          </label>
-        </div>
-
-        <div class="form-control">
-          <label class="label cursor-pointer justify-start gap-4">
-            <input
-              type="checkbox"
-              v-model="settings.autoStart"
-              @change="saveSettings"
-              class="checkbox checkbox-primary"
-            />
-            <span class="label-text">{{ $t('settings.autoStart') }}</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
     <!-- Action Buttons -->
     <div class="flex gap-4 justify-end">
       <button @click="resetSettings" class="btn btn-ghost">
@@ -130,28 +81,20 @@ const { t: $t } = useI18n()
 
 const settings = ref({
   installationDirectory: '',
-  backupDirectory: '',
-  theme: 'dark',
-  enableNotifications: true,
-  autoStart: false
+  backupDirectory: ''
 })
 
 const saveMessage = ref('')
 
 const defaultSettings = {
   installationDirectory: '',
-  backupDirectory: '',
-  theme: 'dark',
-  enableNotifications: true,
-  autoStart: false
+  backupDirectory: ''
 }
 
 const SETTINGS_FILE = 'settings.json'
 
 onMounted(async () => {
   await loadSettings()
-  // Apply theme from settings
-  applyTheme(settings.value.theme)
 })
 
 async function loadSettings() {
@@ -165,7 +108,7 @@ async function loadSettings() {
       const loadedSettings = JSON.parse(contents)
       // Filter out any old fields that no longer exist
       // eslint-disable-next-line no-unused-vars
-      const { appName, ...validSettings } = loadedSettings
+      const { appName, theme, enableNotifications, autoStart, ...validSettings } = loadedSettings
       settings.value = { ...defaultSettings, ...validSettings }
     }
 
@@ -205,15 +148,6 @@ async function saveSettings() {
 
 function resetSettings() {
   settings.value = { ...defaultSettings }
-  saveSettings()
-}
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme)
-}
-
-function changeTheme() {
-  applyTheme(settings.value.theme)
   saveSettings()
 }
 
