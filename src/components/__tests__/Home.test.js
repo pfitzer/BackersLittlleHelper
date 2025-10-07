@@ -8,8 +8,35 @@ vi.mock('@tauri-apps/plugin-http', () => ({
   fetch: vi.fn(() => Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ data: [] }),
-    text: () => Promise.resolve('<rss></rss>')
+    text: () => Promise.resolve(JSON.stringify({
+      items: [
+        {
+          id: '1',
+          title: 'Test News 1',
+          summary: 'Test summary 1',
+          date_published: '2025-01-01',
+          content_html: '<p>Test content 1</p>'
+        },
+        {
+          id: '2',
+          title: 'Test News 2',
+          summary: 'Test summary 2',
+          date_published: '2025-01-02',
+          content_html: '<p>Test content 2</p>'
+        }
+      ]
+    }))
   }))
+}))
+
+// Mock the useCommLinks composable
+vi.mock('../../composables/useCommLinks', () => ({
+  useCommLinks: () => ({
+    commLinks: { value: [] },
+    loading: { value: false },
+    error: { value: null },
+    fetchCommLinks: vi.fn()
+  })
 }))
 
 const i18n = createI18n({
