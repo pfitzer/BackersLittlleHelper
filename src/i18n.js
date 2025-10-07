@@ -10,7 +10,7 @@ const messages = {
       tools: 'Tools'
     },
     home: {
-      welcome: 'Welcome to Backers Little Helper!',
+      welcome: 'A Backers Work Is Never Done!',
       description: 'Your Star Citizen companion tool',
       serverStatus: 'Server Status',
       latestNews: 'Latest News',
@@ -104,7 +104,7 @@ const messages = {
       tools: 'Werkzeuge'
     },
     home: {
-      welcome: 'Willkommen bei Backers Little Helper!',
+      welcome: 'A Backers Work Is Never Done!',
       description: 'Dein Star Citizen Begleiter-Tool',
       serverStatus: 'Serverstatus',
       latestNews: 'Neueste Nachrichten',
