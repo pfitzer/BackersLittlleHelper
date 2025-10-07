@@ -1,35 +1,35 @@
 <template>
-  <div class="h-screen flex flex-col overflow-hidden">
+  <div class="h-screen flex flex-col overflow-hidden relative">
 
     <!-- Navigation -->
-    <div class="navbar bg-base-300/50 backdrop-blur-md border-b border-primary/30 flex-shrink-0">
+    <div class="navbar backdrop-blur-md border-b border-blue-500/20 flex-shrink-0 rsi-border relative z-10" style="background: rgba(0, 11, 17, 0.85);">
       <div class="flex-1">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <h1 class="text-2xl font-bold tracking-wider uppercase rsi-glow" style="color: #3b82f6; letter-spacing: 0.1em;">
           {{ $t('app.title') }}
         </h1>
       </div>
-      <div class="flex-none gap-2">
+      <div class="flex-none gap-1">
         <button
           @click="currentView = 'home'"
-          :class="['btn btn-sm', currentView === 'home' ? 'btn-primary' : 'btn-ghost']"
+          :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'home' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
           {{ $t('app.home') }}
         </button>
         <button
           @click="currentView = 'vehicles'"
-          :class="['btn btn-sm', currentView === 'vehicles' ? 'btn-primary' : 'btn-ghost']"
+          :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'vehicles' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
           {{ $t('app.vehicles') }}
         </button>
         <button
           @click="currentView = 'settings'"
-          :class="['btn btn-sm', currentView === 'settings' ? 'btn-primary' : 'btn-ghost']"
+          :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'settings' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
           {{ $t('app.settings') }}
         </button>
         <button
             @click="currentView = 'tools'"
-            :class="['btn btn-sm', currentView === 'tools' ? 'btn-primary' : 'btn-ghost']"
+            :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'tools' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
           {{ $t('app.tools') }}
         </button>

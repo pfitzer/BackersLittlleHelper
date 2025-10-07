@@ -34,7 +34,8 @@
         <div
             v-for="commLink in commLinks"
             :key="commLink.id"
-            class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 hover:border-primary/50 transition-all"
+            class="card rsi-border rsi-corners backdrop-blur-md shadow-xl hover:shadow-2xl transition-all"
+            style="background: rgba(0, 11, 17, 0.85);"
         >
           <figure v-if="commLink.banner" class="relative h-48 overflow-hidden">
             <img
@@ -44,7 +45,7 @@
             />
           </figure>
           <div class="card-body">
-            <h4 class="card-title text-secondary">{{ commLink.title }}</h4>
+            <h4 class="card-title" style="color: #3b82f6;">{{ commLink.title }}</h4>
             <p class="text-sm opacity-70">{{ formatDate(commLink.created_at) }}</p>
             <p class="text-sm line-clamp-3" v-if="commLink.excerpt">{{ commLink.excerpt }}</p>
             <div class="card-actions justify-end mt-4">
@@ -52,7 +53,7 @@
                   :href="commLink.rsi_url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn btn-primary btn-sm"
+                  class="rsi-nav-btn font-mono uppercase tracking-wide"
               >
                 {{ $t('home.readMore') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -85,15 +86,15 @@
       </div>
 
       <!-- Status Card -->
-      <div v-else-if="serverStatus" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+      <div v-else-if="serverStatus" class="card rsi-border rsi-corners backdrop-blur-md shadow-xl overflow-hidden" style="background: rgba(0, 11, 17, 0.85);">
         <div class="card-body">
           <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h4 class="card-title text-secondary mb-2">{{ serverStatus.title }}</h4>
+            <div class="flex-1 overflow-hidden">
+              <h4 class="card-title mb-2" style="color: #3b82f6;">{{ serverStatus.title }}</h4>
               <p class="text-sm opacity-70 mb-2">{{ formatDate(serverStatus.pubDate) }}</p>
-              <div class="prose prose-sm max-w-none" v-html="serverStatus.description"></div>
+              <div class="prose prose-sm max-w-none overflow-x-hidden" v-html="serverStatus.description"></div>
             </div>
-            <div class="badge badge-lg" :class="getStatusBadgeClass(serverStatus.title)">
+            <div class="badge badge-lg flex-shrink-0 ml-4" :class="getStatusBadgeClass(serverStatus.title)">
               {{ getStatusText(serverStatus.title) }}
             </div>
           </div>
@@ -102,7 +103,7 @@
               :href="serverStatus.link"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn btn-sm btn-ghost"
+              class="rsi-nav-btn font-mono uppercase tracking-wide"
             >
               {{ $t('home.viewDetails') }}
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

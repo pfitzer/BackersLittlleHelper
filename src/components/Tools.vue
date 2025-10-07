@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { useI18n } from "vue-i18n"
 import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, stat } from '@tauri-apps/plugin-fs'
 import { homeDir, dirname, localDataDir } from '@tauri-apps/api/path'
@@ -121,6 +121,13 @@ onMounted(async () => {
   await loadSettings()
   // Calculate log size only if not in test environment
   if (import.meta.env.MODE !== 'test') {
+    await calculateLogSize()
+  }
+})
+
+// Recalculate log size every time the component is activated/shown
+onActivated(async () => {
+  if (import.meta.env.MODE !== 'test' && settings.value.logDirectory) {
     await calculateLogSize()
   }
 })
@@ -274,7 +281,10 @@ async function calculateDirectorySize(path) {
 
   try {
     const dirExists = await exists(path)
-    if (!dirExists) return 0
+
+    if (!dirExists) {
+      return 0
+    }
 
     const entries = await readDir(path)
 
@@ -282,18 +292,19 @@ async function calculateDirectorySize(path) {
       const entryPath = `${path}\\${entry.name}`
 
       if (entry.isDirectory) {
-        totalSize += await calculateDirectorySize(entryPath)
+        const dirSize = await calculateDirectorySize(entryPath)
+        totalSize += dirSize
       } else {
         try {
           const fileStat = await stat(entryPath)
           totalSize += fileStat.size
         } catch {
-          // Skip files we can't stat
+          // Silently skip files that can't be accessed
         }
       }
     }
   } catch {
-    // Error calculating size, return 0
+    // Silently handle errors
   }
 
   return totalSize
@@ -309,6 +320,11 @@ function formatBytes(bytes) {
 
 async function calculateLogSize() {
   try {
+    if (!settings.value.logDirectory) {
+      logSize.value = ''
+      return
+    }
+
     const sizeInBytes = await calculateDirectorySize(settings.value.logDirectory)
     logSize.value = formatBytes(sizeInBytes)
   } catch {

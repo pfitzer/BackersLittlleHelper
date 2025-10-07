@@ -5,8 +5,9 @@ export default defineConfig({
   plugins: [vue()],
   clearScreen: false,
   server: {
+    host: '0.0.0.0',
     port: 5175,
-    strictPort: true,
+    strictPort: false,
   },
   envPrefix: ['VITE_', 'TAURI_'],
   build: {

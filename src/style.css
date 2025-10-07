@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-    font-size: clamp(70%, 0.5vw + 0.5vh, 100%);
+    font-size: clamp(68%, 0.5vw + 0.5vh, 100%);
 }
 
 /* Fallback for different window sizes */
@@ -25,6 +25,26 @@ html {
     }
 }
 
+/* RSI-style dark background */
+body {
+    background: #000b11;
+}
+
+/* Noise texture overlay similar to RSI */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/png;base64,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');
+    background-size: 200px 200px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1;
+}
+
 #background {
     position: fixed;
     height: 100vh;
@@ -33,8 +53,8 @@ html {
     background-size: 50%;
     background-repeat: no-repeat;
     background-position: 50% 75%;
-    opacity: 0.1;
-    z-index: -1;
+    opacity: 0.08;
+    z-index: 0;
 }
 
 #background2 {
@@ -43,6 +63,205 @@ html {
     width: 100vw;
     background-size: 150%;
     background-repeat: no-repeat;
-    background-image: linear-gradient(90deg,rgba(2, 0, 36, 1) 5%, rgba(45, 12, 232, 1) 77%, rgba(218, 220, 227, 1) 100%);
-    z-index: -1;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(45, 12, 232, 0.15) 0%, rgba(2, 0, 36, 0.8) 50%, #000b11 100%);
+    z-index: 0;
+}
+
+/* RSI-style corner elements */
+.rsi-corners {
+    position: relative;
+    border-radius: 0 !important;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+/* Remove rounded corners from card children */
+.rsi-corners > figure,
+.rsi-corners > .card-body {
+    border-radius: 0 !important;
+}
+
+/* Top-left corner */
+.rsi-corners::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 0;
+    border-top: 2px solid rgba(59, 130, 246, 0.6);
+    border-left: 2px solid rgba(59, 130, 246, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Top-right corner */
+.rsi-corners::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    right: 0;
+    border-top: 2px solid rgba(59, 130, 246, 0.6);
+    border-right: 2px solid rgba(59, 130, 246, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Bottom corners using box-shadow layering */
+.rsi-corners {
+    box-shadow:
+        /* Main card shadow */
+        0 0 10px rgba(59, 130, 246, 0.1),
+        /* Bottom-left corner */
+        inset 12px -12px 0 -10px rgba(59, 130, 246, 0.6),
+        inset -12px 12px 0 -10px rgba(59, 130, 246, 0.6);
+}
+
+/* Create bottom corners with a nested element approach */
+.rsi-corners > *:last-child::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    bottom: 0;
+    left: 0;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+    border-left: 2px solid rgba(59, 130, 246, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.rsi-corners > *:last-child::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    bottom: 0;
+    right: 0;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+    border-right: 2px solid rgba(59, 130, 246, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.rsi-corners > *:last-child {
+    position: relative;
+}
+
+/* Additional RSI styling utilities */
+.rsi-border {
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+}
+
+.rsi-glow {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* RSI-style navigation buttons */
+.rsi-nav-btn {
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: rgba(59, 130, 246, 0.8);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.rsi-nav-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.6);
+    color: #3b82f6;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.rsi-nav-active {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.8);
+    color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.2);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* RSI-style badges - sharp corners like buttons */
+.badge {
+    border-radius: 0 !important;
+    border: 1px solid currentColor;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.6);
+    color: #10b981;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.6);
+    color: #f59e0b;
+}
+
+.badge-error {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #ef4444;
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.6);
+    color: #3b82f6;
+}
+
+/* Remove rounded corners from all buttons and form elements */
+.btn,
+button,
+input,
+textarea,
+select,
+.input,
+.select,
+.textarea {
+    border-radius: 0 !important;
+}
+
+/* Add glow to all buttons */
+.btn,
+button:not([type="checkbox"]):not([type="radio"]) {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn:hover,
+button:not([type="checkbox"]):not([type="radio"]):hover {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Style form inputs to match RSI aesthetic */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select,
+.input,
+.select,
+.textarea {
+    background: rgba(0, 11, 17, 0.5);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus,
+.input:focus,
+.select:focus,
+.textarea:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    outline: none;
 }

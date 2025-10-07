@@ -2,14 +2,32 @@
 
 [![Run Tests](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml/badge.svg)](https://github.com/pfitzer/BackersLittlleHelper/actions/workflows/test.yml)
 
-A desktop application built with Tauri 2 and Vue.js for managing Star Citizen game configurations and settings.
+A desktop application built with Tauri 2 and Vue.js for managing Star Citizen game configurations and settings, featuring a sleek RSI-inspired interface.
+
+## Screenshots
+
+### Home Dashboard
+![Home Dashboard](docs/start.png)
+*Latest Comm-Links from Star Citizen Wiki and live RSI server status*
+
+### Vehicle Database
+![Vehicle Database](docs/vehicles.png)
+*Search and view detailed specifications for Star Citizen vehicles*
+
+### Tools & Directory Management
+![Tools](docs/tools.png)
+*Manage game directories with backup, restore, and cleanup operations*
+
+### Settings
+![Settings](docs/settings.png)
+*Configure installation and backup directories*
 
 ## Features
 
 - **Home Dashboard**:
   - Latest Comm-Links from Star Citizen Wiki API
   - Live RSI Server Status from official status feed
-  - Beautiful gradient UI with space-themed background
+  - Beautiful RSI-inspired UI with space-themed background and glowing effects
 - **Vehicle Database**:
   - Search Star Citizen vehicles with live API integration
   - View detailed vehicle specifications (manufacturer, type, size, crew, dimensions, mass)
@@ -19,20 +37,22 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
   - Quick launch Star Citizen from configured installation directory
   - GitHub repository access
   - About dialog with copyright information
-- **Multi-language Support**: Automatically detects OS language (English and German supported)
 - **Settings Management**:
   - Installation Directory configuration
-  - Backup Directory configuration
-  - Theme selection (Light, Dark, Night)
-  - Notifications toggle
-  - Auto-start on system startup
+  - Backup Directory configuration with browse dialog
+  - Settings persistence across application restarts
 - **Tools & Directory Management**:
   - **Backup Directory**: Delete backup contents
   - **User Directory**: Backup, restore, and delete user data
   - **Shader Directory**: Delete shader cache
   - **Log Directory**: Delete logs with automatic size calculation and display
 - **Cross-platform**: Built with Tauri 2 for Windows, macOS, and Linux
-- **Modern UI**: Vue 3 with Composition API and DaisyUI Synthwave theme
+- **Multi-language Support**: Automatically detects OS language (English and German supported)
+- **Modern UI**:
+  - Vue 3 with Composition API
+  - Custom RSI-inspired theme with sharp corners and blue glowing accents
+  - Responsive design with dynamic font sizing
+  - Noise texture overlay and atmospheric gradients
 
 ## Prerequisites
 
@@ -167,9 +187,9 @@ BackersLittleHelper/
 
 - **Frontend**: Vue 3, Vite, vue-i18n
 - **Backend**: Tauri 2, Rust
-- **UI Framework**: Tailwind CSS, DaisyUI (Synthwave theme)
+- **UI Framework**: Tailwind CSS with custom RSI-inspired theme
 - **Code Quality**: ESLint, eslint-plugin-vue
-- **Testing**: Vitest, Vue Test Utils
+- **Testing**: Vitest, Vue Test Utils (40 tests with 100% pass rate)
 - **APIs**: Star Citizen Wiki API, RSI Status Feed (XML)
 - **Tauri Plugins**:
   - FS (File System operations)

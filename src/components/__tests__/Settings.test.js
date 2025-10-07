@@ -32,14 +32,6 @@ const i18n = createI18n({
         installationDir: 'Installation Directory',
         backupDir: 'Backup Directory',
         browse: 'Browse',
-        appearance: 'Appearance',
-        theme: 'Theme',
-        themeLight: 'Light',
-        themeDark: 'Dark',
-        themeNight: 'Night',
-        advanced: 'Advanced',
-        enableNotifications: 'Enable Notifications',
-        autoStart: 'Auto Start',
         resetDefaults: 'Reset to Defaults',
         saveSettings: 'Save Settings',
         savedSuccessfully: 'Settings saved successfully',
@@ -73,41 +65,14 @@ describe('Settings.vue', () => {
     expect(wrapper.find('#backup-dir').exists()).toBe(true)
   })
 
-  it('renders theme selector', () => {
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [i18n]
-      }
-    })
-    const themeSelect = wrapper.find('#theme')
-    expect(themeSelect.exists()).toBe(true)
-    const options = themeSelect.findAll('option')
-    expect(options).toHaveLength(3)
-    expect(options[0].text()).toBe('Light')
-    expect(options[1].text()).toBe('Dark')
-    expect(options[2].text()).toBe('Night')
-  })
-
-  it('renders notification and auto-start checkboxes', () => {
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [i18n]
-      }
-    })
-    const checkboxes = wrapper.findAll('input[type="checkbox"]')
-    expect(checkboxes).toHaveLength(2)
-  })
-
   it('loads settings on mount', async () => {
     const { exists, readTextFile } = await import('@tauri-apps/plugin-fs')
+    const { homeDir } = await import('@tauri-apps/api/path')
+    homeDir.mockResolvedValue('/home/user')
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
       installationDirectory: '/test/install',
-      userDirectory: '/test/user',
-      shaderDirectory: '/test/shader',
-      theme: 'light',
-      enableNotifications: false,
-      autoStart: true
+      backupDirectory: '/test/backup'
     }))
 
     const wrapper = mount(Settings, {
@@ -120,7 +85,7 @@ describe('Settings.vue', () => {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     expect(wrapper.vm.settings.installationDirectory).toBe('/test/install')
-    expect(wrapper.vm.settings.theme).toBe('light')
+    expect(wrapper.vm.settings.backupDirectory).toBe('/test/backup')
   })
 
   it('saves settings when save button is clicked', async () => {
@@ -144,23 +109,29 @@ describe('Settings.vue', () => {
   })
 
   it('resets settings to defaults', async () => {
+    const { writeTextFile, mkdir } = await import('@tauri-apps/plugin-fs')
+    mkdir.mockResolvedValue()
+    writeTextFile.mockResolvedValue()
+
     const wrapper = mount(Settings, {
       global: {
         plugins: [i18n]
       }
     })
 
-    wrapper.vm.settings.theme = 'light'
     wrapper.vm.settings.installationDirectory = '/custom/path'
+    wrapper.vm.settings.backupDirectory = '/custom/backup'
 
     await wrapper.vm.resetSettings()
 
-    expect(wrapper.vm.settings.theme).toBe('dark')
     expect(wrapper.vm.settings.installationDirectory).toBe('')
+    expect(wrapper.vm.settings.backupDirectory).toBe('')
   })
 
   it('opens directory picker when browse button is clicked', async () => {
     const { open } = await import('@tauri-apps/plugin-dialog')
+    const { homeDir } = await import('@tauri-apps/api/path')
+    homeDir.mockResolvedValue('/home/user')
     open.mockResolvedValue('/selected/path')
 
     const wrapper = mount(Settings, {
@@ -176,6 +147,7 @@ describe('Settings.vue', () => {
     expect(open).toHaveBeenCalledWith({
       directory: true,
       multiple: false,
+      defaultPath: expect.any(String),
       title: expect.stringContaining('installation')
     })
   })
@@ -196,45 +168,5 @@ describe('Settings.vue', () => {
 
     expect(wrapper.vm.saveMessage).toBe('Settings saved successfully')
     expect(wrapper.find('.alert-success').exists()).toBe(true)
-  })
-
-  it('updates theme when theme select changes', async () => {
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [i18n]
-      }
-    })
-
-    const themeSelect = wrapper.find('#theme')
-    await themeSelect.setValue('light')
-
-    expect(wrapper.vm.settings.theme).toBe('light')
-  })
-
-  it('updates checkbox values when toggled', async () => {
-    const { exists } = await import('@tauri-apps/plugin-fs')
-    exists.mockResolvedValue(false)
-
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [i18n]
-      }
-    })
-
-    // Wait for loadSettings to complete
-    await wrapper.vm.$nextTick()
-    await new Promise(resolve => setTimeout(resolve, 50))
-
-    const checkboxes = wrapper.findAll('input[type="checkbox"]')
-    const notificationCheckbox = checkboxes[0]
-    const autoStartCheckbox = checkboxes[1]
-
-    expect(wrapper.vm.settings.enableNotifications).toBe(true)
-    await notificationCheckbox.setValue(false)
-    expect(wrapper.vm.settings.enableNotifications).toBe(false)
-
-    expect(wrapper.vm.settings.autoStart).toBe(false)
-    await autoStartCheckbox.setValue(true)
-    expect(wrapper.vm.settings.autoStart).toBe(true)
   })
 })
