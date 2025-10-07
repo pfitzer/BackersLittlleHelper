@@ -5,7 +5,7 @@
   "identifier": "com.backerslittlehelper.app",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:5175",
+    "devUrl": "http://localhost:8999",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },

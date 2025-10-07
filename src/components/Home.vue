@@ -32,36 +32,42 @@
       <!-- Comm-Links Grid -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-            v-for="commLink in commLinks"
-            :key="commLink.id"
+            v-for="item in commLinks"
+            :key="item.id"
             class="card rsi-border rsi-corners backdrop-blur-md shadow-xl hover:shadow-2xl transition-all"
             style="background: rgba(0, 11, 17, 0.85);"
         >
-          <figure v-if="commLink.banner" class="relative h-48 overflow-hidden">
-            <img
-                :src="commLink.banner"
-                :alt="commLink.title"
-                class="w-full h-full object-cover"
-            />
-          </figure>
           <div class="card-body">
-            <h4 class="card-title" style="color: #3b82f6;">{{ commLink.title }}</h4>
-            <p class="text-sm opacity-70">{{ formatDate(commLink.created_at) }}</p>
-            <p class="text-sm line-clamp-3" v-if="commLink.excerpt">{{ commLink.excerpt }}</p>
+            <h4 class="card-title mb-2" style="color: #3b82f6;">{{ item.title }}</h4>
+            <p class="text-sm opacity-70 mb-4">{{ formatDate(item.date_published) }}</p>
+
             <div class="card-actions justify-end mt-4">
-              <a
-                  :href="commLink.rsi_url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="rsi-nav-btn font-mono uppercase tracking-wide"
+              <button
+                @click="openModal(item)"
+                class="rsi-nav-btn font-mono uppercase tracking-wide"
               >
-                {{ $t('home.readMore') }}
+                {{ $t('common.readMore') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div v-if="selectedItem" class="modal modal-open" @click.self="closeModal">
+        <div class="modal-box max-w-4xl rsi-border rsi-corners backdrop-blur-md animate-modal-in" style="background: rgba(0, 11, 17, 0.95);">
+          <button
+            @click="closeModal"
+            class="btn btn-sm btn-circle absolute right-2 top-2 rsi-nav-btn"
+          >✕</button>
+
+          <h3 class="font-bold text-3xl mb-2" style="color: #3b82f6;">{{ selectedItem.title }}</h3>
+          <p class="text-sm opacity-70 mb-6">{{ formatDate(selectedItem.date_published) }}</p>
+
+          <div class="prose prose-invert max-w-none overflow-y-auto max-h-[60vh]" v-html="decodeHtml(selectedItem.content_html)"></div>
         </div>
       </div>
     </div>
@@ -122,12 +128,12 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetch } from '@tauri-apps/plugin-http'
+import { useCommLinks } from '../composables/useCommLinks'
 
 const { t: $t } = useI18n()
 
-const commLinks = ref([])
-const loading = ref(true)
-const error = ref(null)
+const { commLinks, loading, error, fetchCommLinks } = useCommLinks()
+const selectedItem = ref(null)
 
 const serverStatus = ref(null)
 const statusLoading = ref(true)
@@ -135,35 +141,10 @@ const statusError = ref(null)
 
 onMounted(async () => {
   await Promise.all([
-    fetchCommLinks(),
+    fetchCommLinks(2),
     fetchServerStatus()
   ])
 })
-
-async function fetchCommLinks() {
-  try {
-    loading.value = true
-    error.value = null
-
-    const response = await fetch('https://api.star-citizen.wiki/api/v2/comm-links?include=&limit=2')
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data && data.data) {
-      commLinks.value = data.data
-    } else {
-      throw new Error('Invalid response format')
-    }
-  } catch {
-    error.value = $t('home.errorLoadingNews')
-  } finally {
-    loading.value = false
-  }
-}
 
 async function fetchServerStatus() {
   try {
@@ -238,6 +219,20 @@ function getStatusText(title) {
   }
   return $t('home.statusUnknown')
 }
+
+function openModal(item) {
+  selectedItem.value = item
+}
+
+function closeModal() {
+  selectedItem.value = null
+}
+
+function decodeHtml(html) {
+  const txt = document.createElement('textarea')
+  txt.innerHTML = html
+  return txt.value
+}
 </script>
 
 <style scoped>
@@ -246,5 +241,57 @@ function getStatusText(title) {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.modal {
+  animation: modal-fade-in 1s ease-out;
+}
+
+.animate-modal-in {
+  animation: modal-slide-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modal-fade-in {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: scale(0.7) translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Glow effect on modal */
+.modal-box {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+/* Custom scrollbar for modal content */
+.modal-box .prose::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-box .prose::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.modal-box .prose::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+}
+
+.modal-box .prose::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
 }
 </style>

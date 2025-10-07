@@ -1,56 +1,12 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import {onMounted, ref} from "vue";
-import {fetch} from "@tauri-apps/plugin-http";
+import { onMounted, ref } from "vue"
+import { useCommLinks } from '../composables/useCommLinks'
 
 const { t: $t } = useI18n()
 
-const loading = ref(false)
-const error = ref(null)
-const commLinks = ref([])
+const { commLinks, loading, error, fetchCommLinks } = useCommLinks()
 const selectedItem = ref(null)
-
-async function fetchCommLinksJson() {
-  try {
-    loading.value = true
-    error.value = null
-
-    const url = "https://leonick.se/feeds/rsi/json"
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'BackersLittleHelper/1.0'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    // Read as text and manually parse to handle escape sequences
-    const text = await response.text()
-
-    // Fix the invalid escape sequences in the JSON
-    // The JSON contains \& which is not a valid JSON escape sequence
-    const cleanText = text.replace(/\\&/g, '&')
-
-    const data = JSON.parse(cleanText)
-
-    if (data && data.items) {
-      commLinks.value = data.items.slice(0, 10)
-      console.log('Loaded', commLinks.value.length, 'comm-link items')
-    } else {
-      throw new Error('Invalid response format')
-    }
-  } catch (e) {
-    console.error('Fetch error:', e)
-    error.value = $t('home.errorLoadingNews')
-  } finally {
-    loading.value = false
-  }
-}
 
 function openModal(item) {
   selectedItem.value = item
@@ -73,7 +29,7 @@ function decodeHtml(html) {
 
 onMounted(async () => {
   await Promise.all([
-    fetchCommLinksJson()
+    fetchCommLinks(10)
   ])
 })
 
@@ -147,11 +103,11 @@ onMounted(async () => {
 }
 
 .modal {
-  animation: modal-fade-in 0.3s ease-out;
+  animation: modal-fade-in 1s ease-out;
 }
 
 .animate-modal-in {
-  animation: modal-slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: modal-slide-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes modal-fade-in {
