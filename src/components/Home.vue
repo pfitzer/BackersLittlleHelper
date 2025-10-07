@@ -121,6 +121,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Setup Required Modal -->
+    <div v-if="showSetupModal" class="modal modal-open" @click.self="closeSetupModal">
+      <div class="modal-box rsi-border rsi-corners backdrop-blur-md animate-modal-in" style="background: rgba(0, 11, 17, 0.95);">
+        <button
+          @click="closeSetupModal"
+          class="btn btn-sm btn-circle absolute right-2 top-2 rsi-nav-btn"
+        >✕</button>
+
+        <h3 class="font-bold text-3xl mb-4" style="color: #3b82f6;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          {{ $t('home.setupRequired') }}
+        </h3>
+
+        <p class="text-lg mb-6">{{ $t('home.setupMessage') }}</p>
+
+        <div class="modal-action flex gap-3">
+          <button
+            @click="closeSetupModal"
+            class="btn btn-ghost font-mono uppercase tracking-wide"
+          >
+            {{ $t('home.remindLater') }}
+          </button>
+          <button
+            @click="goToSettings"
+            class="rsi-nav-btn font-mono uppercase tracking-wide"
+          >
+            {{ $t('home.goToSettings') }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -129,11 +166,15 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetch } from '@tauri-apps/plugin-http'
 import { useCommLinks } from '../composables/useCommLinks'
+import { useSettings } from '../composables/useSettings'
 
 const { t: $t } = useI18n()
+const emit = defineEmits(['navigate-to'])
 
 const { commLinks, loading, error, fetchCommLinks } = useCommLinks()
+const { settingsExist, checkSettingsExist } = useSettings()
 const selectedItem = ref(null)
+const showSetupModal = ref(false)
 
 const serverStatus = ref(null)
 const statusLoading = ref(true)
@@ -142,8 +183,14 @@ const statusError = ref(null)
 onMounted(async () => {
   await Promise.all([
     fetchCommLinks(2),
-    fetchServerStatus()
+    fetchServerStatus(),
+    checkSettingsExist()
   ])
+
+  // Show setup modal if settings don't exist
+  if (!settingsExist.value) {
+    showSetupModal.value = true
+  }
 })
 
 async function fetchServerStatus() {
@@ -232,6 +279,15 @@ function decodeHtml(html) {
   const txt = document.createElement('textarea')
   txt.innerHTML = html
   return txt.value
+}
+
+function goToSettings() {
+  showSetupModal.value = false
+  emit('navigate-to', 'settings')
+}
+
+function closeSetupModal() {
+  showSetupModal.value = false
 }
 </script>
 

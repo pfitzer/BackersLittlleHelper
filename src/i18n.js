@@ -30,7 +30,11 @@ const messages = {
       statusOperational: 'Operational',
       statusDegraded: 'Degraded',
       statusDown: 'Down',
-      statusUnknown: 'Unknown'
+      statusUnknown: 'Unknown',
+      setupRequired: 'Setup Required',
+      setupMessage: 'Welcome to Backers Little Helper! To get started, please configure your directories in the settings.',
+      goToSettings: 'Go to Settings',
+      remindLater: 'Remind Me Later'
     },
     settings: {
       title: 'Settings',
@@ -128,12 +132,16 @@ const messages = {
       latestNews: 'Neueste Nachrichten',
       readMore: 'Weiterlesen',
       viewDetails: 'Details anzeigen',
-      errorLoadingNews: 'Nachrichten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.',
+      errorLoadingNews: 'Nachrichten konnten nicht geladen werden. Bitte versuche es später erneut.',
       errorLoadingStatus: 'Serverstatus konnte nicht geladen werden.',
       statusOperational: 'Betriebsbereit',
       statusDegraded: 'Eingeschränkt',
       statusDown: 'Ausgefallen',
-      statusUnknown: 'Unbekannt'
+      statusUnknown: 'Unbekannt',
+      setupRequired: 'Einrichtung erforderlich',
+      setupMessage: 'Willkommen bei Backers Little Helper! Um loszulegen, konfiguriere bitte deine Verzeichnisse in den Einstellungen.',
+      goToSettings: 'Zu den Einstellungen',
+      remindLater: 'Später erinnern'
     },
     settings: {
       title: 'Einstellungen',
@@ -176,13 +184,13 @@ const messages = {
       deleting: 'Lösche Verzeichnis...',
       deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
       deleteError: 'Fehler beim Löschen des Verzeichnisses',
-      confirmDelete: 'Sind Sie sicher, dass Sie dieses Verzeichnis löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!'
+      confirmDelete: 'Bist du sicher, dass du dieses Verzeichnis löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!'
     },
     vehicles: {
       title: 'Fahrzeuge',
       search: 'Fahrzeuge suchen...',
-      searchHint: 'Geben Sie mindestens 3 Zeichen ein, um nach einem Fahrzeug zu suchen',
-      startSearching: 'Beginnen Sie mit der Eingabe, um Fahrzeuge zu suchen',
+      searchHint: 'Gib mindestens 3 Zeichen ein, um nach einem Fahrzeug zu suchen',
+      startSearching: 'Beginne mit der Eingabe, um Fahrzeuge zu suchen',
       noResults: 'Keine Fahrzeuge gefunden',
       manufacturer: 'Hersteller',
       type: 'Typ',
@@ -204,7 +212,7 @@ const messages = {
       shops: 'Verfügbar in Geschäften',
       price: 'Preis',
       viewDetails: 'Details anzeigen',
-      errorLoading: 'Fahrzeuge konnten nicht geladen werden. Bitte versuchen Sie es später erneut.'
+      errorLoading: 'Fahrzeuge konnten nicht geladen werden. Bitte versuche es später erneut.'
     }
   }
 }

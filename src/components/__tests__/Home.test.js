@@ -39,11 +39,23 @@ vi.mock('../../composables/useCommLinks', () => ({
   })
 }))
 
+// Mock the useSettings composable
+vi.mock('../../composables/useSettings', () => ({
+  useSettings: () => ({
+    settingsExist: { value: true },
+    loading: { value: false },
+    checkSettingsExist: vi.fn()
+  })
+}))
+
 const i18n = createI18n({
   legacy: false,
   locale: 'en',
   messages: {
     en: {
+      common: {
+        readMore: 'Read More'
+      },
       home: {
         welcome: 'Welcome',
         description: 'Your Star Citizen companion',
@@ -56,7 +68,11 @@ const i18n = createI18n({
         statusOperational: 'Operational',
         statusDegraded: 'Degraded',
         statusDown: 'Down',
-        statusUnknown: 'Unknown'
+        statusUnknown: 'Unknown',
+        setupRequired: 'Setup Required',
+        setupMessage: 'Welcome to Backers Little Helper! To get started, please configure your directories in the settings.',
+        goToSettings: 'Go to Settings',
+        remindLater: 'Remind Me Later'
       }
     }
   }
@@ -128,5 +144,28 @@ describe('Home.vue', () => {
       expect(h3.classes()).toContain('bg-clip-text')
       expect(h3.classes()).toContain('text-transparent')
     })
+  })
+
+  it('does not show setup modal when settings exist', () => {
+    const wrapper = mount(Home, {
+      global: {
+        plugins: [i18n]
+      }
+    })
+    expect(wrapper.find('.modal-open').exists()).toBe(false)
+  })
+
+  it('emits navigate-to event when navigating to settings', async () => {
+    const wrapper = mount(Home, {
+      global: {
+        plugins: [i18n]
+      }
+    })
+
+    // Access the component instance to call goToSettings
+    await wrapper.vm.goToSettings()
+
+    expect(wrapper.emitted('navigate-to')).toBeTruthy()
+    expect(wrapper.emitted('navigate-to')[0]).toEqual(['settings'])
   })
 })

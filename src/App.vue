@@ -28,16 +28,16 @@
           {{ $t('app.commlink') }}
         </button>
         <button
-          @click="currentView = 'settings'"
-          :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'settings' ? 'rsi-nav-active' : 'rsi-nav-btn']"
-        >
-          {{ $t('app.settings') }}
-        </button>
-        <button
             @click="currentView = 'tools'"
             :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'tools' ? 'rsi-nav-active' : 'rsi-nav-btn']"
         >
           {{ $t('app.tools') }}
+        </button>
+        <button
+            @click="currentView = 'settings'"
+            :class="['btn btn-sm font-mono uppercase tracking-wide transition-all', currentView === 'settings' ? 'rsi-nav-active' : 'rsi-nav-btn']"
+        >
+          {{ $t('app.settings') }}
         </button>
       </div>
     </div>
@@ -45,7 +45,7 @@
     <!-- Content -->
     <div class="flex-1 overflow-y-auto">
       <div class="container mx-auto px-1 py-1">
-        <Home v-if="currentView === 'home'" />
+        <Home v-if="currentView === 'home'" @navigate-to="navigateTo" />
         <Vehicles v-if="currentView === 'vehicles'" />
         <Commlink v-if="currentView === 'commlink'" />
         <Settings v-if="currentView === 'settings'" />
@@ -64,6 +64,10 @@ import Vehicles from './components/Vehicles.vue'
 import Commlink from "./components/Commlink.vue";
 
 const currentView = ref('home')
+
+function navigateTo(view) {
+  currentView.value = view
+}
 
 </script>
 
