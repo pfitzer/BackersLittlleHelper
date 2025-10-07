@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-10-07
+
+### Added
+- **RSI-Inspired UI Theme**: Complete visual overhaul to match Roberts Space Industries website aesthetic
+  - Custom blue-glowing button and card effects with smooth transitions
+  - Sharp corners throughout the interface (no rounded borders)
+  - Noise texture overlay for authentic space-themed atmosphere
+  - Radial gradient backgrounds with atmospheric depth
+  - Custom corner decorations on cards using CSS pseudo-elements
+- **Vehicle Database**: New comprehensive vehicle search and information system
+  - Live search integration with Star Citizen Wiki API
+  - Detailed vehicle specifications (manufacturer, type, size, crew, dimensions, mass)
+  - Shop availability and pricing information
+  - Multilingual support (English/German)
+  - Unit tests with 100% pass rate
+- **Screenshots Documentation**: Added 4 high-quality screenshots to docs folder showcasing all features
+- **Enhanced Tools Page**: Automatic log folder size calculation that updates when navigating to page
+- **Tauri Permissions**: Added fs:allow-stat capability for file size operations
+
+### Changed
+- **UI Framework**: Replaced DaisyUI Synthwave theme with custom RSI-inspired Tailwind CSS theme
+- **Theme System**: Removed theme selection feature (now uses fixed RSI theme)
+- **Style Consistency**: All buttons, form fields, badges, and cards now use sharp corners
+- **README**: Comprehensive update with screenshots, accurate feature list, and current technologies
+- **Test Coverage**: Updated all 40 tests to reflect UI changes (100% pass rate maintained)
+
+### Removed
+- **Settings**: Removed non-functional features that were placeholders:
+  - Theme selection dropdown (Light/Dark/Night)
+  - Enable Notifications toggle
+  - Auto-start on system startup toggle
+  - Appearance and Advanced settings sections
+- **Debug Code**: Removed all console.log statements from production code
+  - Cleaned up Tools.vue directory size calculation
+  - Removed debug logging from Settings.vue
+
+### Fixed
+- **Horizontal Scrollbar**: Resolved overflow issue on server status card in Home component
+- **Log Size Calculation**: Fixed permission error preventing file size calculation in Tools
+- **Settings Filtering**: Old deprecated settings (theme, notifications, autoStart) now filtered on load
+
 ## [0.1.1] - 2025-10-05
 
 ### Added
@@ -74,5 +115,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic settings and tools functionality
 - Security updates via Dependabot (Electron 24.3.0 → 35.7.5)
 
+[0.2.0]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.1.1
 [0.1.0]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.1.0
