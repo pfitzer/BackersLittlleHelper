@@ -101,7 +101,7 @@
               <div class="flex-1">
                 <h3 class="card-title text-3xl text-secondary mb-4">{{ vehicle.name }}</h3>
 
-                <div v-if="vehicle.description" class="mb-4 text-sm opacity-80 italic">
+                <div v-if="vehicle.description" class="mb-4 text-lg opacity-80 italic">
                   {{ vehicle.description }}
                 </div>
 
