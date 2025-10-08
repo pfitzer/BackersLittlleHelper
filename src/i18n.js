@@ -105,7 +105,21 @@ const messages = {
       shops: 'Available at Shops',
       price: 'Price',
       viewDetails: 'View Details',
-      errorLoading: 'Failed to load vehicles. Please try again later.'
+      errorLoading: 'Failed to load vehicles. Please try again later.',
+      info: 'Information',
+      body: 'Body',
+      dimensions: 'Dimensions',
+      carga_capacity: 'Cargo Capacity',
+      quantum_fuel: 'Quantum Fuel',
+      speed: 'Speed',
+      speed_scm: 'SCM Speed',
+      speed_max: 'Max Speed',
+      zero_to_scm: '0 to SCM',
+      scm_to_zero: 'SCM to 0',
+      pitch: 'Pitch',
+      yaw: 'Yaw',
+      roll: 'Roll',
+      rentable: 'Rentable'
     }
   },
   de: {
@@ -212,7 +226,21 @@ const messages = {
       shops: 'Verfügbar in Geschäften',
       price: 'Preis',
       viewDetails: 'Details anzeigen',
-      errorLoading: 'Fahrzeuge konnten nicht geladen werden. Bitte versuche es später erneut.'
+      errorLoading: 'Fahrzeuge konnten nicht geladen werden. Bitte versuche es später erneut.',
+      info: 'Information',
+      body: 'Rumpf',
+      dimensions: 'Abmessungen',
+      carga_capacity: 'Ladekapazität',
+      quantum_fuel: 'Quantumtreibstoff',
+      speed: 'Geschwindigkeit',
+      speed_scm: 'SCM-Geschwindigkeit',
+      speed_max: 'Höchstgeschwindigkeit',
+      zero_to_scm: '0 bis SCM',
+      scm_to_zero: 'SCM bis 0',
+      pitch: 'Nicken',
+      yaw: 'Gieren',
+      roll: 'Rollen',
+      rentable: 'Mietbar'
     }
   }
 }
