@@ -109,6 +109,7 @@
                 <div v-if="vehicle.description" class="mb-4 text-lg opacity-80 italic">
                   {{ vehicle.description }}
                 </div>
+                <!-- GENERAL INFO -->
                 <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.info') }}</h2>
@@ -125,9 +126,21 @@
                           <li v-for="foci in vehicle.foci" :key="foci" class="list-item">{{ foci }}</li>
                         </ul>
                       </div>
+
+                      <div v-if="vehicle.production_status">
+                        <span class="opacity-70">{{ $t('vehicles.production_status') }}:</span>
+                        <div class="font-semibold">{{ vehicle.production_status }}</div>
+                      </div>
+
+                      <div v-if="vehicle.msrp">
+                        <span class="opacity-70">{{ $t('vehicles.msrp') }}:</span>
+                        <div class="font-semibold">${{ vehicle.msrp }}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <!-- PHYSICAL SPECIFICATIONS -->
                 <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.body') }}</h2>
@@ -154,10 +167,12 @@
                         <span class="opacity-70">{{ $t('vehicles.mass') }}:</span>
                         <div class="font-semibold">{{ vehicle.mass }} kg</div>
                       </div>
+
                       <div v-if="vehicle.cargo_capacity">
                         <span class="opacity-70">{{ $t('vehicles.carga_capacity') }}:</span>
                         <div class="font-semibold">{{ vehicle.cargo_capacity }} SCU</div>
                       </div>
+
                       <div v-if="vehicle.fuel">
                         <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
                         <div class="font-semibold">{{ vehicle.fuel.capacity }}</div>
@@ -165,6 +180,50 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- DEFENSE (HULL & SHIELDS) -->
+                <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                  <div class="card-body">
+                    <h2 class="card-title">{{ $t('vehicles.shields_armor') }}</h2>
+                    <div class="grid grid-cols-2 gap-4 text-md">
+                      <div v-if="vehicle.health">
+                        <span class="opacity-70">{{ $t('vehicles.hull_health') }}:</span>
+                        <div class="font-semibold">{{ vehicle.health.toLocaleString() }} HP</div>
+                      </div>
+                      <div v-if="vehicle.shield_hp">
+                        <span class="opacity-70">{{ $t('vehicles.shield_hp') }}:</span>
+                        <div class="font-semibold">{{ vehicle.shield_hp.toLocaleString() }} HP</div>
+                      </div>
+                      <div v-if="vehicle.shield_face_type">
+                        <span class="opacity-70">{{ $t('vehicles.shield_type') }}:</span>
+                        <div class="font-semibold">{{ vehicle.shield_face_type }}</div>
+                      </div>
+                    </div>
+                    <div v-if="vehicle.armor" class="mt-4">
+                      <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.damage_reduction') }}</h3>
+                      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                        <div v-if="vehicle.armor.damage_physical !== undefined">
+                          <span class="opacity-70">{{ $t('vehicles.physical') }}:</span>
+                          <div class="font-semibold">{{ (vehicle.armor.damage_physical * 100).toFixed(0) }}%</div>
+                        </div>
+                        <div v-if="vehicle.armor.damage_energy !== undefined">
+                          <span class="opacity-70">{{ $t('vehicles.energy') }}:</span>
+                          <div class="font-semibold">{{ (vehicle.armor.damage_energy * 100).toFixed(0) }}%</div>
+                        </div>
+                        <div v-if="vehicle.armor.damage_distortion !== undefined">
+                          <span class="opacity-70">{{ $t('vehicles.distortion') }}:</span>
+                          <div class="font-semibold">{{ (vehicle.armor.damage_distortion * 100).toFixed(0) }}%</div>
+                        </div>
+                        <div v-if="vehicle.armor.damage_thermal !== undefined">
+                          <span class="opacity-70">{{ $t('vehicles.thermal') }}:</span>
+                          <div class="font-semibold">{{ (vehicle.armor.damage_thermal * 100).toFixed(0) }}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PERFORMANCE (SPEED & AGILITY) -->
                 <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.speed') }}</h2>
@@ -186,23 +245,133 @@
                         <div class="font-semibold">{{ vehicle.speed.scm_to_zero }} s</div>
                       </div>
                     </div>
-                    <div v-if="vehicle.agility" class="grid grid-cols-3 gap-6 text-md w-100 mt-4">
-                      <div v-if="vehicle.agility.pitch">
-                        <span class="opacity-70">{{ $t('vehicles.pitch') }}:</span>
-                        <div class="font-semibold">{{ vehicle.agility.pitch }}</div>
+                    <div v-if="vehicle.agility" class="mt-4">
+                      <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.agility') }}</h3>
+                      <div class="grid grid-cols-3 gap-4 text-md">
+                        <div v-if="vehicle.agility.pitch">
+                          <span class="opacity-70">{{ $t('vehicles.pitch') }}:</span>
+                          <div class="font-semibold">{{ vehicle.agility.pitch }}</div>
+                        </div>
+                        <div v-if="vehicle.agility.yaw">
+                          <span class="opacity-70">{{ $t('vehicles.yaw') }}:</span>
+                          <div class="font-semibold">{{ vehicle.agility.yaw }}</div>
+                        </div>
+                        <div v-if="vehicle.agility.roll">
+                          <span class="opacity-70">{{ $t('vehicles.roll') }}:</span>
+                          <div class="font-semibold">{{ vehicle.agility.roll }}</div>
+                        </div>
                       </div>
-                      <div v-if="vehicle.agility.yaw">
-                        <span class="opacity-70">{{ $t('vehicles.yaw') }}:</span>
-                        <div class="font-semibold">{{ vehicle.agility.yaw }}</div>
-                      </div>
-                      <div v-if="vehicle.speed.scm_to_zero">
-                        <span class="opacity-70">{{ $t('vehicles.roll') }}:</span>
-                        <div class="font-semibold">{{ vehicle.agility.roll }}</div>
+                    </div>
+                    <div v-if="vehicle.afterburner" class="mt-4">
+                      <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.afterburner') }}</h3>
+                      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div v-if="vehicle.afterburner.capacitor">
+                          <span class="opacity-70">{{ $t('vehicles.capacitor') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.capacitor }}</div>
+                        </div>
+                        <div v-if="vehicle.afterburner.regen_per_sec">
+                          <span class="opacity-70">{{ $t('vehicles.regen_per_sec') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.regen_per_sec }}/s</div>
+                        </div>
+                        <div v-if="vehicle.afterburner.ramp_up_time">
+                          <span class="opacity-70">{{ $t('vehicles.ramp_up_time') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.ramp_up_time }} s</div>
+                        </div>
+                        <div v-if="vehicle.afterburner.pitch_boost_multiplier">
+                          <span class="opacity-70">{{ $t('vehicles.pitch_boost') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.pitch_boost_multiplier }}x</div>
+                        </div>
+                        <div v-if="vehicle.afterburner.yaw_boost_multiplier">
+                          <span class="opacity-70">{{ $t('vehicles.yaw_boost') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.yaw_boost_multiplier }}x</div>
+                        </div>
+                        <div v-if="vehicle.afterburner.roll_boost_multiplier">
+                          <span class="opacity-70">{{ $t('vehicles.roll_boost') }}:</span>
+                          <div class="font-semibold">{{ vehicle.afterburner.roll_boost_multiplier }}x</div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                <!-- QUANTUM TRAVEL -->
+                <div v-if="vehicle.quantum" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                  <div class="card-body">
+                    <h2 class="card-title">{{ $t('vehicles.quantum_drive') }}</h2>
+                    <div class="grid grid-cols-2 gap-4 text-md">
+                      <div v-if="vehicle.quantum.quantum_speed">
+                        <span class="opacity-70">{{ $t('vehicles.quantum_speed') }}:</span>
+                        <div class="font-semibold">{{ (vehicle.quantum.quantum_speed / 1000000).toFixed(1) }} Mm/s</div>
+                      </div>
+                      <div v-if="vehicle.quantum.quantum_spool_time">
+                        <span class="opacity-70">{{ $t('vehicles.spool_time') }}:</span>
+                        <div class="font-semibold">{{ vehicle.quantum.quantum_spool_time }} s</div>
+                      </div>
+                      <div v-if="vehicle.quantum.quantum_fuel_capacity">
+                        <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
+                        <div class="font-semibold">{{ vehicle.quantum.quantum_fuel_capacity }} L</div>
+                      </div>
+                      <div v-if="vehicle.quantum.quantum_range">
+                        <span class="opacity-70">{{ $t('vehicles.quantum_range') }}:</span>
+                        <div class="font-semibold">{{ (vehicle.quantum.quantum_range / 1000000).toFixed(2) }} Mm</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- STEALTH (EMISSIONS & SIGNATURES) -->
+                <div v-if="vehicle.emission || vehicle.armor" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                  <div class="card-body">
+                    <h2 class="card-title">{{ $t('vehicles.emissions_signatures') }}</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
+                      <div v-if="vehicle.emission?.ir">
+                        <span class="opacity-70">{{ $t('vehicles.infrared') }}:</span>
+                        <div class="font-semibold">{{ vehicle.emission.ir.toLocaleString() }}</div>
+                      </div>
+                      <div v-if="vehicle.emission?.em_idle">
+                        <span class="opacity-70">{{ $t('vehicles.em_idle') }}:</span>
+                        <div class="font-semibold">{{ vehicle.emission.em_idle.toLocaleString() }}</div>
+                      </div>
+                      <div v-if="vehicle.emission?.em_max">
+                        <span class="opacity-70">{{ $t('vehicles.em_max') }}:</span>
+                        <div class="font-semibold">{{ vehicle.emission.em_max.toLocaleString() }}</div>
+                      </div>
+                      <div v-if="vehicle.armor?.signal_cross_section">
+                        <span class="opacity-70">{{ $t('vehicles.cross_section') }}:</span>
+                        <div class="font-semibold">{{ (vehicle.armor.signal_cross_section * 100).toFixed(0) }}%</div>
+                      </div>
+                      <div v-if="vehicle.armor?.signal_infrared">
+                        <span class="opacity-70">{{ $t('vehicles.ir_signature') }}:</span>
+                        <div class="font-semibold">{{ (vehicle.armor.signal_infrared * 100).toFixed(0) }}%</div>
+                      </div>
+                      <div v-if="vehicle.armor?.signal_electromagnetic">
+                        <span class="opacity-70">{{ $t('vehicles.em_signature') }}:</span>
+                        <div class="font-semibold">{{ (vehicle.armor.signal_electromagnetic * 100).toFixed(0) }}%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- INSURANCE -->
+                <div v-if="vehicle.insurance" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                  <div class="card-body">
+                    <h2 class="card-title">{{ $t('vehicles.insurance') }}</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
+                      <div v-if="vehicle.insurance.claim_time">
+                        <span class="opacity-70">{{ $t('vehicles.claim_time') }}:</span>
+                        <div class="font-semibold">{{ vehicle.insurance.claim_time.toFixed(2) }} min</div>
+                      </div>
+                      <div v-if="vehicle.insurance.expedite_time">
+                        <span class="opacity-70">{{ $t('vehicles.expedite_time') }}:</span>
+                        <div class="font-semibold">{{ vehicle.insurance.expedite_time.toFixed(2) }} min</div>
+                      </div>
+                      <div v-if="vehicle.insurance.expedite_cost">
+                        <span class="opacity-70">{{ $t('vehicles.expedite_cost') }}:</span>
+                        <div class="font-semibold">{{ vehicle.insurance.expedite_cost.toLocaleString() }} aUEC</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="mt-4">
                   <a
