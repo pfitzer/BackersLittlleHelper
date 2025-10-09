@@ -49,7 +49,7 @@ body::before {
     position: fixed;
     height: 100vh;
     width: 100vw;
-    background-image: url('./assets/img/MadeByTheCommunity_black.png');
+    background-image: url('./assets/img/MadeByTheCommunity_Black.png');
     background-size: 50%;
     background-repeat: no-repeat;
     background-position: 50% 75%;

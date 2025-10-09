@@ -93,7 +93,7 @@
           class="space-y-6"
       >
         <!-- Main Vehicle Card -->
-        <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+        <div class="card rsi-border rsi-corners rsi-glow bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
           <div class="card-body">
             <div class="flex flex-col md:flex-row gap-6">
               <figure v-if="vehicle.store_image" class="w-full md:w-1/3">
@@ -110,7 +110,7 @@
                   {{ vehicle.description }}
                 </div>
                 <!-- GENERAL INFO -->
-                <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.info') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
@@ -141,7 +141,7 @@
                 </div>
 
                 <!-- PHYSICAL SPECIFICATIONS -->
-                <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.body') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
@@ -182,7 +182,7 @@
                 </div>
 
                 <!-- DEFENSE (HULL & SHIELDS) -->
-                <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.shields_armor') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
@@ -201,7 +201,7 @@
                     </div>
                     <div v-if="vehicle.armor" class="mt-4">
                       <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.damage_reduction') }}</h3>
-                      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                         <div v-if="vehicle.armor.damage_physical !== undefined">
                           <span class="opacity-70">{{ $t('vehicles.physical') }}:</span>
                           <div class="font-semibold">{{ (vehicle.armor.damage_physical * 100).toFixed(0) }}%</div>
@@ -224,7 +224,7 @@
                 </div>
 
                 <!-- PERFORMANCE (SPEED & AGILITY) -->
-                <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.speed') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
@@ -295,7 +295,7 @@
                 </div>
 
                 <!-- QUANTUM TRAVEL -->
-                <div v-if="vehicle.quantum" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div v-if="vehicle.quantum" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.quantum_drive') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
@@ -320,7 +320,7 @@
                 </div>
 
                 <!-- STEALTH (EMISSIONS & SIGNATURES) -->
-                <div v-if="vehicle.emission || vehicle.armor" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div v-if="vehicle.emission || vehicle.armor" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.emissions_signatures') }}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
@@ -353,7 +353,7 @@
                 </div>
 
                 <!-- INSURANCE -->
-                <div v-if="vehicle.insurance" class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
+                <div v-if="vehicle.insurance" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
                   <div class="card-body">
                     <h2 class="card-title">{{ $t('vehicles.insurance') }}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
@@ -396,7 +396,7 @@
 
         <!-- Components -->
         <div v-if="vehicle.components && vehicle.components.length > 0"
-             class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+             class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
           <div class="card-body">
             <h4 class="card-title text-xl text-secondary mb-4">{{ $t('vehicles.components') }}</h4>
             <div class="overflow-x-auto">
@@ -424,7 +424,7 @@
 
         <!-- Shops -->
         <div v-if="vehicle.shops && vehicle.shops.length > 0"
-             class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+             class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
           <div class="card-body">
             <h4 class="card-title text-xl text-secondary mb-4">{{ $t('vehicles.shops') }}</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -436,7 +436,7 @@
                     {{ $t('vehicles.price') }}: {{ item.base_price?.toLocaleString() }} aUEC
                     <span
                         :class="{'text-green-600': item.rentable, 'text-red-600': !item.rentable }"
-                        class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end">{{ $t('vehicles.rentable') }}</span>
+                        class="rsi-border rsi-corners inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end">{{ $t('vehicles.rentable') }}</span>
                   </div>
                 </div>
               </div>
