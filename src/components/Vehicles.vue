@@ -106,127 +106,183 @@
 
               <div class="flex-1">
                 <h3 class="card-title text-3xl text-secondary mb-4">{{ vehicle.name }}</h3>
-                <div v-if="vehicle.description" class="mb-4 text-lg opacity-80 italic">
+                <div v-if="vehicle.description" class="mb-4 text-base opacity-80 italic">
                   {{ vehicle.description }}
                 </div>
-                <!-- GENERAL INFO -->
-                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.info') }}</h2>
-                    <div class="grid grid-cols-2 gap-4 text-md">
-                      <div v-if="vehicle.manufacturer">
-                        <span class="opacity-70">{{ $t('vehicles.manufacturer') }}:</span>
-                        <div class="font-semibold">{{ vehicle.manufacturer.name }}</div>
-                      </div>
 
-                      <div v-if="vehicle.type">
-                        <span class="opacity-70">{{ $t('vehicles.type') }}:</span>
-                        <div class="font-semibold">{{ vehicle.type }}</div>
-                        <ul class="list-disc list-inside mt-2">
-                          <li v-for="foci in vehicle.foci" :key="foci" class="list-item">{{ foci }}</li>
-                        </ul>
-                      </div>
-
-                      <div v-if="vehicle.production_status">
-                        <span class="opacity-70">{{ $t('vehicles.production_status') }}:</span>
-                        <div class="font-semibold">{{ vehicle.production_status }}</div>
-                      </div>
-
-                      <div v-if="vehicle.msrp">
-                        <span class="opacity-70">{{ $t('vehicles.msrp') }}:</span>
-                        <div class="font-semibold">${{ vehicle.msrp }}</div>
-                      </div>
-                    </div>
+                <!-- Quick Stats Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div v-if="vehicle.manufacturer" class="rsi-border rsi-corners bg-base-200/50 p-3">
+                    <div class="text-xs opacity-70 uppercase tracking-wide">{{ $t('vehicles.manufacturer') }}</div>
+                    <div class="text-sm font-bold text-primary">{{ vehicle.manufacturer.name }}</div>
+                  </div>
+                  <div v-if="vehicle.size" class="rsi-border rsi-corners bg-base-200/50 p-3">
+                    <div class="text-xs opacity-70 uppercase tracking-wide">{{ $t('vehicles.size') }}</div>
+                    <div class="text-sm font-bold text-primary">{{ vehicle.size }}</div>
+                  </div>
+                  <div v-if="vehicle.crew" class="rsi-border rsi-corners bg-base-200/50 p-3">
+                    <div class="text-xs opacity-70 uppercase tracking-wide">{{ $t('vehicles.crew') }}</div>
+                    <div class="text-sm font-bold text-primary">{{ vehicle.crew.min }}<span v-if="vehicle.crew.max"> - {{ vehicle.crew.max }}</span></div>
+                  </div>
+                  <div v-if="vehicle.msrp" class="rsi-border rsi-corners bg-base-200/50 p-3">
+                    <div class="text-xs opacity-70 uppercase tracking-wide">{{ $t('vehicles.msrp') }}</div>
+                    <div class="text-sm font-bold text-primary">${{ vehicle.msrp.toLocaleString() }}</div>
                   </div>
                 </div>
 
-                <!-- PHYSICAL SPECIFICATIONS -->
-                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.body') }}</h2>
-                    <div class="grid grid-cols-2 gap-4 text-md">
-                      <div v-if="vehicle.size">
-                        <span class="opacity-70">{{ $t('vehicles.size') }}:</span>
-                        <div class="font-semibold">{{ vehicle.size }}</div>
-                      </div>
+                <!-- Tabs Navigation -->
+                <div class="flex flex-wrap gap-2 mb-6 border-b border-primary/20 pb-2">
+                  <button
+                    @click="activeTab = 'overview'"
+                    :class="activeTab === 'overview' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.info') }}
+                  </button>
+                  <button
+                    @click="activeTab = 'performance'"
+                    :class="activeTab === 'performance' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.speed') }}
+                  </button>
+                  <button
+                    @click="activeTab = 'defense'"
+                    :class="activeTab === 'defense' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.shields_armor') }}
+                  </button>
+                  <button
+                    v-if="vehicle.quantum"
+                    @click="activeTab = 'quantum'"
+                    :class="activeTab === 'quantum' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.quantum_drive') }}
+                  </button>
+                  <button
+                    v-if="vehicle.components && vehicle.components.length > 0"
+                    @click="activeTab = 'components'"
+                    :class="activeTab === 'components' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.components') }}
+                  </button>
+                  <button
+                    v-if="vehicle.shops && vehicle.shops.length > 0"
+                    @click="activeTab = 'shops'"
+                    :class="activeTab === 'shops' ? 'rsi-nav-active' : 'rsi-nav-btn'"
+                    class="text-sm"
+                  >
+                    {{ $t('vehicles.shops') }}
+                  </button>
+                </div>
 
-                      <div v-if="vehicle.crew">
-                        <span class="opacity-70">{{ $t('vehicles.crew') }}:</span>
-                        <div class="font-semibold">min {{ vehicle.crew.min }} <span
-                            v-if="vehicle.crew_max"> - max {{ vehicle.crew.max }}</span></div>
-                      </div>
+                <!-- Tab Content -->
+                <div class="min-h-[400px]">
+                  <!-- OVERVIEW TAB -->
+                  <div v-show="activeTab === 'overview'" class="space-y-4">
+                    <!-- GENERAL INFO -->
+                    <div class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.info') }}</h2>
+                        <div class="grid grid-cols-2 gap-4 text-md">
+                          <div v-if="vehicle.manufacturer">
+                            <span class="opacity-70">{{ $t('vehicles.manufacturer') }}:</span>
+                            <div class="font-semibold">{{ vehicle.manufacturer.name }}</div>
+                          </div>
 
-                      <div v-if="vehicle.sizes">
-                        <span class="opacity-70">{{ $t('vehicles.dimensions') }}:</span>
-                        <div class="font-semibold">{{ vehicle.sizes.length }}m x {{ vehicle.sizes.height }}m - Beam:
-                          {{ vehicle.sizes.beam }}m
+                          <div v-if="vehicle.type">
+                            <span class="opacity-70">{{ $t('vehicles.type') }}:</span>
+                            <div class="font-semibold">{{ vehicle.type }}</div>
+                            <ul class="list-disc list-inside mt-2">
+                              <li v-for="foci in vehicle.foci" :key="foci" class="list-item text-sm">{{ foci }}</li>
+                            </ul>
+                          </div>
+
+                          <div v-if="vehicle.production_status">
+                            <span class="opacity-70">{{ $t('vehicles.production_status') }}:</span>
+                            <div class="font-semibold">{{ vehicle.production_status }}</div>
+                          </div>
+
+                          <div v-if="vehicle.msrp">
+                            <span class="opacity-70">{{ $t('vehicles.msrp') }}:</span>
+                            <div class="font-semibold">${{ vehicle.msrp.toLocaleString() }}</div>
+                          </div>
                         </div>
                       </div>
+                    </div>
 
-                      <div v-if="vehicle.mass">
-                        <span class="opacity-70">{{ $t('vehicles.mass') }}:</span>
-                        <div class="font-semibold">{{ vehicle.mass }} kg</div>
+                    <!-- PHYSICAL SPECIFICATIONS -->
+                    <div class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.body') }}</h2>
+                        <div class="grid grid-cols-2 gap-4 text-md">
+                          <div v-if="vehicle.size">
+                            <span class="opacity-70">{{ $t('vehicles.size') }}:</span>
+                            <div class="font-semibold">{{ vehicle.size }}</div>
+                          </div>
+
+                          <div v-if="vehicle.crew">
+                            <span class="opacity-70">{{ $t('vehicles.crew') }}:</span>
+                            <div class="font-semibold">min {{ vehicle.crew.min }} <span
+                                v-if="vehicle.crew_max"> - max {{ vehicle.crew.max }}</span></div>
+                          </div>
+
+                          <div v-if="vehicle.sizes">
+                            <span class="opacity-70">{{ $t('vehicles.dimensions') }}:</span>
+                            <div class="font-semibold">{{ vehicle.sizes.length }}m x {{ vehicle.sizes.height }}m - Beam:
+                              {{ vehicle.sizes.beam }}m
+                            </div>
+                          </div>
+
+                          <div v-if="vehicle.mass">
+                            <span class="opacity-70">{{ $t('vehicles.mass') }}:</span>
+                            <div class="font-semibold">{{ vehicle.mass.toLocaleString() }} kg</div>
+                          </div>
+
+                          <div v-if="vehicle.cargo_capacity">
+                            <span class="opacity-70">{{ $t('vehicles.carga_capacity') }}:</span>
+                            <div class="font-semibold">{{ vehicle.cargo_capacity }} SCU</div>
+                          </div>
+
+                          <div v-if="vehicle.fuel">
+                            <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
+                            <div class="font-semibold">{{ vehicle.fuel.capacity }}</div>
+                          </div>
+                        </div>
                       </div>
+                    </div>
 
-                      <div v-if="vehicle.cargo_capacity">
-                        <span class="opacity-70">{{ $t('vehicles.carga_capacity') }}:</span>
-                        <div class="font-semibold">{{ vehicle.cargo_capacity }} SCU</div>
-                      </div>
-
-                      <div v-if="vehicle.fuel">
-                        <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
-                        <div class="font-semibold">{{ vehicle.fuel.capacity }}</div>
+                    <!-- INSURANCE -->
+                    <div v-if="vehicle.insurance" class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.insurance') }}</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
+                          <div v-if="vehicle.insurance.claim_time">
+                            <span class="opacity-70">{{ $t('vehicles.claim_time') }}:</span>
+                            <div class="font-semibold">{{ vehicle.insurance.claim_time.toFixed(2) }} min</div>
+                          </div>
+                          <div v-if="vehicle.insurance.expedite_time">
+                            <span class="opacity-70">{{ $t('vehicles.expedite_time') }}:</span>
+                            <div class="font-semibold">{{ vehicle.insurance.expedite_time.toFixed(2) }} min</div>
+                          </div>
+                          <div v-if="vehicle.insurance.expedite_cost">
+                            <span class="opacity-70">{{ $t('vehicles.expedite_cost') }}:</span>
+                            <div class="font-semibold">{{ vehicle.insurance.expedite_cost.toLocaleString() }} aUEC</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- DEFENSE (HULL & SHIELDS) -->
-                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.shields_armor') }}</h2>
-                    <div class="grid grid-cols-2 gap-4 text-md">
-                      <div v-if="vehicle.health">
-                        <span class="opacity-70">{{ $t('vehicles.hull_health') }}:</span>
-                        <div class="font-semibold">{{ vehicle.health.toLocaleString() }} HP</div>
-                      </div>
-                      <div v-if="vehicle.shield_hp">
-                        <span class="opacity-70">{{ $t('vehicles.shield_hp') }}:</span>
-                        <div class="font-semibold">{{ vehicle.shield_hp.toLocaleString() }} HP</div>
-                      </div>
-                      <div v-if="vehicle.shield_face_type">
-                        <span class="opacity-70">{{ $t('vehicles.shield_type') }}:</span>
-                        <div class="font-semibold">{{ vehicle.shield_face_type }}</div>
-                      </div>
-                    </div>
-                    <div v-if="vehicle.armor" class="mt-4">
-                      <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.damage_reduction') }}</h3>
-                      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                        <div v-if="vehicle.armor.damage_physical !== undefined">
-                          <span class="opacity-70">{{ $t('vehicles.physical') }}:</span>
-                          <div class="font-semibold">{{ (vehicle.armor.damage_physical * 100).toFixed(0) }}%</div>
-                        </div>
-                        <div v-if="vehicle.armor.damage_energy !== undefined">
-                          <span class="opacity-70">{{ $t('vehicles.energy') }}:</span>
-                          <div class="font-semibold">{{ (vehicle.armor.damage_energy * 100).toFixed(0) }}%</div>
-                        </div>
-                        <div v-if="vehicle.armor.damage_distortion !== undefined">
-                          <span class="opacity-70">{{ $t('vehicles.distortion') }}:</span>
-                          <div class="font-semibold">{{ (vehicle.armor.damage_distortion * 100).toFixed(0) }}%</div>
-                        </div>
-                        <div v-if="vehicle.armor.damage_thermal !== undefined">
-                          <span class="opacity-70">{{ $t('vehicles.thermal') }}:</span>
-                          <div class="font-semibold">{{ (vehicle.armor.damage_thermal * 100).toFixed(0) }}%</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- PERFORMANCE (SPEED & AGILITY) -->
-                <div class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.speed') }}</h2>
+                  <!-- PERFORMANCE TAB -->
+                  <div v-show="activeTab === 'performance'" class="space-y-4">
+                    <!-- SPEED & AGILITY -->
+                    <div class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.speed') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
                       <div v-if="vehicle.speed.scm">
                         <span class="opacity-70">{{ $t('vehicles.speed_scm') }}:</span>
@@ -291,89 +347,178 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                      </div>
+                    </div>
 
-                <!-- QUANTUM TRAVEL -->
-                <div v-if="vehicle.quantum" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.quantum_drive') }}</h2>
-                    <div class="grid grid-cols-2 gap-4 text-md">
-                      <div v-if="vehicle.quantum.quantum_speed">
-                        <span class="opacity-70">{{ $t('vehicles.quantum_speed') }}:</span>
-                        <div class="font-semibold">{{ (vehicle.quantum.quantum_speed / 1000000).toFixed(1) }} Mm/s</div>
+                    <!-- STEALTH (EMISSIONS & SIGNATURES) -->
+                    <div v-if="vehicle.emission || vehicle.armor" class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mt-4">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.emissions_signatures') }}</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
+                          <div v-if="vehicle.emission?.ir">
+                            <span class="opacity-70">{{ $t('vehicles.infrared') }}:</span>
+                            <div class="font-semibold">{{ vehicle.emission.ir.toLocaleString() }}</div>
+                          </div>
+                          <div v-if="vehicle.emission?.em_idle">
+                            <span class="opacity-70">{{ $t('vehicles.em_idle') }}:</span>
+                            <div class="font-semibold">{{ vehicle.emission.em_idle.toLocaleString() }}</div>
+                          </div>
+                          <div v-if="vehicle.emission?.em_max">
+                            <span class="opacity-70">{{ $t('vehicles.em_max') }}:</span>
+                            <div class="font-semibold">{{ vehicle.emission.em_max.toLocaleString() }}</div>
+                          </div>
+                          <div v-if="vehicle.armor?.signal_cross_section">
+                            <span class="opacity-70">{{ $t('vehicles.cross_section') }}:</span>
+                            <div class="font-semibold">{{ (vehicle.armor.signal_cross_section * 100).toFixed(0) }}%</div>
+                          </div>
+                          <div v-if="vehicle.armor?.signal_infrared">
+                            <span class="opacity-70">{{ $t('vehicles.ir_signature') }}:</span>
+                            <div class="font-semibold">{{ (vehicle.armor.signal_infrared * 100).toFixed(0) }}%</div>
+                          </div>
+                          <div v-if="vehicle.armor?.signal_electromagnetic">
+                            <span class="opacity-70">{{ $t('vehicles.em_signature') }}:</span>
+                            <div class="font-semibold">{{ (vehicle.armor.signal_electromagnetic * 100).toFixed(0) }}%</div>
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="vehicle.quantum.quantum_spool_time">
-                        <span class="opacity-70">{{ $t('vehicles.spool_time') }}:</span>
-                        <div class="font-semibold">{{ vehicle.quantum.quantum_spool_time }} s</div>
+                    </div>
+                  </div>
+
+                  <!-- DEFENSE TAB -->
+                  <div v-show="activeTab === 'defense'" class="space-y-4">
+                    <!-- SHIELDS & ARMOR -->
+                    <div class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.shields_armor') }}</h2>
+                        <div class="grid grid-cols-2 gap-4 text-md">
+                          <div v-if="vehicle.health">
+                            <span class="opacity-70">{{ $t('vehicles.hull_health') }}:</span>
+                            <div class="font-semibold">{{ vehicle.health.toLocaleString() }} HP</div>
+                          </div>
+                          <div v-if="vehicle.shield_hp">
+                            <span class="opacity-70">{{ $t('vehicles.shield_hp') }}:</span>
+                            <div class="font-semibold">{{ vehicle.shield_hp.toLocaleString() }} HP</div>
+                          </div>
+                          <div v-if="vehicle.shield_face_type">
+                            <span class="opacity-70">{{ $t('vehicles.shield_type') }}:</span>
+                            <div class="font-semibold">{{ vehicle.shield_face_type }}</div>
+                          </div>
+                        </div>
+                        <div v-if="vehicle.armor" class="mt-4">
+                          <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.damage_reduction') }}</h3>
+                          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div v-if="vehicle.armor.damage_physical !== undefined">
+                              <span class="opacity-70">{{ $t('vehicles.physical') }}:</span>
+                              <div class="font-semibold">{{ (vehicle.armor.damage_physical * 100).toFixed(0) }}%</div>
+                            </div>
+                            <div v-if="vehicle.armor.damage_energy !== undefined">
+                              <span class="opacity-70">{{ $t('vehicles.energy') }}:</span>
+                              <div class="font-semibold">{{ (vehicle.armor.damage_energy * 100).toFixed(0) }}%</div>
+                            </div>
+                            <div v-if="vehicle.armor.damage_distortion !== undefined">
+                              <span class="opacity-70">{{ $t('vehicles.distortion') }}:</span>
+                              <div class="font-semibold">{{ (vehicle.armor.damage_distortion * 100).toFixed(0) }}%</div>
+                            </div>
+                            <div v-if="vehicle.armor.damage_thermal !== undefined">
+                              <span class="opacity-70">{{ $t('vehicles.thermal') }}:</span>
+                              <div class="font-semibold">{{ (vehicle.armor.damage_thermal * 100).toFixed(0) }}%</div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="vehicle.quantum.quantum_fuel_capacity">
-                        <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
-                        <div class="font-semibold">{{ vehicle.quantum.quantum_fuel_capacity }} L</div>
+                    </div>
+                  </div>
+
+                  <!-- QUANTUM TAB -->
+                  <div v-show="activeTab === 'quantum'" class="space-y-4">
+                    <!-- QUANTUM TRAVEL -->
+                    <div v-if="vehicle.quantum" class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">{{ $t('vehicles.quantum_drive') }}</h2>
+                        <div class="grid grid-cols-2 gap-4 text-md">
+                          <div v-if="vehicle.quantum.quantum_speed">
+                            <span class="opacity-70">{{ $t('vehicles.quantum_speed') }}:</span>
+                            <div class="font-semibold">{{ (vehicle.quantum.quantum_speed / 1000000).toFixed(1) }} Mm/s</div>
+                          </div>
+                          <div v-if="vehicle.quantum.quantum_spool_time">
+                            <span class="opacity-70">{{ $t('vehicles.spool_time') }}:</span>
+                            <div class="font-semibold">{{ vehicle.quantum.quantum_spool_time }} s</div>
+                          </div>
+                          <div v-if="vehicle.quantum.quantum_fuel_capacity">
+                            <span class="opacity-70">{{ $t('vehicles.quantum_fuel') }}:</span>
+                            <div class="font-semibold">{{ vehicle.quantum.quantum_fuel_capacity }} L</div>
+                          </div>
+                          <div v-if="vehicle.quantum.quantum_range">
+                            <span class="opacity-70">{{ $t('vehicles.quantum_range') }}:</span>
+                            <div class="font-semibold">{{ (vehicle.quantum.quantum_range / 1000000).toFixed(2) }} Mm</div>
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="vehicle.quantum.quantum_range">
-                        <span class="opacity-70">{{ $t('vehicles.quantum_range') }}:</span>
-                        <div class="font-semibold">{{ (vehicle.quantum.quantum_range / 1000000).toFixed(2) }} Mm</div>
+                    </div>
+                  </div>
+
+                  <!-- COMPONENTS TAB -->
+                  <div v-show="activeTab === 'components'">
+                    <div v-if="vehicle.components && vehicle.components.length > 0" class="space-y-4">
+                      <div v-for="(componentGroup, type) in groupedComponents(vehicle.components)" :key="type"
+                           class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                        <div class="card-body">
+                          <h4 class="card-title text-xl mb-4 capitalize">{{ formatComponentType(type) }}</h4>
+                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div v-for="(component, index) in componentGroup" :key="`${type}-${index}`"
+                                 class="rsi-border rsi-corners bg-base-200/50 p-4">
+                              <div class="font-bold text-primary mb-2">{{ component.name }}</div>
+                              <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <span class="opacity-70">{{ $t('vehicles.componentSize') }}:</span>
+                                  <div class="font-semibold">{{ component.size || component.component_size || 'N/A' }}</div>
+                                </div>
+                                <div>
+                                  <span class="opacity-70">{{ $t('vehicles.quantity') }}:</span>
+                                  <div class="font-semibold">{{ component.quantity || 1 }}</div>
+                                </div>
+                                <div v-if="component.mounts" class="col-span-2">
+                                  <span class="opacity-70">{{ $t('vehicles.mounts') }}:</span>
+                                  <div class="font-semibold">{{ component.mounts }}</div>
+                                </div>
+                                <div v-if="component.manufacturer && component.manufacturer !== 'TBD'" class="col-span-2">
+                                  <span class="opacity-70">{{ $t('vehicles.componentManufacturer') }}:</span>
+                                  <div class="font-semibold text-xs">{{ component.manufacturer }}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- SHOPS TAB -->
+                  <div v-show="activeTab === 'shops'">
+                    <div v-if="vehicle.shops && vehicle.shops.length > 0"
+                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h4 class="card-title text-xl mb-4">{{ $t('vehicles.shops') }}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div v-for="shop in vehicle.shops" :key="shop.id" class="p-4 bg-base-200 rounded-lg">
+                            <div class="font-semibold">{{ shop.name_raw }}</div>
+                            <div v-if="shop.location" class="text-sm opacity-70">{{ shop.location }}</div>
+                            <div v-if="shop.items && shop.items.length > 0" class="text-sm mt-2">
+                              <div v-for="item in shop.items" :key="item.id">
+                                {{ $t('vehicles.price') }}: {{ item.base_price?.toLocaleString() }} aUEC
+                                <span
+                                    :class="{'text-green-600': item.rentable, 'text-red-600': !item.rentable }"
+                                    class="rsi-border rsi-corners inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end">{{ $t('vehicles.rentable') }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- STEALTH (EMISSIONS & SIGNATURES) -->
-                <div v-if="vehicle.emission || vehicle.armor" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.emissions_signatures') }}</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
-                      <div v-if="vehicle.emission?.ir">
-                        <span class="opacity-70">{{ $t('vehicles.infrared') }}:</span>
-                        <div class="font-semibold">{{ vehicle.emission.ir.toLocaleString() }}</div>
-                      </div>
-                      <div v-if="vehicle.emission?.em_idle">
-                        <span class="opacity-70">{{ $t('vehicles.em_idle') }}:</span>
-                        <div class="font-semibold">{{ vehicle.emission.em_idle.toLocaleString() }}</div>
-                      </div>
-                      <div v-if="vehicle.emission?.em_max">
-                        <span class="opacity-70">{{ $t('vehicles.em_max') }}:</span>
-                        <div class="font-semibold">{{ vehicle.emission.em_max.toLocaleString() }}</div>
-                      </div>
-                      <div v-if="vehicle.armor?.signal_cross_section">
-                        <span class="opacity-70">{{ $t('vehicles.cross_section') }}:</span>
-                        <div class="font-semibold">{{ (vehicle.armor.signal_cross_section * 100).toFixed(0) }}%</div>
-                      </div>
-                      <div v-if="vehicle.armor?.signal_infrared">
-                        <span class="opacity-70">{{ $t('vehicles.ir_signature') }}:</span>
-                        <div class="font-semibold">{{ (vehicle.armor.signal_infrared * 100).toFixed(0) }}%</div>
-                      </div>
-                      <div v-if="vehicle.armor?.signal_electromagnetic">
-                        <span class="opacity-70">{{ $t('vehicles.em_signature') }}:</span>
-                        <div class="font-semibold">{{ (vehicle.armor.signal_electromagnetic * 100).toFixed(0) }}%</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- INSURANCE -->
-                <div v-if="vehicle.insurance" class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20 mb-4">
-                  <div class="card-body">
-                    <h2 class="card-title">{{ $t('vehicles.insurance') }}</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-md">
-                      <div v-if="vehicle.insurance.claim_time">
-                        <span class="opacity-70">{{ $t('vehicles.claim_time') }}:</span>
-                        <div class="font-semibold">{{ vehicle.insurance.claim_time.toFixed(2) }} min</div>
-                      </div>
-                      <div v-if="vehicle.insurance.expedite_time">
-                        <span class="opacity-70">{{ $t('vehicles.expedite_time') }}:</span>
-                        <div class="font-semibold">{{ vehicle.insurance.expedite_time.toFixed(2) }} min</div>
-                      </div>
-                      <div v-if="vehicle.insurance.expedite_cost">
-                        <span class="opacity-70">{{ $t('vehicles.expedite_cost') }}:</span>
-                        <div class="font-semibold">{{ vehicle.insurance.expedite_cost.toLocaleString() }} aUEC</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4">
+                <div class="mt-6">
                   <a
                       v-if="vehicle.url"
                       :href="vehicle.url"
@@ -388,56 +533,6 @@
                       <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
                     </svg>
                   </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Components -->
-        <div v-if="vehicle.components && vehicle.components.length > 0"
-             class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
-          <div class="card-body">
-            <h4 class="card-title text-xl text-secondary mb-4">{{ $t('vehicles.components') }}</h4>
-            <div class="overflow-x-auto">
-              <table class="table table-sm">
-                <thead>
-                <tr>
-                  <th>{{ $t('vehicles.componentType') }}</th>
-                  <th>{{ $t('vehicles.componentName') }}</th>
-                  <th>{{ $t('vehicles.componentSize') }}</th>
-                  <th>{{ $t('vehicles.componentManufacturer') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="component in vehicle.components" :key="component.uuid">
-                  <td>{{ component.type }}</td>
-                  <td>{{ component.name }}</td>
-                  <td>{{ component.size }}</td>
-                  <td>{{ component.manufacturer }}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Shops -->
-        <div v-if="vehicle.shops && vehicle.shops.length > 0"
-             class="card rsi-border rsi-corners  bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
-          <div class="card-body">
-            <h4 class="card-title text-xl text-secondary mb-4">{{ $t('vehicles.shops') }}</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-for="shop in vehicle.shops" :key="shop.id" class="p-4 bg-base-200 rounded-lg">
-                <div class="font-semibold">{{ shop.name_raw }}</div>
-                <div v-if="shop.location" class="text-sm opacity-70">{{ shop.location }}</div>
-                <div v-if="shop.items && shop.items.length > 0" class="text-sm mt-2">
-                  <div v-for="item in shop.items" :key="item.id">
-                    {{ $t('vehicles.price') }}: {{ item.base_price?.toLocaleString() }} aUEC
-                    <span
-                        :class="{'text-green-600': item.rentable, 'text-red-600': !item.rentable }"
-                        class="rsi-border rsi-corners inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end">{{ $t('vehicles.rentable') }}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -462,6 +557,7 @@ const loading = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
 const showDropdown = ref(false)
+const activeTab = ref('overview')
 
 // Debounce timer
 let debounceTimer = null
@@ -542,6 +638,7 @@ async function selectVehicle(vehicle) {
   selectedVehicle.value = vehicle
   searchQuery.value = vehicle.name
   showDropdown.value = false
+  activeTab.value = 'overview' // Reset to overview tab when selecting a new vehicle
 
   // Fetch full vehicle details
   await fetchVehicleDetails(vehicle.name)
@@ -583,6 +680,44 @@ async function fetchVehicleDetails(vehicleName) {
   } finally {
     loading.value = false
   }
+}
+
+// Group components by type
+function groupedComponents(components) {
+  if (!components || components.length === 0) return {}
+
+  const grouped = {}
+  components.forEach(component => {
+    const type = component.type || 'Other'
+    if (!grouped[type]) {
+      grouped[type] = []
+    }
+    grouped[type].push(component)
+  })
+
+  // Sort each group by size (descending) then by name
+  Object.keys(grouped).forEach(type => {
+    grouped[type].sort((a, b) => {
+      // Sort by size first (larger sizes first)
+      const sizeA = parseInt(a.size || a.component_size) || 0
+      const sizeB = parseInt(b.size || b.component_size) || 0
+      if (sizeB !== sizeA) {
+        return sizeB - sizeA
+      }
+      // Then by name
+      return (a.name || '').localeCompare(b.name || '')
+    })
+  })
+
+  return grouped
+}
+
+// Format component type names for display
+function formatComponentType(type) {
+  return type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 </script>
 
