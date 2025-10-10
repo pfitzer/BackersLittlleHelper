@@ -192,9 +192,11 @@ describe('Vehicles.vue', () => {
           type: 'Medium Freight',
           size: 'Medium',
           crew: { min: 1, max: 3 },
-          length: 38,
-          beam: 26.5,
-          height: 10.5,
+          sizes: {
+            length: 38,
+            beam: 26.5,
+            height: 10.5
+          },
           mass: 53000
         }
       })
@@ -257,9 +259,11 @@ describe('Vehicles.vue', () => {
           type: 'Medium Freight',
           size: 'Medium',
           crew: { min: 1, max: 3 },
-          length: 38,
-          beam: 26.5,
-          height: 10.5,
+          sizes: {
+            length: 38,
+            beam: 26.5,
+            height: 10.5
+          },
           mass: 53000
         }
       })
@@ -404,8 +408,8 @@ describe('Vehicles.vue', () => {
     expect(wrapper.text()).toContain('Available at Shops')
     expect(wrapper.text()).toContain('New Deal')
     expect(wrapper.text()).toContain('Lorville')
-    // Price formatting is locale-dependent, just check it contains the price
-    expect(wrapper.text()).toMatch(/1[.,]456[.,]200/)
+    // Price formatting is locale-dependent, just check it contains the price digits
+    expect(wrapper.text()).toMatch(/1.456.200/)
   })
 
   it('applies correct CSS classes to root element', () => {

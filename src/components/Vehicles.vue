@@ -284,19 +284,19 @@
                       <div class="card-body">
                         <h2 class="card-title text-xl mb-4">{{ $t('vehicles.speed') }}</h2>
                     <div class="grid grid-cols-2 gap-4 text-md">
-                      <div v-if="vehicle.speed.scm">
+                      <div v-if="vehicle.speed?.scm">
                         <span class="opacity-70">{{ $t('vehicles.speed_scm') }}:</span>
                         <div class="font-semibold">{{ vehicle.speed.scm }} m/s</div>
                       </div>
-                      <div v-if="vehicle.speed.max">
+                      <div v-if="vehicle.speed?.max">
                         <span class="opacity-70">{{ $t('vehicles.speed_max') }}:</span>
                         <div class="font-semibold">{{ vehicle.speed.max }} m/s</div>
                       </div>
-                      <div v-if="vehicle.speed.zero_to_scm">
+                      <div v-if="vehicle.speed?.zero_to_scm">
                         <span class="opacity-70">{{ $t('vehicles.zero_to_scm') }}:</span>
                         <div class="font-semibold">{{ vehicle.speed.zero_to_scm }} s</div>
                       </div>
-                      <div v-if="vehicle.speed.scm_to_zero">
+                      <div v-if="vehicle.speed?.scm_to_zero">
                         <span class="opacity-70">{{ $t('vehicles.scm_to_zero') }}:</span>
                         <div class="font-semibold">{{ vehicle.speed.scm_to_zero }} s</div>
                       </div>
@@ -304,15 +304,15 @@
                     <div v-if="vehicle.agility" class="mt-4">
                       <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.agility') }}</h3>
                       <div class="grid grid-cols-3 gap-4 text-md">
-                        <div v-if="vehicle.agility.pitch">
+                        <div v-if="vehicle.agility?.pitch">
                           <span class="opacity-70">{{ $t('vehicles.pitch') }}:</span>
                           <div class="font-semibold">{{ vehicle.agility.pitch }}</div>
                         </div>
-                        <div v-if="vehicle.agility.yaw">
+                        <div v-if="vehicle.agility?.yaw">
                           <span class="opacity-70">{{ $t('vehicles.yaw') }}:</span>
                           <div class="font-semibold">{{ vehicle.agility.yaw }}</div>
                         </div>
-                        <div v-if="vehicle.agility.roll">
+                        <div v-if="vehicle.agility?.roll">
                           <span class="opacity-70">{{ $t('vehicles.roll') }}:</span>
                           <div class="font-semibold">{{ vehicle.agility.roll }}</div>
                         </div>
@@ -321,27 +321,27 @@
                     <div v-if="vehicle.afterburner" class="mt-4">
                       <h3 class="text-lg font-semibold mb-2">{{ $t('vehicles.afterburner') }}</h3>
                       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                        <div v-if="vehicle.afterburner.capacitor">
+                        <div v-if="vehicle.afterburner?.capacitor">
                           <span class="opacity-70">{{ $t('vehicles.capacitor') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.capacitor }}</div>
                         </div>
-                        <div v-if="vehicle.afterburner.regen_per_sec">
+                        <div v-if="vehicle.afterburner?.regen_per_sec">
                           <span class="opacity-70">{{ $t('vehicles.regen_per_sec') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.regen_per_sec }}/s</div>
                         </div>
-                        <div v-if="vehicle.afterburner.ramp_up_time">
+                        <div v-if="vehicle.afterburner?.ramp_up_time">
                           <span class="opacity-70">{{ $t('vehicles.ramp_up_time') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.ramp_up_time }} s</div>
                         </div>
-                        <div v-if="vehicle.afterburner.pitch_boost_multiplier">
+                        <div v-if="vehicle.afterburner?.pitch_boost_multiplier">
                           <span class="opacity-70">{{ $t('vehicles.pitch_boost') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.pitch_boost_multiplier }}x</div>
                         </div>
-                        <div v-if="vehicle.afterburner.yaw_boost_multiplier">
+                        <div v-if="vehicle.afterburner?.yaw_boost_multiplier">
                           <span class="opacity-70">{{ $t('vehicles.yaw_boost') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.yaw_boost_multiplier }}x</div>
                         </div>
-                        <div v-if="vehicle.afterburner.roll_boost_multiplier">
+                        <div v-if="vehicle.afterburner?.roll_boost_multiplier">
                           <span class="opacity-70">{{ $t('vehicles.roll_boost') }}:</span>
                           <div class="font-semibold">{{ vehicle.afterburner.roll_boost_multiplier }}x</div>
                         </div>
@@ -459,32 +459,31 @@
 
                   <!-- COMPONENTS TAB -->
                   <div v-show="activeTab === 'components'">
-                    <div v-if="vehicle.components && vehicle.components.length > 0" class="space-y-4">
-                      <div v-for="(componentGroup, type) in groupedComponents(vehicle.components)" :key="type"
-                           class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
-                        <div class="card-body">
-                          <h4 class="card-title text-xl mb-4 capitalize">{{ formatComponentType(type) }}</h4>
-                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="(component, index) in componentGroup" :key="`${type}-${index}`"
-                                 class="rsi-border rsi-corners bg-base-200/50 p-4">
-                              <div class="font-bold text-primary mb-2">{{ component.name }}</div>
-                              <div class="grid grid-cols-2 gap-2 text-sm">
-                                <div>
-                                  <span class="opacity-70">{{ $t('vehicles.componentSize') }}:</span>
-                                  <div class="font-semibold">{{ component.size || component.component_size || 'N/A' }}</div>
-                                </div>
-                                <div>
-                                  <span class="opacity-70">{{ $t('vehicles.quantity') }}:</span>
-                                  <div class="font-semibold">{{ component.quantity || 1 }}</div>
-                                </div>
-                                <div v-if="component.mounts" class="col-span-2">
-                                  <span class="opacity-70">{{ $t('vehicles.mounts') }}:</span>
-                                  <div class="font-semibold">{{ component.mounts }}</div>
-                                </div>
-                                <div v-if="component.manufacturer && component.manufacturer !== 'TBD'" class="col-span-2">
-                                  <span class="opacity-70">{{ $t('vehicles.componentManufacturer') }}:</span>
-                                  <div class="font-semibold text-xs">{{ component.manufacturer }}</div>
-                                </div>
+                    <div v-if="vehicle.components && vehicle.components.length > 0"
+                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                      <div class="card-body">
+                        <h4 class="card-title text-xl mb-4">{{ $t('vehicles.components') }}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div v-for="(component, index) in sortedComponents(vehicle.components)" :key="`component-${index}`"
+                               class="rsi-border rsi-corners bg-base-200/50 p-4">
+                            <div class="font-bold text-primary mb-2 text-lg">{{ component.name }}</div>
+                            <div class="text-sm opacity-70 mb-2 uppercase">{{ formatComponentType(component.type) }}</div>
+                            <div class="grid grid-cols-2 gap-2 text-base">
+                              <div>
+                                <span class="opacity-70">{{ $t('vehicles.componentSize') }}:</span>
+                                <div class="font-semibold">{{ component.size || component.component_size || 'N/A' }}</div>
+                              </div>
+                              <div>
+                                <span class="opacity-70">{{ $t('vehicles.quantity') }}:</span>
+                                <div class="font-semibold">{{ component.quantity || 1 }}</div>
+                              </div>
+                              <div v-if="component.mounts">
+                                <span class="opacity-70">{{ $t('vehicles.mounts') }}:</span>
+                                <div class="font-semibold">{{ component.mounts }}</div>
+                              </div>
+                              <div v-if="component.manufacturer && component.manufacturer !== 'TBD'">
+                                <span class="opacity-70">{{ $t('vehicles.componentManufacturer') }}:</span>
+                                <div class="font-semibold text-sm">{{ component.manufacturer }}</div>
                               </div>
                             </div>
                           </div>
@@ -682,34 +681,30 @@ async function fetchVehicleDetails(vehicleName) {
   }
 }
 
-// Group components by type
-function groupedComponents(components) {
-  if (!components || components.length === 0) return {}
+// Sort components by type, then by size, then by name
+function sortedComponents(components) {
+  if (!components || components.length === 0) {
+    return []
+  }
 
-  const grouped = {}
-  components.forEach(component => {
-    const type = component.type || 'Other'
-    if (!grouped[type]) {
-      grouped[type] = []
+  return [...components].sort((a, b) => {
+    // Sort by type first
+    const typeA = a.type || 'other'
+    const typeB = b.type || 'other'
+    if (typeA !== typeB) {
+      return typeA.localeCompare(typeB)
     }
-    grouped[type].push(component)
-  })
 
-  // Sort each group by size (descending) then by name
-  Object.keys(grouped).forEach(type => {
-    grouped[type].sort((a, b) => {
-      // Sort by size first (larger sizes first)
-      const sizeA = parseInt(a.size || a.component_size) || 0
-      const sizeB = parseInt(b.size || b.component_size) || 0
-      if (sizeB !== sizeA) {
-        return sizeB - sizeA
-      }
-      // Then by name
-      return (a.name || '').localeCompare(b.name || '')
-    })
-  })
+    // Then by size (larger sizes first)
+    const sizeA = parseInt(a.size || a.component_size) || 0
+    const sizeB = parseInt(b.size || b.component_size) || 0
+    if (sizeB !== sizeA) {
+      return sizeB - sizeA
+    }
 
-  return grouped
+    // Then by name
+    return (a.name || '').localeCompare(b.name || '')
+  })
 }
 
 // Format component type names for display
