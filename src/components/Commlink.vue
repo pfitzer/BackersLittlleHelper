@@ -58,7 +58,7 @@ onMounted(async () => {
         style="background: rgba(0, 11, 17, 0.85);"
       >
         <div class="card-body">
-          <h3 class="card-title mb-2" style="color: #3b82f6;">{{ item.title }}</h3>
+          <h3 class="card-title mb-2" style="color: #3b82f6;">{{ decodeHtml(item.title) }}</h3>
           <p class="text-sm opacity-70 mb-4">{{ formatDate(item.date_published) }}</p>
           <p class="text-sm line-clamp-3 mb-4">{{ item.summary }}</p>
 
@@ -85,7 +85,7 @@ onMounted(async () => {
           class="btn btn-sm btn-circle absolute right-2 top-2 rsi-nav-btn"
         >✕</button>
 
-        <h3 class="font-bold text-3xl mb-2" style="color: #3b82f6;">{{ selectedItem.title }}</h3>
+        <h3 class="font-bold text-3xl mb-2" style="color: #3b82f6;">{{ decodeHtml(selectedItem.title) }}</h3>
         <p class="text-sm opacity-70 mb-6">{{ formatDate(selectedItem.date_published) }}</p>
 
         <div class="prose prose-invert max-w-none overflow-y-auto max-h-[60vh]" v-html="decodeHtml(selectedItem.content_html)"></div>
