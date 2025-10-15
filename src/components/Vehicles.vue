@@ -546,8 +546,10 @@
 import {ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {fetch} from '@tauri-apps/plugin-http'
+import {useApiCache} from '../composables/useApiCache'
 
 const {t: $t, locale} = useI18n()
+const {fetchWithCache} = useApiCache()
 
 const vehicles = ref([])
 const searchResults = ref([])
@@ -603,21 +605,25 @@ async function searchVehiclesList(query) {
 
     // Search for vehicles matching the query using POST
     const url = `https://api.star-citizen.wiki/api/v2/vehicles/search?locale=${apiLocale}`
+    const cacheKey = `vehicle_search_${apiLocale}_${query}`
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({query})
+    const data = await fetchWithCache(cacheKey, ONE_WEEK_MS, async () => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({query})
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
 
     if (data && data.data) {
       searchResults.value = data.data
@@ -655,18 +661,21 @@ async function fetchVehicleDetails(vehicleName) {
     const url = `https://api.star-citizen.wiki/api/v2/vehicles/${encodeURIComponent(vehicleName)}?locale=${apiLocale}&include=manufacturer,shops,components`
     console.log('Fetch vehicle details URL:', url)
 
-    const response = await fetch(url)
+    const cacheKey = `vehicle_details_${apiLocale}_${vehicleName}`
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        vehicles.value = []
-        loading.value = false
-        return
+    const data = await fetchWithCache(cacheKey, ONE_WEEK_MS, async () => {
+      const response = await fetch(url)
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return { data: null }
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
 
-    const data = await response.json()
+      return await response.json()
+    })
 
     if (data && data.data) {
       vehicles.value = [data.data]
