@@ -38,6 +38,12 @@
             style="background: rgba(0, 11, 17, 0.85);"
         >
           <div class="card-body">
+            <img
+              v-if="extractFirstImage(item.content_html)"
+              :src="extractFirstImage(item.content_html)"
+              :alt="item.title"
+              class="rounded-lg w-full h-48 object-cover mb-4"
+            />
             <h4 class="card-title mb-2" style="color: #3b82f6;">{{ item.title }}</h4>
             <p class="text-sm opacity-70 mb-4">{{ formatDate(item.date_published) }}</p>
 
@@ -279,6 +285,21 @@ function decodeHtml(html) {
   const txt = document.createElement('textarea')
   txt.innerHTML = html
   return txt.value
+}
+
+function extractFirstImage(html) {
+  if (!html) return null
+
+  // Decode HTML entities first
+  const decodedHtml = decodeHtml(html)
+
+  // Create a temporary div to parse the HTML
+  const temp = document.createElement('div')
+  temp.innerHTML = decodedHtml
+
+  // Find the first img tag in the content
+  const img = temp.querySelector('img')
+  return img ? img.src : null
 }
 
 function goToSettings() {
