@@ -18,7 +18,7 @@ export function useCommLinks() {
 
       const url = "https://leonick.se/feeds/rsi/json"
       const cacheKey = `commlinks_${limit}`
-      const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
+      const ONE_WEEK_MS = 60 * 60 * 1000
 
       // Use cached data or fetch fresh data
       const data = await fetchWithCache(cacheKey, ONE_WEEK_MS, async () => {
