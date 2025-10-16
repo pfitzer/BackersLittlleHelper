@@ -59,28 +59,38 @@
     <!-- Error State -->
     <div v-else-if="error" class="alert alert-error shadow-lg mb-4">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <path
+stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+/>
       </svg>
       <span>{{ error }}</span>
     </div>
 
     <!-- No Search Message -->
     <div v-else-if="!searchQuery || searchQuery.trim().length === 0" class="text-center py-12">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      <svg
+xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor"
+>
+        <path
+stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+/>
       </svg>
       <p class="text-lg opacity-70">{{ $t('vehicles.startSearching') }}</p>
     </div>
 
     <!-- No Results Message -->
     <div v-else-if="vehicles.length === 0 && !loading" class="text-center py-12">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      <svg
+xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor"
+>
+        <path
+stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+/>
       </svg>
       <p class="text-lg opacity-70">{{ $t('vehicles.noResults') }}</p>
     </div>
@@ -227,7 +237,8 @@
                           <div v-if="vehicle.crew">
                             <span class="opacity-70">{{ $t('vehicles.crew') }}:</span>
                             <div class="font-semibold">min {{ vehicle.crew.min }} <span
-                                v-if="vehicle.crew_max"> - max {{ vehicle.crew.max }}</span></div>
+                                v-if="vehicle.crew_max"
+> - max {{ vehicle.crew.max }}</span></div>
                           </div>
 
                           <div v-if="vehicle.sizes">
@@ -459,13 +470,17 @@
 
                   <!-- COMPONENTS TAB -->
                   <div v-show="activeTab === 'components'">
-                    <div v-if="vehicle.components && vehicle.components.length > 0"
-                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                    <div
+v-if="vehicle.components && vehicle.components.length > 0"
+                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20"
+>
                       <div class="card-body">
                         <h4 class="card-title text-xl mb-4">{{ $t('vehicles.components') }}</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div v-for="(component, index) in sortedComponents(vehicle.components)" :key="`component-${index}`"
-                               class="rsi-border rsi-corners bg-base-200/50 p-4">
+                          <div
+v-for="(component, index) in sortedComponents(vehicle.components)" :key="`component-${index}`"
+                               class="rsi-border rsi-corners bg-base-200/50 p-4"
+>
                             <div class="font-bold text-primary mb-2 text-lg">{{ component.name }}</div>
                             <div class="text-sm opacity-70 mb-2 uppercase">{{ formatComponentType(component.type) }}</div>
                             <div class="grid grid-cols-2 gap-2 text-base">
@@ -494,8 +509,10 @@
 
                   <!-- SHOPS TAB -->
                   <div v-show="activeTab === 'shops'">
-                    <div v-if="vehicle.shops && vehicle.shops.length > 0"
-                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
+                    <div
+v-if="vehicle.shops && vehicle.shops.length > 0"
+                         class="card rsi-border rsi-corners bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20"
+>
                       <div class="card-body">
                         <h4 class="card-title text-xl mb-4">{{ $t('vehicles.shops') }}</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -507,7 +524,8 @@
                                 {{ $t('vehicles.price') }}: {{ item.base_price?.toLocaleString() }} aUEC
                                 <span
                                     :class="{'text-green-600': item.rentable, 'text-red-600': !item.rentable }"
-                                    class="rsi-border rsi-corners inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end">{{ $t('vehicles.rentable') }}</span>
+                                    class="rsi-border rsi-corners inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium inset-ring inset-ring-gray-500/10 float-end"
+>{{ $t('vehicles.rentable') }}</span>
                               </div>
                             </div>
                           </div>
@@ -528,8 +546,9 @@
                     {{ $t('vehicles.viewDetails') }}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path
-                          d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
-                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                          d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
+/>
+                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
                     </svg>
                   </a>
                 </div>
