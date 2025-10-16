@@ -25,9 +25,10 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 ## Features
 
 - **Home Dashboard**:
-  - Latest Comm-Links from Star Citizen Wiki API
+  - Latest Comm-Links from Star Citizen Wiki API with images
   - Live RSI Server Status from official status feed
   - Beautiful RSI-inspired UI with space-themed background and glowing effects
+  - Smart API caching (1 hour for Comm-Links, 30 days for vehicles)
 - **Vehicle Database**:
   - Search Star Citizen vehicles with live API integration
   - View detailed vehicle specifications (manufacturer, type, size, crew, dimensions, mass)
