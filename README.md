@@ -10,6 +10,10 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
 ![Home Dashboard](docs/start.png)
 *Latest Comm-Links from Star Citizen Wiki and live RSI server status*
 
+### Comm-Links
+![Comm-Links](docs/commlinks.png)
+*Browse the latest Star Citizen Comm-Links with images and descriptions*
+
 ### Vehicle Database
 ![Vehicle Database](docs/vehicles.png)
 *Search and view detailed specifications for Star Citizen vehicles*
