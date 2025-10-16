@@ -62,7 +62,7 @@ export function useApiCache() {
       // Ensure cache directory exists
       try {
         await mkdir(CACHE_DIR, { baseDir: BaseDirectory.AppData, recursive: true })
-      } catch (error) {
+      } catch (_error) {
         // Directory might already exist, which is fine
       }
 
