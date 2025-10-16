@@ -37,7 +37,7 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
   - Search Star Citizen vehicles with live API integration
   - View detailed vehicle specifications (manufacturer, type, size, crew, dimensions, mass)
   - Browse available shops and pricing information
-  - Multilingual support (English/German)
+  - Multilingual support (English/German/French)
 - **Application Menu**:
   - Quick launch Star Citizen from configured installation directory
   - GitHub repository access
@@ -52,7 +52,7 @@ A desktop application built with Tauri 2 and Vue.js for managing Star Citizen ga
   - **Shader Directory**: Delete shader cache
   - **Log Directory**: Delete logs with automatic size calculation and display
 - **Cross-platform**: Built with Tauri 2 for Windows, macOS, and Linux
-- **Multi-language Support**: Automatically detects OS language (English and German supported)
+- **Multi-language Support**: Automatically detects OS language (English, German, and French supported)
 - **Modern UI**:
   - Vue 3 with Composition API
   - Custom RSI-inspired theme with sharp corners and blue glowing accents
@@ -206,9 +206,9 @@ BackersLittleHelper/
 ## Configuration
 
 Settings are stored in the application data directory:
-- **Windows**: `%APPDATA%\com.backerslittlehelper.app\settings.json`
-- **macOS**: `~/Library/Application Support/com.backerslittlehelper.app/settings.json`
-- **Linux**: `~/.config/com.backerslittlehelper.app/settings.json`
+- **Windows**: `%APPDATA%\com.backers-little-helper\settings.json`
+- **macOS**: `~/Library/Application Support/com.backers-little-helper/settings.json`
+- **Linux**: `~/.config/com.backers-little-helper/settings.json`
 
 ## License
 
