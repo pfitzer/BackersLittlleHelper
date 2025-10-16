@@ -86,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Renamed application from "Backers Little Helper 2" to "Backers Little Helper"
-- Updated application identifier from `com.backerslittlehelper2.app` to `com.backerslittlehelper.app`
+- Updated application identifier from `com.backerslittlehelper2.app` to `com.backers-little-helper`
 - Updated package name from `backers-little-helper2` to `backers-little-helper`
 - Improved error handling consistency across all components
 - Refined HTML font scaling using CSS clamp() and viewport units
