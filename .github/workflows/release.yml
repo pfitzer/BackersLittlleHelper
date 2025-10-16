@@ -34,12 +34,26 @@ jobs:
         run: npm ci
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
+        run: npm run tauri build
+
+      - name: Rename MSI files to remove language suffix
+        shell: pwsh
+        run: |
+          $msiFiles = Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*_en-US.msi"
+          foreach ($file in $msiFiles) {
+            $newName = $file.Name -replace "_en-US\.msi$", ".msi"
+            $newPath = Join-Path $file.DirectoryName $newName
+            Move-Item -Path $file.FullName -Destination $newPath -Force
+            Write-Host "Renamed: $($file.Name) -> $newName"
+          }
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          name: 'Backers Little Helper ${{ github.ref_name }}'
+          body: 'See the assets to download this version and install.'
+          draft: false
+          prerelease: false
+          files: src-tauri/target/release/bundle/msi/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Backers Little Helper ${{ github.ref_name }}'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: false
-          prerelease: false
