@@ -9,8 +9,8 @@
     "tauri": "tauri",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext .vue,.js",
-    "lint:fix": "eslint src --ext .vue,.js --fix"
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "dependencies": {
     "@tauri-apps/plugin-dialog": "^2.4.0",
@@ -18,17 +18,18 @@
     "@tauri-apps/plugin-http": "^2.5.2",
     "@tauri-apps/plugin-shell": "^2.3.1",
     "daisyui": "^4.12.24",
-    "vue": "^3.4.0",
-    "vue-i18n": "^9.14.5"
+    "vue": "^3.5.13",
+    "vue-i18n": "^10.0.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.37.0",
     "@tauri-apps/cli": "^2.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitest/ui": "^3.2.4",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.21",
-    "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.20.0",
+    "eslint": "^9.37.0",
+    "eslint-plugin-vue": "^10.5.1",
     "happy-dom": "^20.0.2",
     "postcss": "^8.5.6",
     "sharp": "^0.34.4",
