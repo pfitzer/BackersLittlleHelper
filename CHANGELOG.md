@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-10-16
+
+### Added
+- **API Caching System**: Implemented comprehensive caching for API requests
+  - Vehicles data cached for 30 days to reduce API load
+  - Comm-Links data cached for 1 hour for fresh content
+  - Comprehensive test suite for API caching functionality
+- **Enhanced Comm-Links**:
+  - Added images to Comm-Links display
+  - HTML encoding for Comm-Link titles for proper rendering
+- **Vehicle Details**: Additional ship data from the API displayed in vehicle view
+
+### Changed
+- Enhanced vehicle details view with improved data presentation
+- Updated internationalization (i18n) translations for new features
+- RSI-inspired CSS styles applied to vehicle cards
+- Updated all existing tests to accommodate new caching functionality
+
+### Fixed
+- **API Cache Bug**: Fixed parameter order bug in API cache implementation
+- **File System Permissions**: Corrected Tauri 2.0 file system permissions
+  - Restructured fs permissions to use proper Tauri 2.0 format
+  - Added fs:scope with $APPDATA/** for proper app data directory access
+  - Settings.json now properly accessible in AppData folder
+- **Background Image**: Fixed case sensitivity error preventing background image loading
+
 ## [0.2.0] - 2025-10-07
 
 ### Added
@@ -115,6 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic settings and tools functionality
 - Security updates via Dependabot (Electron 24.3.0 → 35.7.5)
 
+[0.4.1]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.4.1
 [0.2.0]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.1.1
 [0.1.0]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.1.0

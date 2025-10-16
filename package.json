@@ -1,6 +1,6 @@
 {
   "name": "backers-little-helper",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "type": "module",
   "scripts": {
     "dev": "vite",

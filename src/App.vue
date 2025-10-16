@@ -72,31 +72,5 @@ function navigateTo(view) {
 </script>
 
 <style scoped>
-/* Starfield animation */
-@keyframes move-twink-back {
-  from {background-position: 0 0;}
-  to {background-position: -10000px 5000px;}
-}
 
-.stars, .twinkling {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: -1;
-}
-
-.stars {
-  background: #000 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==') repeat top center;
-}
-
-.twinkling {
-  background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQIW2NkYGD4z8DAwMgABXAGNgGADgMB+1u3CQAAAABJRU5ErkJggg==') repeat top center;
-  animation: move-twink-back 200s linear infinite;
-  opacity: 0.3;
-}
 </style>

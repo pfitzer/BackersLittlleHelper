@@ -11,6 +11,14 @@ vi.mock('@tauri-apps/plugin-http', () => ({
   }))
 }))
 
+// Mock the useApiCache composable
+const mockFetchWithCache = vi.fn()
+vi.mock('../../composables/useApiCache', () => ({
+  useApiCache: () => ({
+    fetchWithCache: mockFetchWithCache
+  })
+}))
+
 import { fetch as mockFetch } from '@tauri-apps/plugin-http'
 
 const i18n = createI18n({
@@ -48,6 +56,11 @@ const i18n = createI18n({
 describe('Vehicles.vue', () => {
   beforeEach(() => {
     mockFetch.mockClear()
+    mockFetchWithCache.mockClear()
+    // Default implementation - call the fetch function
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
   })
 
   it('renders title', () => {
@@ -121,12 +134,10 @@ describe('Vehicles.vue', () => {
     // Wait for the search to trigger
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('vehicles/search'),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ query: 'Cut' })
-      })
+    expect(mockFetchWithCache).toHaveBeenCalledWith(
+      expect.stringContaining('vehicle_search'),
+      30 * 24 * 60 * 60 * 1000, // 30 days
+      expect.any(Function)
     )
   })
 
@@ -168,41 +179,43 @@ describe('Vehicles.vue', () => {
   })
 
   it('fetches vehicle details when selecting from dropdown', async () => {
-    const searchResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: [
-          {
-            id: 1,
-            name: 'Cutlass Black',
-            manufacturer: { name: 'Drake' }
-          }
-        ]
-      })
-    }
-
-    const detailsResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: {
+    const searchData = {
+      data: [
+        {
           id: 1,
           name: 'Cutlass Black',
-          description: 'A versatile medium freighter',
-          manufacturer: { name: 'Drake' },
-          type: 'Medium Freight',
-          size: 'Medium',
-          crew: { min: 1, max: 3 },
-          length: 38,
-          beam: 26.5,
-          height: 10.5,
-          mass: 53000
+          manufacturer: { name: 'Drake' }
         }
-      })
+      ]
     }
 
-    mockFetch
-      .mockResolvedValueOnce(searchResponse)
-      .mockResolvedValueOnce(detailsResponse)
+    const detailsData = {
+      data: {
+        id: 1,
+        name: 'Cutlass Black',
+        description: 'A versatile medium freighter',
+        manufacturer: { name: 'Drake' },
+        type: 'Medium Freight',
+        size: 'Medium',
+        crew: { min: 1, max: 3 },
+        sizes: {
+          length: 38,
+          beam: 26.5,
+          height: 10.5
+        },
+        mass: 53000
+      }
+    }
+
+    // Mock fetchWithCache to return the appropriate data based on the cache key
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      if (cacheKey.includes('search')) {
+        return searchData
+      } else if (cacheKey.includes('details')) {
+        return detailsData
+      }
+      return await fetchFn()
+    })
 
     const wrapper = mount(Vehicles, {
       global: {
@@ -225,49 +238,59 @@ describe('Vehicles.vue', () => {
     await new Promise(resolve => setTimeout(resolve, 100))
     await wrapper.vm.$nextTick()
 
-    // Check that the 2nd call was for vehicle details (1st was search, 2nd is details)
-    expect(mockFetch).toHaveBeenNthCalledWith(
-      2,
-      expect.stringContaining('vehicles/Cutlass%20Black')
+    // Check that fetchWithCache was called multiple times (search + details)
+    expect(mockFetchWithCache).toHaveBeenCalled()
+    expect(mockFetchWithCache.mock.calls.length).toBeGreaterThanOrEqual(2)
+
+    // Verify first call was for search
+    expect(mockFetchWithCache.mock.calls[0][0]).toContain('vehicle_search')
+    expect(mockFetchWithCache.mock.calls[0][1]).toBe(30 * 24 * 60 * 60 * 1000)
+
+    // Verify there's a call for details
+    const detailsCalls = mockFetchWithCache.mock.calls.filter(call =>
+      call[0].includes('vehicle_details')
     )
+    expect(detailsCalls.length).toBeGreaterThan(0)
   })
 
   it('displays vehicle details after selection', async () => {
-    const searchResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: [
-          {
-            id: 1,
-            name: 'Cutlass Black',
-            manufacturer: { name: 'Drake' }
-          }
-        ]
-      })
-    }
-
-    const detailsResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: {
+    const searchData = {
+      data: [
+        {
           id: 1,
           name: 'Cutlass Black',
-          description: 'A versatile medium freighter',
-          manufacturer: { name: 'Drake' },
-          type: 'Medium Freight',
-          size: 'Medium',
-          crew: { min: 1, max: 3 },
-          length: 38,
-          beam: 26.5,
-          height: 10.5,
-          mass: 53000
+          manufacturer: { name: 'Drake' }
         }
-      })
+      ]
     }
 
-    mockFetch
-      .mockResolvedValueOnce(searchResponse)
-      .mockResolvedValueOnce(detailsResponse)
+    const detailsData = {
+      data: {
+        id: 1,
+        name: 'Cutlass Black',
+        description: 'A versatile medium freighter',
+        manufacturer: { name: 'Drake' },
+        type: 'Medium Freight',
+        size: 'Medium',
+        crew: { min: 1, max: 3 },
+        sizes: {
+          length: 38,
+          beam: 26.5,
+          height: 10.5
+        },
+        mass: 53000
+      }
+    }
+
+    // Mock fetchWithCache to return the appropriate data based on the cache key
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      if (cacheKey.includes('search')) {
+        return searchData
+      } else if (cacheKey.includes('details')) {
+        return detailsData
+      }
+      return await fetchFn()
+    })
 
     const wrapper = mount(Vehicles, {
       global: {
@@ -340,46 +363,46 @@ describe('Vehicles.vue', () => {
   })
 
   it('displays shops when available in vehicle details', async () => {
-    const searchResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: [
-          {
-            id: 1,
-            name: 'Cutlass Black',
-            manufacturer: { name: 'Drake' }
-          }
-        ]
-      })
-    }
-
-    const detailsResponse = {
-      ok: true,
-      json: () => Promise.resolve({
-        data: {
+    const searchData = {
+      data: [
+        {
           id: 1,
           name: 'Cutlass Black',
-          manufacturer: { name: 'Drake' },
-          shops: [
-            {
-              id: 1,
-              name_raw: 'New Deal',
-              location: 'Lorville',
-              items: [
-                {
-                  id: 1,
-                  base_price: 1456200
-                }
-              ]
-            }
-          ]
+          manufacturer: { name: 'Drake' }
         }
-      })
+      ]
     }
 
-    mockFetch
-      .mockResolvedValueOnce(searchResponse)
-      .mockResolvedValueOnce(detailsResponse)
+    const detailsData = {
+      data: {
+        id: 1,
+        name: 'Cutlass Black',
+        manufacturer: { name: 'Drake' },
+        shops: [
+          {
+            id: 1,
+            name_raw: 'New Deal',
+            location: 'Lorville',
+            items: [
+              {
+                id: 1,
+                base_price: 1456200
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+    // Mock fetchWithCache to return the appropriate data based on the cache key
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      if (cacheKey.includes('search')) {
+        return searchData
+      } else if (cacheKey.includes('details')) {
+        return detailsData
+      }
+      return await fetchFn()
+    })
 
     const wrapper = mount(Vehicles, {
       global: {
@@ -404,8 +427,8 @@ describe('Vehicles.vue', () => {
     expect(wrapper.text()).toContain('Available at Shops')
     expect(wrapper.text()).toContain('New Deal')
     expect(wrapper.text()).toContain('Lorville')
-    // Price formatting is locale-dependent, just check it contains the price
-    expect(wrapper.text()).toMatch(/1[.,]456[.,]200/)
+    // Price formatting is locale-dependent, just check it contains the price digits
+    expect(wrapper.text()).toMatch(/1.456.200/)
   })
 
   it('applies correct CSS classes to root element', () => {

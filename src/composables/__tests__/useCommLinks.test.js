@@ -13,11 +13,20 @@ vi.mock('@tauri-apps/plugin-http', () => ({
   fetch: vi.fn()
 }))
 
+// Mock the useApiCache composable
+const mockFetchWithCache = vi.fn()
+vi.mock('../useApiCache', () => ({
+  useApiCache: () => ({
+    fetchWithCache: mockFetchWithCache
+  })
+}))
+
 import { fetch as mockFetch } from '@tauri-apps/plugin-http'
 
 describe('useCommLinks', () => {
   beforeEach(() => {
     mockFetch.mockReset()
+    mockFetchWithCache.mockReset()
   })
 
   it('initializes with correct default values', () => {
@@ -48,6 +57,11 @@ describe('useCommLinks', () => {
       ]
     }
 
+    // Mock fetchWithCache to call the fetch function
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve(JSON.stringify(mockData))
@@ -57,15 +71,10 @@ describe('useCommLinks', () => {
 
     await fetchCommLinks(2)
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      'https://leonick.se/feeds/rsi/json',
-      expect.objectContaining({
-        method: 'GET',
-        headers: expect.objectContaining({
-          'Accept': 'application/json',
-          'User-Agent': 'BackersLittleHelper/1.0'
-        })
-      })
+    expect(mockFetchWithCache).toHaveBeenCalledWith(
+      'commlinks_2',
+      60 * 60 * 1000, // 1 hour
+      expect.any(Function)
     )
     expect(commLinks.value).toHaveLength(2)
     expect(commLinks.value[0].title).toBe('Test News 1')
@@ -83,6 +92,10 @@ describe('useCommLinks', () => {
         content_html: `<p>Content ${i + 1}</p>`
       }))
     }
+
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
 
     mockFetch.mockResolvedValue({
       ok: true,
@@ -109,6 +122,10 @@ describe('useCommLinks', () => {
       ]
     }
 
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve(JSON.stringify(mockDataWithEscapes).replace(/&/g, '\\&'))
@@ -122,6 +139,10 @@ describe('useCommLinks', () => {
   })
 
   it('handles HTTP errors', async () => {
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockResolvedValue({
       ok: false,
       status: 500
@@ -136,6 +157,10 @@ describe('useCommLinks', () => {
   })
 
   it('handles invalid JSON response', async () => {
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve('invalid json')
@@ -150,6 +175,10 @@ describe('useCommLinks', () => {
   })
 
   it('handles missing items in response', async () => {
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve(JSON.stringify({ data: [] }))
@@ -164,6 +193,10 @@ describe('useCommLinks', () => {
   })
 
   it('sets loading state correctly during fetch', async () => {
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      return await fetchFn()
+    })
+
     mockFetch.mockImplementation(() => new Promise(resolve => {
       setTimeout(() => {
         resolve({
