@@ -221,6 +221,90 @@
             cursor: pointer;
         }
 
+        /* Carousel Styling */
+        .carousel-container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .carousel-slide-content {
+            max-width: 675px;
+            margin: 0 auto;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            color: #3b82f6;
+            width: 50px;
+            height: 50px;
+            border-radius: 0;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .carousel-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .carousel-btn.prev {
+            left: 20px;
+        }
+
+        .carousel-btn.next {
+            right: 20px;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .carousel-indicator {
+            width: 12px;
+            height: 12px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-indicator:hover {
+            background: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .carousel-indicator.active {
+            background: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            width: 30px;
+        }
+
         /* Image Modal/Lightbox */
         .image-modal {
             display: none;
@@ -460,36 +544,77 @@
         <div class="container mx-auto px-4">
             <h2 class="section-title text-center mb-16 rsi-glow" style="color: #3b82f6;">Screenshots</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Home Dashboard</h3>
-                    <img src="start.png" alt="Home Dashboard" class="screenshot w-full h-auto">
-                    <p class="text-gray-400 mt-3">Latest Comm-Links and server status</p>
+            <div class="carousel-container">
+                <!-- Previous Button -->
+                <button class="carousel-btn prev" onclick="changeSlide(-1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Carousel Slides -->
+                <div class="carousel-wrapper" id="carouselWrapper">
+                    <!-- Slide 1: Home Dashboard -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Home Dashboard</h3>
+                            <img src="start.png" alt="Home Dashboard" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Latest Comm-Links and server status</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: Comm-Links -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Comm-Links</h3>
+                            <img src="commlinks.png" alt="Comm-Links" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Browse the latest Star Citizen Comm-Links</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Vehicle Database -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Vehicle Database</h3>
+                            <img src="vehicles.png" alt="Vehicle Database" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Search and view vehicle specifications</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: Tools & Management -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Tools & Management</h3>
+                            <img src="tools.png" alt="Tools" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Manage directories and game files</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: Settings -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Settings</h3>
+                            <img src="settings.png" alt="Settings" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Configure installation and backup paths</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Comm-Links</h3>
-                    <img src="commlinks.png" alt="Comm-Links" class="screenshot w-full h-auto">
-                    <p class="text-gray-400 mt-3">Browse the latest Star Citizen Comm-Links</p>
-                </div>
+                <!-- Next Button -->
+                <button class="carousel-btn next" onclick="changeSlide(1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
 
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Vehicle Database</h3>
-                    <img src="vehicles.png" alt="Vehicle Database" class="screenshot w-full h-auto">
-                    <p class="text-gray-400 mt-3">Search and view vehicle specifications</p>
-                </div>
-
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Tools & Management</h3>
-                    <img src="tools.png" alt="Tools" class="screenshot w-full h-auto">
-                    <p class="text-gray-400 mt-3">Manage directories and game files</p>
-                </div>
-
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Settings</h3>
-                    <img src="settings.png" alt="Settings" class="screenshot w-full h-auto">
-                    <p class="text-gray-400 mt-3">Configure installation and backup paths</p>
-                </div>
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carouselIndicators">
+                <div class="carousel-indicator active" onclick="goToSlide(0)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(1)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(2)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(3)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(4)"></div>
             </div>
         </div>
     </section>
@@ -636,6 +761,74 @@ npm run tauri build</code></pre>
 </div>
 
 <script>
+    // Carousel functionality
+    let currentSlide = 0;
+    const totalSlides = 5;
+
+    function updateCarousel() {
+        const wrapper = document.getElementById('carouselWrapper');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+
+        // Update slide position
+        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update indicators
+        indicators.forEach((indicator, index) => {
+            if (index === currentSlide) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+    }
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+
+        // Loop around
+        if (currentSlide < 0) {
+            currentSlide = totalSlides - 1;
+        } else if (currentSlide >= totalSlides) {
+            currentSlide = 0;
+        }
+
+        updateCarousel();
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateCarousel();
+    }
+
+    // Auto-advance carousel every 5 seconds
+    let autoAdvance = setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+
+    // Pause auto-advance on hover
+    document.addEventListener('DOMContentLoaded', function() {
+        const carouselContainer = document.querySelector('.carousel-container');
+
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoAdvance);
+        });
+
+        carouselContainer.addEventListener('mouseleave', () => {
+            autoAdvance = setInterval(() => {
+                changeSlide(1);
+            }, 2500);
+        });
+    });
+
+    // Keyboard navigation for carousel
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+            changeSlide(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeSlide(1);
+        }
+    });
+
     // Image modal functionality
     function openImageModal(src, alt) {
         const modal = document.getElementById('imageModal');
