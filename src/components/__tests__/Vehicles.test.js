@@ -253,6 +253,71 @@ describe('Vehicles.vue', () => {
     expect(detailsCalls.length).toBeGreaterThan(0)
   })
 
+  it('passes all required parameters to fetchWithCache for vehicle details', async () => {
+    const searchData = {
+      data: [
+        {
+          id: 1,
+          name: 'Cutlass Black',
+          manufacturer: { name: 'Drake' }
+        }
+      ]
+    }
+
+    const detailsData = {
+      data: {
+        id: 1,
+        name: 'Cutlass Black',
+        manufacturer: { name: 'Drake' }
+      }
+    }
+
+    // Mock fetchWithCache to return the appropriate data based on the cache key
+    mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
+      if (cacheKey.includes('search')) {
+        return searchData
+      } else if (cacheKey.includes('details')) {
+        return detailsData
+      }
+      return await fetchFn()
+    })
+
+    const wrapper = mount(Vehicles, {
+      global: {
+        plugins: [i18n]
+      }
+    })
+
+    const input = wrapper.find('input[type="text"]')
+    await input.setValue('Cutlass')
+
+    await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await wrapper.vm.$nextTick()
+
+    // Click on the first result to trigger fetchVehicleDetails
+    const firstResult = wrapper.find('li')
+    await firstResult.trigger('click')
+
+    await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await wrapper.vm.$nextTick()
+
+    // Verify fetchWithCache was called for vehicle details with correct parameters
+    const detailsCalls = mockFetchWithCache.mock.calls.filter(call =>
+      call[0].includes('vehicle_details')
+    )
+
+    expect(detailsCalls.length).toBeGreaterThan(0)
+
+    // Check that all 3 parameters are passed: cacheKey, cacheDuration, fetchFunction
+    const [cacheKey, cacheDuration, fetchFunction] = detailsCalls[0]
+
+    expect(cacheKey).toContain('vehicle_details_en_EN_Cutlass Black')
+    expect(cacheDuration).toBe(30 * 24 * 60 * 60 * 1000) // 30 days in milliseconds
+    expect(typeof fetchFunction).toBe('function')
+  })
+
   it('displays vehicle details after selection', async () => {
     const searchData = {
       data: [

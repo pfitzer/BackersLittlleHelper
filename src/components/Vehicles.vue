@@ -681,8 +681,9 @@ async function fetchVehicleDetails(vehicleName) {
     console.log('Fetch vehicle details URL:', url)
 
     const cacheKey = `vehicle_details_${apiLocale}_${vehicleName}`
+    const ONE_WEEK_MS = 30 * 24 * 60 * 60 * 1000
 
-    const data = await fetchWithCache(cacheKey, async () => {
+    const data = await fetchWithCache(cacheKey, ONE_WEEK_MS, async () => {
       const response = await fetch(url)
 
       if (!response.ok) {
