@@ -236,12 +236,15 @@ async function loadSettings() {
     if (fileExists) {
       const contents = await readTextFile(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
       const loadedSettings = JSON.parse(contents)
+      // Normalize paths to use forward slashes
+      const normalizedInstallDir = loadedSettings.installationDirectory ? loadedSettings.installationDirectory.replace(/\\/g, '/') : ''
+      const normalizedBackupDir = loadedSettings.backupDirectory ? loadedSettings.backupDirectory.replace(/\\/g, '/') : ''
       settings.value = {
-        installationDirectory: loadedSettings.installationDirectory || '',
-        userDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}/${selectedEnvironment.value}/user` : '',
-        backupDirectory: loadedSettings.backupDirectory || '',
+        installationDirectory: normalizedInstallDir,
+        userDirectory: normalizedInstallDir ? `${normalizedInstallDir}/${selectedEnvironment.value}/user` : '',
+        backupDirectory: normalizedBackupDir,
         shaderDirectory: `${localDataPath}/Star Citizen`,
-        logDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}/${selectedEnvironment.value}/logs` : ''
+        logDirectory: normalizedInstallDir ? `${normalizedInstallDir}/${selectedEnvironment.value}/logs` : ''
       }
     }
 
@@ -256,8 +259,10 @@ async function loadSettings() {
 
 function updateDirectoriesForEnvironment(env) {
   if (settings.value.installationDirectory) {
-    settings.value.userDirectory = `${settings.value.installationDirectory}/${env}/user`
-    settings.value.logDirectory = `${settings.value.installationDirectory}/${env}/logs`
+    // Normalize path separators to forward slashes for cross-platform compatibility
+    const normalizedPath = settings.value.installationDirectory.replace(/\\/g, '/')
+    settings.value.userDirectory = `${normalizedPath}/${env}/user`
+    settings.value.logDirectory = `${normalizedPath}/${env}/logs`
 
     // Recalculate log size for the new environment if not in test mode
     if (import.meta.env.MODE !== 'test') {
@@ -279,7 +284,9 @@ async function checkEnvironmentFolders() {
 
   for (const env of environments) {
     try {
-      const envPath = `${settings.value.installationDirectory}/${env}`
+      // Normalize path separators
+      const normalizedPath = settings.value.installationDirectory.replace(/\\/g, '/')
+      const envPath = `${normalizedPath}/${env}`
       environmentStatus.value[env] = await exists(envPath)
     } catch {
       environmentStatus.value[env] = false
@@ -294,20 +301,21 @@ async function scanExistingBackups() {
   }
 
   try {
-    const backupDirExists = await exists(settings.value.backupDirectory)
+    const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+    const backupDirExists = await exists(normalizedBackupDir)
     if (!backupDirExists) {
       existingBackups.value = []
       return
     }
 
-    const entries = await readDir(settings.value.backupDirectory)
+    const entries = await readDir(normalizedBackupDir)
     const backups = []
 
     for (const entry of entries) {
       if (entry.isDirectory && entry.name.startsWith('user_')) {
         const universe = entry.name.replace('user_', '')
         if (environments.includes(universe)) {
-          const backupPath = `${settings.value.backupDirectory}/${entry.name}`
+          const backupPath = `${normalizedBackupDir}/${entry.name}`
           try {
             const stats = await stat(backupPath)
             backups.push({
@@ -360,7 +368,8 @@ function getUniverseBadgeClass(universe) {
 }
 
 async function restoreFromBackup(backupName) {
-  const backupPath = `${settings.value.backupDirectory}/${backupName}`
+  const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+  const backupPath = `${normalizedBackupDir}/${backupName}`
   const universe = backupName.replace('user_', '')
 
   if (!confirm($t('tools.confirmRestoreFrom', { universe }))) return
@@ -369,7 +378,8 @@ async function restoreFromBackup(backupName) {
   statusType.value = 'info'
 
   try {
-    const userPath = `${settings.value.installationDirectory}/${universe}/user/..`
+    const normalizedInstallDir = settings.value.installationDirectory.replace(/\\/g, '/')
+    const userPath = `${normalizedInstallDir}/${universe}/user/..`
     const parentPath = await dirname(userPath)
 
     await copyDirectoryRecursive(backupPath, parentPath)
@@ -392,7 +402,8 @@ async function restoreFromBackup(backupName) {
 async function deleteBackup(backupName) {
   if (!confirm($t('tools.confirmDeleteBackup', { name: backupName }))) return
 
-  const backupPath = `${settings.value.backupDirectory}/${backupName}`
+  const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+  const backupPath = `${normalizedBackupDir}/${backupName}`
 
   statusMessage.value = $t('tools.deleting')
   statusType.value = 'info'
@@ -455,7 +466,8 @@ async function backupDirectory(type) {
     let backupPath
     if (type === 'user') {
       // For user directory, copy to backup directory with environment-specific folder name
-      backupPath = `${settings.value.backupDirectory}/user_${selectedEnvironment.value}`
+      const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+      backupPath = `${normalizedBackupDir}/user_${selectedEnvironment.value}`
       if (!settings.value.backupDirectory) {
         statusMessage.value = $t('tools.backupError') + ': No backup directory set'
         statusType.value = 'error'
@@ -465,11 +477,14 @@ async function backupDirectory(type) {
     } else {
       // For other directories, create timestamped backup
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-      backupPath = `${path}_backup_${timestamp}`
+      const normalizedPath = path.replace(/\\/g, '/')
+      backupPath = `${normalizedPath}_backup_${timestamp}`
     }
 
+    // Normalize source path
+    const normalizedPath = path.replace(/\\/g, '/')
     // Copy directory recursively using filesystem API
-    await copyDirectoryRecursive(path, backupPath)
+    await copyDirectoryRecursive(normalizedPath, backupPath)
 
     statusMessage.value = $t('tools.backupSuccess')
     statusType.value = 'success'
@@ -496,7 +511,8 @@ async function restoreDirectory(type) {
   try {
     if (type === 'user') {
       // For user directory, restore from backup directory with environment-specific folder name
-      const backupPath = `${settings.value.backupDirectory}/user_${selectedEnvironment.value}`
+      const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+      const backupPath = `${normalizedBackupDir}/user_${selectedEnvironment.value}`
 
       if (!settings.value.backupDirectory) {
         statusMessage.value = $t('tools.restoreError') + ': No backup directory set'
@@ -606,16 +622,19 @@ async function deleteDirectory(type) {
   statusType.value = 'info'
 
   try {
+    // Normalize path to use forward slashes
+    const normalizedPath = path.replace(/\\/g, '/')
+
     if (type === 'backup') {
       // For backup directory, delete all contents but keep the directory
-      const entries = await readDir(path)
+      const entries = await readDir(normalizedPath)
       for (const entry of entries) {
-        const entryPath = `${path}/${entry.name}`
+        const entryPath = `${normalizedPath}/${entry.name}`
         await remove(entryPath, { recursive: true })
       }
     } else {
       // For other directories, delete the entire directory
-      await remove(path, { recursive: true })
+      await remove(normalizedPath, { recursive: true })
     }
 
     statusMessage.value = $t('tools.deleteSuccess')
