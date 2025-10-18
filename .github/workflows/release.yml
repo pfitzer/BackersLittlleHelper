@@ -25,13 +25,18 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Clean npm cache
+        run: |
+          Remove-Item -Path package-lock.json -ErrorAction SilentlyContinue
+          Remove-Item -Path node_modules -Recurse -Force -ErrorAction SilentlyContinue
+        shell: pwsh
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Tauri app
         run: npm run tauri build

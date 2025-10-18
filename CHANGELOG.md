@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2025-10-17
+
+### Fixed
+- **Vehicle Details API Cache Bug**: Fixed missing `cacheDuration` parameter in `fetchVehicleDetails` function
+  - The function was only passing 2 parameters instead of required 3 to `fetchWithCache`
+  - This caused `fetchFunction` to be undefined, resulting in "fetchFunction is not a function" error
+  - Fixed by adding the missing `ONE_WEEK_MS` (30 days) cache duration parameter
+
+### Added
+- **GitHub Page Carousel**: Converted screenshots section to interactive carousel
+  - Auto-advance feature (cycles every 2.5 seconds)
+  - Previous/Next navigation buttons with RSI-styled hover effects
+  - Dot indicators for direct slide navigation
+  - Keyboard support (arrow keys)
+  - Pause on hover functionality
+  - Click on screenshots to view in fullscreen lightbox
+- **Test Coverage Enhancement**: Added comprehensive test for vehicle details API caching
+  - New test validates all 3 parameters are correctly passed to `fetchWithCache`
+  - Verifies cache key format, duration value, and function type
+  - Prevents regression of the parameter order bug
+
+### Changed
+- **GitHub Page Layout**: Carousel sized at 75% of original screenshots grid for better visual balance
+
 ## [0.4.1] - 2025-10-16
 
 ### Added
@@ -141,6 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic settings and tools functionality
 - Security updates via Dependabot (Electron 24.3.0 → 35.7.5)
 
+[0.4.3]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.4.3
 [0.4.1]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.4.1
 [0.2.0]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/pfitzer/BackersLittlleHelper/releases/tag/v0.1.1

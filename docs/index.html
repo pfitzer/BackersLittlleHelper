@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="rsi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backers Little Helper - Star Citizen Management Tool</title>
+    <meta name="description"
+          content="A desktop application for managing Star Citizen game configurations and settings, featuring a sleek RSI-inspired interface.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css"/>
+
+    <style>
+        /* Tailwind config - RSI theme */
+        :root {
+            --color-primary: #3b82f6;
+            --color-secondary: #60a5fa;
+            --color-accent: #2563eb;
+            --color-neutral: #0a0e1a;
+            --color-base-100: #000b11;
+            --color-base-200: #020712;
+            --color-base-300: #030a14;
+            --color-info: #3b82f6;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+        }
+
+        html {
+            font-size: clamp(68%, 0.5vw + 0.5vh, 100%);
+        }
+
+        /* RSI-style dark background */
+        body {
+            background: #000b11;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Noise texture overlay similar to RSI */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 3px
+            ),
+            repeating-linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 3px
+            );
+            background-size: 4px 4px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #background {
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background-size: 150%;
+            background-repeat: no-repeat;
+            background-image: radial-gradient(ellipse at 50% 50%, rgba(45, 12, 232, 0.15) 0%, rgba(2, 0, 36, 0.8) 50%, #000b11 100%);
+            z-index: 0;
+        }
+
+        #background2 {
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background-image: url('MadeByTheCommunity_Black.png');
+            background-size: 40%;
+            background-repeat: no-repeat;
+            background-position: center center;
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #app {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* RSI-style corner elements */
+        .rsi-corners {
+            position: relative;
+            border-radius: 0 !important;
+        }
+
+        /* Top-left corner */
+        .rsi-corners::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            top: 0;
+            left: 0;
+            border-top: 2px solid rgba(59, 130, 246, 0.6);
+            border-left: 2px solid rgba(59, 130, 246, 0.6);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Top-right corner */
+        .rsi-corners::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            top: 0;
+            right: 0;
+            border-top: 2px solid rgba(59, 130, 246, 0.6);
+            border-right: 2px solid rgba(59, 130, 246, 0.6);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .rsi-corners > *:last-child::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            bottom: 0;
+            left: 0;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+            border-left: 2px solid rgba(59, 130, 246, 0.6);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .rsi-corners > *:last-child::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            bottom: 0;
+            right: 0;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+            border-right: 2px solid rgba(59, 130, 246, 0.6);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .rsi-corners > *:last-child {
+            position: relative;
+        }
+
+        .rsi-border {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+        }
+
+        .rsi-glow {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Remove all rounded corners */
+        .btn,
+        button,
+        .card,
+        .badge {
+            border-radius: 0 !important;
+        }
+
+        .btn {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .badge {
+            border: 1px solid currentColor;
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 600;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Screenshot styling */
+        .screenshot {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .screenshot:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+
+        /* Carousel Styling */
+        .carousel-container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .carousel-slide-content {
+            max-width: 675px;
+            margin: 0 auto;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            color: #3b82f6;
+            width: 50px;
+            height: 50px;
+            border-radius: 0;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .carousel-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .carousel-btn.prev {
+            left: 20px;
+        }
+
+        .carousel-btn.next {
+            right: 20px;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .carousel-indicator {
+            width: 12px;
+            height: 12px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-indicator:hover {
+            background: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .carousel-indicator.active {
+            background: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            width: 30px;
+        }
+
+        /* Image Modal/Lightbox */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 11, 17, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+            animation: zoomIn 0.3s ease;
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 40px;
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .image-modal-close:hover {
+            color: #60a5fa;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="background"></div>
+<div id="background2"></div>
+
+<div id="app">
+    <!-- Navigation -->
+    <nav class="navbar backdrop-blur-md border-b border-blue-500/20 rsi-border sticky top-0 z-50"
+         style="background: rgba(0, 11, 17, 0.85);">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <a href="#" class="text-xl font-bold rsi-glow" style="color: #3b82f6;">Backers Little Helper</a>
+                <span class="ml-3 badge badge-info">v0.4.2</span>
+            </div>
+            <div class="flex-none gap-2">
+                <a href="#features" class="btn btn-ghost text-blue-400">Features</a>
+                <a href="#download" class="btn btn-ghost text-blue-400">Download</a>
+                <a href="#screenshots" class="btn btn-ghost text-blue-400">Screenshots</a>
+                <a href="https://github.com/pfitzer/BackersLittlleHelper" target="_blank" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero min-h-screen">
+        <div class="hero-content text-center" style="transform: translateY(-10%);">
+
+            <div class="max-w-4xl">
+                <h1 class="hero-title rsi-glow mb-5" style="color: #3b82f6;">
+                    Backers Little Helper
+                </h1>
+                <p class="text-xl mb-8 text-gray-300">
+                    A desktop application for managing Star Citizen game configurations and settings
+                </p>
+                <p class="text-lg mb-12 text-gray-400 max-w-2xl mx-auto">
+                    Built with Tauri 2 and Vue.js, featuring a sleek RSI-inspired interface. Manage your game
+                    directories, browse vehicles, stay updated with the latest Comm-Links, and monitor server status.
+                </p>
+                <div class="flex gap-4 justify-center flex-wrap">
+                    <a href="#download" class="btn btn-primary btn-lg px-8">
+                        Download Now
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-lg px-8"
+                       style="border-color: #3b82f6; color: #3b82f6;">
+                        Learn More
+                    </a>
+                    <a href="https://github.com/pfitzer/BackersLittlleHelper" target="_blank"
+                       class="btn btn-outline btn-lg px-8" style="border-color: #3b82f6; color: #3b82f6;">
+                        View on GitHub
+                    </a>
+                </div>
+
+                <!-- Badges -->
+                <div class="flex gap-3 justify-center mt-8 flex-wrap">
+                        <span class="badge badge-lg"
+                              style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.6); color: #3b82f6;">
+                            Windows
+                        </span>
+                    <span class="badge badge-lg"
+                          style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.6); color: #10b981;">
+                            Open Source
+                        </span>
+                    <span class="badge badge-lg"
+                          style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.6); color: #f59e0b;">
+                            MIT License
+                        </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-center mb-16 rsi-glow" style="color: #3b82f6;">Features</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature Card 1 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Home Dashboard</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Latest Comm-Links from Star Citizen Wiki API</li>
+                            <li>• Live RSI Server Status monitoring</li>
+                            <li>• Beautiful RSI-inspired UI</li>
+                            <li>• Smart API caching</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature Card 2 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Vehicle Database</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Search Star Citizen vehicles</li>
+                            <li>• Detailed specifications display</li>
+                            <li>• Manufacturer and type filtering</li>
+                            <li>• Shop pricing information</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature Card 3 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Tools & Management</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Backup and restore game data</li>
+                            <li>• Delete shader cache</li>
+                            <li>• Clean up log files</li>
+                            <li>• Directory management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature Card 4 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Windows Application</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Native Windows support</li>
+                            <li>• Fast and lightweight</li>
+                            <li>• Low memory footprint</li>
+                            <li>• Native performance with Tauri</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature Card 5 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Multi-Language</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Automatic OS language detection</li>
+                            <li>• English support</li>
+                            <li>• German support</li>
+                            <li>• Easy to extend</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature Card 6 -->
+                <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                     style="background: rgba(0, 11, 17, 0.85);">
+                    <div class="card-body">
+                        <h3 class="card-title text-blue-400">Modern Tech Stack</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li>• Vue 3 with Composition API</li>
+                            <li>• Tauri 2 backend (Rust)</li>
+                            <li>• Tailwind CSS styling</li>
+                            <li>• 100% test coverage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section id="screenshots" class="py-20" style="background: rgba(0, 11, 17, 0.3);">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-center mb-16 rsi-glow" style="color: #3b82f6;">Screenshots</h2>
+
+            <div class="carousel-container">
+                <!-- Previous Button -->
+                <button class="carousel-btn prev" onclick="changeSlide(-1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Carousel Slides -->
+                <div class="carousel-wrapper" id="carouselWrapper">
+                    <!-- Slide 1: Home Dashboard -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Home Dashboard</h3>
+                            <img src="start.png" alt="Home Dashboard" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Latest Comm-Links and server status</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: Comm-Links -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Comm-Links</h3>
+                            <img src="commlinks.png" alt="Comm-Links" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Browse the latest Star Citizen Comm-Links</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Vehicle Database -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Vehicle Database</h3>
+                            <img src="vehicles.png" alt="Vehicle Database" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Search and view vehicle specifications</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: Tools & Management -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Tools & Management</h3>
+                            <img src="tools.png" alt="Tools" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Manage directories and game files</p>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: Settings -->
+                    <div class="carousel-slide">
+                        <div class="carousel-slide-content text-center">
+                            <h3 class="text-2xl font-semibold mb-6 text-blue-400">Settings</h3>
+                            <img src="settings.png" alt="Settings" class="screenshot w-full h-auto">
+                            <p class="text-gray-400 mt-4 text-lg">Configure installation and backup paths</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Button -->
+                <button class="carousel-btn next" onclick="changeSlide(1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carouselIndicators">
+                <div class="carousel-indicator active" onclick="goToSlide(0)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(1)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(2)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(3)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(4)"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-20">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 class="section-title text-center mb-16 rsi-glow" style="color: #3b82f6;">Download & Installation</h2>
+
+            <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl mb-8"
+                 style="background: rgba(0, 11, 17, 0.85);">
+                <div class="card-body">
+                    <h3 class="card-title text-blue-400 mb-4">Download Latest Release</h3>
+                    <p class="text-gray-300 mb-6">
+                        Get the latest version of Backers Little Helper from GitHub Releases:
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 border border-blue-500/30 backdrop-blur-sm"
+                             style="background: rgba(0, 11, 17, 0.5);">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-blue-300">Windows</h4>
+                                <p class="text-sm text-gray-400">Download the .msi or .exe installer</p>
+                            </div>
+                            <a href="https://github.com/pfitzer/BackersLittlleHelper/releases/latest" target="_blank"
+                               class="btn btn-primary">
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Installation Instructions -->
+            <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl mb-8"
+                 style="background: rgba(0, 11, 17, 0.85);">
+                <div class="card-body">
+                    <h3 class="card-title text-blue-400 mb-4">Installation Instructions</h3>
+
+                    <!-- Windows -->
+                    <div>
+                        <h4 class="font-semibold text-blue-300 mb-3">Windows</h4>
+                        <ol class="list-decimal list-inside text-gray-300 space-y-2 ml-4">
+                            <li>Download the .msi or .exe installer from the releases page</li>
+                            <li>Run the installer</li>
+                            <li>If Windows SmartScreen appears, click "More info" then "Run anyway"</li>
+                            <li>Follow the installation wizard</li>
+                            <li>Launch Backers Little Helper from the Start menu</li>
+                        </ol>
+                        <div class="alert mt-4"
+                             style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 class="stroke-warning shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <div class="font-semibold text-warning">Unsigned Application Warning</div>
+                                <div class="text-sm text-gray-300 mt-1">The application is not code-signed. You may see
+                                    security warnings during installation. This is normal for open-source applications.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build from Source -->
+            <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl"
+                 style="background: rgba(0, 11, 17, 0.85);">
+                <div class="card-body">
+                    <h3 class="card-title text-blue-400 mb-4">Build from Source</h3>
+                    <p class="text-gray-300 mb-4">Want to build the application yourself? Follow these steps:</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-gray-300 mb-2"><strong>Prerequisites:</strong></p>
+                            <ul class="list-disc list-inside text-gray-300 ml-4">
+                                <li>Node.js (v20.19+ or v22.12+)</li>
+                                <li>Rust (v1.90.0 or higher)</li>
+                                <li>npm or yarn package manager</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <p class="text-gray-300 mb-2"><strong>Build Steps:</strong></p>
+                            <div class="mockup-code" style="background: rgba(0, 11, 17, 0.9);">
+                                    <pre><code># Clone the repository
+git clone https://github.com/pfitzer/BackersLittlleHelper.git
+cd BackersLittleHelper
+
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run tauri dev
+
+# Build for production
+npm run tauri build</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 border-t border-blue-500/20" style="background: rgba(0, 11, 17, 0.85);">
+        <div>
+            <div class="grid grid-flow-col gap-4 mb-4">
+                <a href="https://github.com/pfitzer/BackersLittlleHelper" target="_blank"
+                   class="link link-hover text-blue-400">GitHub</a>
+                <a href="https://github.com/pfitzer/BackersLittlleHelper/issues" target="_blank"
+                   class="link link-hover text-blue-400">Report Issue</a>
+                <a href="https://github.com/pfitzer/BackersLittlleHelper/blob/master/LICENSE" target="_blank"
+                   class="link link-hover text-blue-400">License</a>
+            </div>
+            <div>
+                <p class="text-gray-400">
+                    Built with <span class="text-red-500">❤</span> by Michael Pfister
+                </p>
+                <p class="text-gray-500 text-sm mt-2">
+                    MIT License | v0.4.2 | Made for the Star Citizen community
+                </p>
+                <h5 class="mt-2">Copyright</h5>
+                <p class="text-gray-500 text-xs mt-2">
+                    All game content and materials are copyright of Cloud Imperium Rights LLC and Cloud Imperium Rights
+                    Ltd..
+                    <br>Star Citizen®, Squadron 42®, Roberts Space Industries®, and Cloud Imperium® are registered
+                    trademarks of Cloud Imperium Rights LLC.
+                    <br>All rights reserved. Other content is available under Creative Commons Attribution-ShareAlike
+                    unless otherwise noted.
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" class="image-modal-content" src="" alt="">
+</div>
+
+<script>
+    // Carousel functionality
+    let currentSlide = 0;
+    const totalSlides = 5;
+
+    function updateCarousel() {
+        const wrapper = document.getElementById('carouselWrapper');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+
+        // Update slide position
+        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update indicators
+        indicators.forEach((indicator, index) => {
+            if (index === currentSlide) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+    }
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+
+        // Loop around
+        if (currentSlide < 0) {
+            currentSlide = totalSlides - 1;
+        } else if (currentSlide >= totalSlides) {
+            currentSlide = 0;
+        }
+
+        updateCarousel();
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateCarousel();
+    }
+
+    // Auto-advance carousel every 5 seconds
+    let autoAdvance = setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+
+    // Pause auto-advance on hover
+    document.addEventListener('DOMContentLoaded', function() {
+        const carouselContainer = document.querySelector('.carousel-container');
+
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoAdvance);
+        });
+
+        carouselContainer.addEventListener('mouseleave', () => {
+            autoAdvance = setInterval(() => {
+                changeSlide(1);
+            }, 2500);
+        });
+    });
+
+    // Keyboard navigation for carousel
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+            changeSlide(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeSlide(1);
+        }
+    });
+
+    // Image modal functionality
+    function openImageModal(src, alt) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.classList.add('active');
+        modalImg.src = src;
+        modalImg.alt = alt;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    }
+
+    // Close modal when clicking outside the image
+    document.getElementById('imageModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+
+    // Add click handlers to all screenshot images
+    document.addEventListener('DOMContentLoaded', function () {
+        const screenshots = document.querySelectorAll('.screenshot');
+        screenshots.forEach(function (img) {
+            img.addEventListener('click', function () {
+                openImageModal(this.src, this.alt);
+            });
+        });
+    });
+</script>
+</body>
+</html>
