@@ -30,6 +30,7 @@ const i18n = createI18n({
         title: 'Settings',
         directories: 'Directories',
         installationDir: 'Installation Directory',
+        installationDirHint: 'On Windows, this path is usually C:\\Program Files\\Roberts Space Industries\\StarCitizen',
         backupDir: 'Backup Directory',
         browse: 'Browse',
         resetDefaults: 'Reset to Defaults',

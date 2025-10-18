@@ -47,7 +47,11 @@ const i18n = createI18n({
         deleting: 'Deleting directory...',
         deleteSuccess: 'Directory deleted successfully!',
         deleteError: 'Error deleting directory',
-        confirmDelete: 'Are you sure you want to delete this directory?'
+        confirmDelete: 'Are you sure you want to delete this directory?',
+        environmentFolders: 'Game Universe',
+        folderExists: 'Installed',
+        folderMissing: 'Not installed',
+        selectEnvironment: 'Choose Universe'
       }
     }
   }
@@ -117,7 +121,7 @@ describe('Tools.vue', () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    expect(wrapper.vm.settings.userDirectory).toBe('C:\\test\\install\\StarCitizen\\LIVE\\user')
+    expect(wrapper.vm.settings.userDirectory).toBe('C:\\test\\install\\LIVE\\user')
     expect(wrapper.vm.settings.backupDirectory).toBe('C:\\test\\backup')
   })
 
@@ -222,7 +226,7 @@ describe('Tools.vue', () => {
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
     localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
-    dirname.mockResolvedValue('C:\\test\\install\\StarCitizen\\LIVE')
+    dirname.mockResolvedValue('C:\\test\\install\\LIVE')
     readDir.mockResolvedValue([
       { name: 'file1.txt', isDirectory: false }
     ])
@@ -337,7 +341,7 @@ describe('Tools.vue', () => {
 
     await wrapper.vm.deleteDirectory('user')
 
-    expect(remove).toHaveBeenCalledWith('C:\\test\\install\\StarCitizen\\LIVE\\user', { recursive: true })
+    expect(remove).toHaveBeenCalledWith('C:\\test\\install\\LIVE\\user', { recursive: true })
     expect(wrapper.vm.statusMessage).toBe('Directory deleted successfully!')
     expect(wrapper.vm.statusType).toBe('success')
   })

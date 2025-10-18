@@ -40,6 +40,7 @@ const messages = {
       title: 'Settings',
       directories: 'Directories',
       installationDir: 'Installation Directory',
+      installationDirHint: 'On Windows, this path is usually C:\\Program Files\\Roberts Space Industries\\StarCitizen',
       backupDir: 'Backup Directory',
       shaderDir: 'Shader Directory',
       browse: 'Browse',
@@ -77,7 +78,11 @@ const messages = {
       deleting: 'Deleting directory...',
       deleteSuccess: 'Directory deleted successfully!',
       deleteError: 'Error deleting directory',
-      confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!'
+      confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!',
+      environmentFolders: 'Game Universe',
+      folderExists: 'Installed',
+      folderMissing: 'Not installed',
+      selectEnvironment: 'Choose Universe'
     },
     vehicles: {
       title: 'Vehicles',
@@ -197,6 +202,7 @@ const messages = {
       title: 'Einstellungen',
       directories: 'Verzeichnisse',
       installationDir: 'Installationsverzeichnis',
+      installationDirHint: 'Unter Windows ist dieser Pfad üblicherweise C:\\Program Files\\Roberts Space Industries\\StarCitizen',
       backupDir: 'Sicherungsverzeichnis',
       shaderDir: 'Shader-Verzeichnis',
       browse: 'Durchsuchen',
@@ -234,7 +240,11 @@ const messages = {
       deleting: 'Lösche Verzeichnis...',
       deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
       deleteError: 'Fehler beim Löschen des Verzeichnisses',
-      confirmDelete: 'Bist du sicher, dass du dieses Verzeichnis löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!'
+      confirmDelete: 'Bist du sicher, dass du dieses Verzeichnis löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!',
+      environmentFolders: 'Spiel-Universum',
+      folderExists: 'Installiert',
+      folderMissing: 'Nicht installiert',
+      selectEnvironment: 'Universum wählen'
     },
     vehicles: {
       title: 'Fahrzeuge',
@@ -354,6 +364,7 @@ const messages = {
       title: 'Paramètres',
       directories: 'Répertoires',
       installationDir: 'Répertoire d\'installation',
+      installationDirHint: 'Sous Windows, ce chemin est généralement C:\\Program Files\\Roberts Space Industries\\StarCitizen',
       backupDir: 'Répertoire de sauvegarde',
       shaderDir: 'Répertoire des shaders',
       browse: 'Parcourir',
@@ -391,7 +402,11 @@ const messages = {
       deleting: 'Suppression du répertoire...',
       deleteSuccess: 'Répertoire supprimé avec succès !',
       deleteError: 'Erreur lors de la suppression du répertoire',
-      confirmDelete: 'Êtes-vous sûr de vouloir supprimer ce répertoire ? Cette action ne peut pas être annulée !'
+      confirmDelete: 'Êtes-vous sûr de vouloir supprimer ce répertoire ? Cette action ne peut pas être annulée !',
+      environmentFolders: 'Univers du jeu',
+      folderExists: 'Installé',
+      folderMissing: 'Non installé',
+      selectEnvironment: 'Choisir l\'univers'
     },
     vehicles: {
       title: 'Véhicules',

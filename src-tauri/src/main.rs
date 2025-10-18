@@ -93,7 +93,6 @@ fn launch_star_citizen(app: &tauri::AppHandle) {
     };
 
     let launcher_path = PathBuf::from(&settings.installation_directory)
-        .join("StarCitizen")
         .join("LIVE")
         .join("StarCitizen_Launcher.exe");
 

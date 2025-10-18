@@ -4,6 +4,27 @@
       {{ $t('tools.title') }}
     </h2>
 
+    <!-- Environment Folders Status -->
+    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('tools.environmentFolders') }}</h3>
+        <div class="flex gap-4 flex-wrap">
+          <div v-for="env in environments" :key="env" class="flex items-center gap-2">
+            <span class="font-semibold">{{ env }}:</span>
+            <span
+                :class="[
+                'badge',
+                'badge-sm',
+                environmentStatus[env] ? 'badge-success' : 'badge-error'
+              ]"
+            >
+              {{ environmentStatus[env] ? $t('tools.folderExists') : $t('tools.folderMissing') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Backup Directory Tools -->
     <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
       <div class="card-body">
@@ -24,6 +45,29 @@
     <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
       <div class="card-body">
         <h3 class="card-title text-secondary mb-4">{{ $t('tools.userDir') }}</h3>
+
+        <!-- Environment Selector -->
+        <div class="form-control mb-4">
+          <div class="flex gap-2 items-center">
+            <span class="text-sm opacity-70">{{ $t('tools.selectEnvironment') }}:</span>
+            <div class="btn-group">
+              <button
+                v-for="env in environments"
+                :key="env"
+                @click="selectedEnvironment = env"
+                :class="[
+                  'btn btn-sm',
+                  selectedEnvironment === env ? 'btn-primary' : 'btn-ghost',
+                  !environmentStatus[env] ? 'opacity-50' : ''
+                ]"
+                :disabled="!environmentStatus[env]"
+              >
+                {{ env }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <p class="text-sm opacity-70 mb-4">{{ settings.userDirectory || $t('tools.noPathSet') }}</p>
         <div class="flex gap-2 flex-wrap">
           <button @click="backupDirectory('user')" class="btn btn-primary btn-sm" :disabled="!settings.userDirectory">
@@ -97,10 +141,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onActivated } from 'vue'
-import { useI18n } from "vue-i18n"
-import { BaseDirectory, readTextFile, exists, copyFile, readDir, remove, mkdir, stat } from '@tauri-apps/plugin-fs'
-import { homeDir, dirname, localDataDir } from '@tauri-apps/api/path'
+import {onActivated, onMounted, ref, watch} from 'vue'
+import {useI18n} from "vue-i18n"
+import {BaseDirectory, copyFile, exists, mkdir, readDir, readTextFile, remove, stat} from '@tauri-apps/plugin-fs'
+import {dirname, homeDir, localDataDir} from '@tauri-apps/api/path'
 
 const { t: $t } = useI18n()
 
@@ -108,7 +152,16 @@ const settings = ref({
   userDirectory: '',
   backupDirectory: '',
   shaderDirectory: '',
-  logDirectory: ''
+  logDirectory: '',
+  installationDirectory: ''
+})
+
+const environments = ['LIVE', 'PTU', 'EPTU']
+const selectedEnvironment = ref('LIVE')
+const environmentStatus = ref({
+  LIVE: false,
+  PTU: false,
+  EPTU: false
 })
 
 const logSize = ref('')
@@ -117,18 +170,27 @@ const statusType = ref('info')
 
 const SETTINGS_FILE = 'settings.json'
 
+// Watch for environment changes and update directories
+watch(selectedEnvironment, (newEnv) => {
+  updateDirectoriesForEnvironment(newEnv)
+})
+
 onMounted(async () => {
   await loadSettings()
   // Calculate log size only if not in test environment
   if (import.meta.env.MODE !== 'test') {
     await calculateLogSize()
+    await checkEnvironmentFolders()
   }
 })
 
 // Recalculate log size every time the component is activated/shown
 onActivated(async () => {
-  if (import.meta.env.MODE !== 'test' && settings.value.logDirectory) {
-    await calculateLogSize()
+  if (import.meta.env.MODE !== 'test') {
+    if (settings.value.logDirectory) {
+      await calculateLogSize()
+    }
+    await checkEnvironmentFolders()
   }
 })
 
@@ -143,10 +205,11 @@ async function loadSettings() {
       const contents = await readTextFile(SETTINGS_FILE, { baseDir: BaseDirectory.AppData })
       const loadedSettings = JSON.parse(contents)
       settings.value = {
-        userDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}\\StarCitizen\\LIVE\\user` : '',
+        installationDirectory: loadedSettings.installationDirectory || '',
+        userDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}/${selectedEnvironment.value}/user` : '',
         backupDirectory: loadedSettings.backupDirectory || '',
-        shaderDirectory: `${localDataPath}\\Star Citizen`,
-        logDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}\\StarCitizen\\LIVE\\logs` : ''
+        shaderDirectory: `${localDataPath}/Star Citizen`,
+        logDirectory: loadedSettings.installationDirectory ? `${loadedSettings.installationDirectory}/${selectedEnvironment.value}/logs` : ''
       }
     }
 
@@ -156,6 +219,39 @@ async function loadSettings() {
     }
   } catch {
     // Settings file doesn't exist or is invalid, use defaults
+  }
+}
+
+function updateDirectoriesForEnvironment(env) {
+  if (settings.value.installationDirectory) {
+    settings.value.userDirectory = `${settings.value.installationDirectory}/${env}/user`
+    settings.value.logDirectory = `${settings.value.installationDirectory}/${env}/logs`
+
+    // Recalculate log size for the new environment if not in test mode
+    if (import.meta.env.MODE !== 'test') {
+      calculateLogSize()
+    }
+  }
+}
+
+async function checkEnvironmentFolders() {
+  if (!settings.value.installationDirectory) {
+    // Reset all to false if no installation directory is set
+    environmentStatus.value = {
+      LIVE: false,
+      PTU: false,
+      EPTU: false
+    }
+    return
+  }
+
+  for (const env of environments) {
+    try {
+      const envPath = `${settings.value.installationDirectory}/${env}`
+      environmentStatus.value[env] = await exists(envPath)
+    } catch {
+      environmentStatus.value[env] = false
+    }
   }
 }
 
@@ -177,8 +273,8 @@ async function copyDirectoryRecursive(sourcePath, destPath) {
   const entries = await readDir(sourcePath)
 
   for (const entry of entries) {
-    const sourceFile = `${sourcePath}\\${entry.name}`
-    const destFile = `${destPath}\\${entry.name}`
+    const sourceFile = `${sourcePath}/${entry.name}`
+    const destFile = `${destPath}/${entry.name}`
 
     if (entry.isDirectory) {
       // Recursively copy subdirectories
@@ -200,8 +296,8 @@ async function backupDirectory(type) {
   try {
     let backupPath
     if (type === 'user') {
-      // For user directory, copy to backup directory with 'user' folder name
-      backupPath = `${settings.value.backupDirectory}\\user`
+      // For user directory, copy to backup directory with environment-specific folder name
+      backupPath = `${settings.value.backupDirectory}/user_${selectedEnvironment.value}`
       if (!settings.value.backupDirectory) {
         statusMessage.value = $t('tools.backupError') + ': No backup directory set'
         statusType.value = 'error'
@@ -236,8 +332,8 @@ async function restoreDirectory(type) {
 
   try {
     if (type === 'user') {
-      // For user directory, restore from backup directory
-      const backupPath = `${settings.value.backupDirectory}\\user`
+      // For user directory, restore from backup directory with environment-specific folder name
+      const backupPath = `${settings.value.backupDirectory}/user_${selectedEnvironment.value}`
 
       if (!settings.value.backupDirectory) {
         statusMessage.value = $t('tools.restoreError') + ': No backup directory set'
@@ -289,7 +385,7 @@ async function calculateDirectorySize(path) {
     const entries = await readDir(path)
 
     for (const entry of entries) {
-      const entryPath = `${path}\\${entry.name}`
+      const entryPath = `${path}/${entry.name}`
 
       if (entry.isDirectory) {
         const dirSize = await calculateDirectorySize(entryPath)
@@ -346,7 +442,7 @@ async function deleteDirectory(type) {
       // For backup directory, delete all contents but keep the directory
       const entries = await readDir(path)
       for (const entry of entries) {
-        const entryPath = `${path}\\${entry.name}`
+        const entryPath = `${path}/${entry.name}`
         await remove(entryPath, { recursive: true })
       }
     } else {

@@ -25,6 +25,9 @@
               {{ $t('settings.browse') }}
             </button>
           </div>
+          <label class="label">
+            <span class="label-text-alt text-info">{{ $t('settings.installationDirHint') }}</span>
+          </label>
         </div>
 
         <div class="form-control">
