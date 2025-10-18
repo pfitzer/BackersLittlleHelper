@@ -30,6 +30,35 @@
       <div class="card-body">
         <h3 class="card-title text-secondary mb-4">{{ $t('tools.backupDir') }}</h3>
         <p class="text-sm opacity-70 mb-4">{{ settings.backupDirectory || $t('tools.noPathSet') }}</p>
+
+        <!-- Existing Backups -->
+        <div v-if="existingBackups.length > 0" class="mb-4">
+          <h4 class="text-sm font-semibold mb-2">{{ $t('tools.existingBackups') }}:</h4>
+          <div class="space-y-2">
+            <div v-for="backup in existingBackups" :key="backup.name" class="flex items-center justify-between p-2 bg-base-200 rounded">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-sm" :class="getUniverseBadgeClass(backup.universe)">{{ backup.universe }}</span>
+                <span class="text-sm">{{ backup.age }}</span>
+              </div>
+              <div class="flex gap-1">
+                <button @click="restoreFromBackup(backup.name)" class="btn btn-xs btn-secondary" :title="$t('tools.restore')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+                <button @click="deleteBackup(backup.name)" class="btn btn-xs btn-error" :title="$t('tools.delete')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else-if="settings.backupDirectory" class="text-sm opacity-70 mb-4">
+          {{ $t('tools.noBackupsFound') }}
+        </div>
+
         <div class="flex gap-2 flex-wrap">
           <button @click="deleteDirectory('backup')" class="btn btn-error btn-sm" :disabled="!settings.backupDirectory">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -164,6 +193,7 @@ const environmentStatus = ref({
   EPTU: false
 })
 
+const existingBackups = ref([])
 const logSize = ref('')
 const statusMessage = ref('')
 const statusType = ref('info')
@@ -181,6 +211,7 @@ onMounted(async () => {
   if (import.meta.env.MODE !== 'test') {
     await calculateLogSize()
     await checkEnvironmentFolders()
+    await scanExistingBackups()
   }
 })
 
@@ -191,6 +222,7 @@ onActivated(async () => {
       await calculateLogSize()
     }
     await checkEnvironmentFolders()
+    await scanExistingBackups()
   }
 })
 
@@ -252,6 +284,132 @@ async function checkEnvironmentFolders() {
     } catch {
       environmentStatus.value[env] = false
     }
+  }
+}
+
+async function scanExistingBackups() {
+  if (!settings.value.backupDirectory) {
+    existingBackups.value = []
+    return
+  }
+
+  try {
+    const backupDirExists = await exists(settings.value.backupDirectory)
+    if (!backupDirExists) {
+      existingBackups.value = []
+      return
+    }
+
+    const entries = await readDir(settings.value.backupDirectory)
+    const backups = []
+
+    for (const entry of entries) {
+      if (entry.isDirectory && entry.name.startsWith('user_')) {
+        const universe = entry.name.replace('user_', '')
+        if (environments.includes(universe)) {
+          const backupPath = `${settings.value.backupDirectory}/${entry.name}`
+          try {
+            const stats = await stat(backupPath)
+            backups.push({
+              name: entry.name,
+              universe: universe,
+              age: formatAge(stats.mtime),
+              timestamp: stats.mtime
+            })
+          } catch {
+            // Skip if can't read stats
+          }
+        }
+      }
+    }
+
+    // Sort by timestamp (newest first)
+    backups.sort((a, b) => b.timestamp - a.timestamp)
+    existingBackups.value = backups
+  } catch {
+    existingBackups.value = []
+  }
+}
+
+function formatAge(timestamp) {
+  const now = Date.now()
+  const diffMs = now - timestamp
+  const diffSec = Math.floor(diffMs / 1000)
+  const diffMin = Math.floor(diffSec / 60)
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+
+  if (diffDay > 0) {
+    return diffDay === 1 ? $t('tools.oneDay') : $t('tools.daysAgo', { count: diffDay })
+  } else if (diffHour > 0) {
+    return diffHour === 1 ? $t('tools.oneHour') : $t('tools.hoursAgo', { count: diffHour })
+  } else if (diffMin > 0) {
+    return diffMin === 1 ? $t('tools.oneMinute') : $t('tools.minutesAgo', { count: diffMin })
+  } else {
+    return $t('tools.justNow')
+  }
+}
+
+function getUniverseBadgeClass(universe) {
+  switch (universe) {
+    case 'LIVE': return 'badge-success'
+    case 'PTU': return 'badge-warning'
+    case 'EPTU': return 'badge-info'
+    default: return 'badge-neutral'
+  }
+}
+
+async function restoreFromBackup(backupName) {
+  const backupPath = `${settings.value.backupDirectory}/${backupName}`
+  const universe = backupName.replace('user_', '')
+
+  if (!confirm($t('tools.confirmRestoreFrom', { universe }))) return
+
+  statusMessage.value = $t('tools.restoring')
+  statusType.value = 'info'
+
+  try {
+    const userPath = `${settings.value.installationDirectory}/${universe}/user/..`
+    const parentPath = await dirname(userPath)
+
+    await copyDirectoryRecursive(backupPath, parentPath)
+
+    statusMessage.value = $t('tools.restoreSuccess')
+    statusType.value = 'success'
+    setTimeout(() => { statusMessage.value = '' }, 3000)
+
+    // Refresh backup list
+    if (import.meta.env.MODE !== 'test') {
+      await scanExistingBackups()
+    }
+  } catch (error) {
+    statusMessage.value = $t('tools.restoreError') + ': ' + (error?.message || 'Unknown error')
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
+  }
+}
+
+async function deleteBackup(backupName) {
+  if (!confirm($t('tools.confirmDeleteBackup', { name: backupName }))) return
+
+  const backupPath = `${settings.value.backupDirectory}/${backupName}`
+
+  statusMessage.value = $t('tools.deleting')
+  statusType.value = 'info'
+
+  try {
+    await remove(backupPath, { recursive: true })
+
+    statusMessage.value = $t('tools.deleteSuccess')
+    statusType.value = 'success'
+    setTimeout(() => { statusMessage.value = '' }, 3000)
+
+    // Refresh backup list
+    await scanExistingBackups()
+  } catch (error) {
+    statusMessage.value = $t('tools.deleteError') + ': ' + (error?.message || 'Unknown error')
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
   }
 }
 
@@ -320,11 +478,16 @@ async function backupDirectory(type) {
     statusMessage.value = $t('tools.backupError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
+  } finally {
+    // Always refresh backup list after attempting backup
+    if (import.meta.env.MODE !== 'test') {
+      await scanExistingBackups()
+    }
   }
 }
 
 async function restoreDirectory(type) {
-  const userPath = getDirectoryPath(type) + '\\..';
+  const userPath = getDirectoryPath(type) + '/..';
   if (!userPath) return
 
   statusMessage.value = $t('tools.restoring')
@@ -369,6 +532,11 @@ async function restoreDirectory(type) {
     statusMessage.value = $t('tools.restoreError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
+  }
+
+  // Refresh backup list after restore
+  if (import.meta.env.MODE !== 'test') {
+    await scanExistingBackups()
   }
 }
 
@@ -462,6 +630,11 @@ async function deleteDirectory(type) {
     statusMessage.value = $t('tools.deleteError') + ': ' + (error?.message || 'Unknown error')
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
+  } finally {
+    // Always refresh backup list after attempting delete
+    if (import.meta.env.MODE !== 'test') {
+      await scanExistingBackups()
+    }
   }
 }
 </script>

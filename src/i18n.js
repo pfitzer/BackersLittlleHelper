@@ -82,7 +82,18 @@ const messages = {
       environmentFolders: 'Game Universe',
       folderExists: 'Installed',
       folderMissing: 'Not installed',
-      selectEnvironment: 'Choose Universe'
+      selectEnvironment: 'Choose Universe',
+      existingBackups: 'Existing Backups',
+      noBackupsFound: 'No backups found',
+      oneDay: '1 day ago',
+      daysAgo: '{count} days ago',
+      oneHour: '1 hour ago',
+      hoursAgo: '{count} hours ago',
+      oneMinute: '1 minute ago',
+      minutesAgo: '{count} minutes ago',
+      justNow: 'Just now',
+      confirmRestoreFrom: 'Are you sure you want to restore from {universe} backup? This will overwrite current data!',
+      confirmDeleteBackup: 'Are you sure you want to delete backup {name}?'
     },
     vehicles: {
       title: 'Vehicles',
@@ -244,7 +255,18 @@ const messages = {
       environmentFolders: 'Spiel-Universum',
       folderExists: 'Installiert',
       folderMissing: 'Nicht installiert',
-      selectEnvironment: 'Universum wählen'
+      selectEnvironment: 'Universum wählen',
+      existingBackups: 'Vorhandene Sicherungen',
+      noBackupsFound: 'Keine Sicherungen gefunden',
+      oneDay: 'Vor 1 Tag',
+      daysAgo: 'Vor {count} Tagen',
+      oneHour: 'Vor 1 Stunde',
+      hoursAgo: 'Vor {count} Stunden',
+      oneMinute: 'Vor 1 Minute',
+      minutesAgo: 'Vor {count} Minuten',
+      justNow: 'Gerade eben',
+      confirmRestoreFrom: 'Bist du sicher, dass du von der {universe}-Sicherung wiederherstellen möchtest? Dies überschreibt die aktuellen Daten!',
+      confirmDeleteBackup: 'Bist du sicher, dass du die Sicherung {name} löschen möchtest?'
     },
     vehicles: {
       title: 'Fahrzeuge',
@@ -406,7 +428,18 @@ const messages = {
       environmentFolders: 'Univers du jeu',
       folderExists: 'Installé',
       folderMissing: 'Non installé',
-      selectEnvironment: 'Choisir l\'univers'
+      selectEnvironment: 'Choisir l\'univers',
+      existingBackups: 'Sauvegardes existantes',
+      noBackupsFound: 'Aucune sauvegarde trouvée',
+      oneDay: 'Il y a 1 jour',
+      daysAgo: 'Il y a {count} jours',
+      oneHour: 'Il y a 1 heure',
+      hoursAgo: 'Il y a {count} heures',
+      oneMinute: 'Il y a 1 minute',
+      minutesAgo: 'Il y a {count} minutes',
+      justNow: 'À l\'instant',
+      confirmRestoreFrom: 'Êtes-vous sûr de vouloir restaurer depuis la sauvegarde {universe} ? Cela écrasera les données actuelles !',
+      confirmDeleteBackup: 'Êtes-vous sûr de vouloir supprimer la sauvegarde {name} ?'
     },
     vehicles: {
       title: 'Véhicules',
