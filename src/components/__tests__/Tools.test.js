@@ -277,8 +277,8 @@ describe('Tools.vue', () => {
     expect(wrapper.vm.statusMessage).toContain('No backup found')
   })
 
-  it('deletes backup directory contents', async () => {
-    const { exists, readTextFile, readDir, remove } = await import('@tauri-apps/plugin-fs')
+  it('deletes backup directory completely', async () => {
+    const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
     const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
 
     exists.mockResolvedValue(true)
@@ -288,10 +288,6 @@ describe('Tools.vue', () => {
     }))
     homeDir.mockResolvedValue('C:\\Users\\test')
     localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
-    readDir.mockResolvedValue([
-      { name: 'user', isDirectory: true },
-      { name: 'file.txt', isDirectory: false }
-    ])
     remove.mockResolvedValue()
 
     // Mock window.confirm
@@ -308,8 +304,7 @@ describe('Tools.vue', () => {
 
     await wrapper.vm.deleteDirectory('backup')
 
-    expect(readDir).toHaveBeenCalledWith('C:/test/backup')
-    expect(remove).toHaveBeenCalledTimes(2)
+    expect(remove).toHaveBeenCalledWith('C:/test/backup', { recursive: true })
     expect(wrapper.vm.statusMessage).toBe('Directory deleted successfully!')
     expect(wrapper.vm.statusType).toBe('success')
   })

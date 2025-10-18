@@ -625,17 +625,8 @@ async function deleteDirectory(type) {
     // Normalize path to use forward slashes
     const normalizedPath = path.replace(/\\/g, '/')
 
-    if (type === 'backup') {
-      // For backup directory, delete all contents but keep the directory
-      const entries = await readDir(normalizedPath)
-      for (const entry of entries) {
-        const entryPath = `${normalizedPath}/${entry.name}`
-        await remove(entryPath, { recursive: true })
-      }
-    } else {
-      // For other directories, delete the entire directory
-      await remove(normalizedPath, { recursive: true })
-    }
+    // Delete the entire directory recursively for all types
+    await remove(normalizedPath, { recursive: true })
 
     statusMessage.value = $t('tools.deleteSuccess')
     statusType.value = 'success'
