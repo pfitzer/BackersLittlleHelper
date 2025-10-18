@@ -121,7 +121,7 @@ describe('Tools.vue', () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    expect(wrapper.vm.settings.userDirectory).toBe('C:\\test\\install\\LIVE\\user')
+    expect(wrapper.vm.settings.userDirectory).toBe('C:\\test\\install/LIVE/user')
     expect(wrapper.vm.settings.backupDirectory).toBe('C:\\test\\backup')
   })
 
@@ -341,7 +341,7 @@ describe('Tools.vue', () => {
 
     await wrapper.vm.deleteDirectory('user')
 
-    expect(remove).toHaveBeenCalledWith('C:\\test\\install\\LIVE\\user', { recursive: true })
+    expect(remove).toHaveBeenCalledWith('C:\\test\\install/LIVE/user', { recursive: true })
     expect(wrapper.vm.statusMessage).toBe('Directory deleted successfully!')
     expect(wrapper.vm.statusType).toBe('success')
   })
