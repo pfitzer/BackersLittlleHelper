@@ -625,8 +625,23 @@ async function deleteDirectory(type) {
     // Normalize path to use forward slashes
     const normalizedPath = path.replace(/\\/g, '/')
 
-    // Delete the entire directory recursively for all types
+    // Delete the entire directory recursively
     await remove(normalizedPath, { recursive: true })
+
+    // If deleting user directory, also delete the corresponding backup
+    if (type === 'user' && settings.value.backupDirectory) {
+      const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+      const backupPath = `${normalizedBackupDir}/user_${selectedEnvironment.value}`
+      try {
+        const backupExists = await exists(backupPath)
+        if (backupExists) {
+          await remove(backupPath, { recursive: true })
+        }
+      } catch (error) {
+        console.error('Error deleting corresponding backup:', error)
+        // Don't fail the whole operation if backup delete fails
+      }
+    }
 
     statusMessage.value = $t('tools.deleteSuccess')
     statusType.value = 'success'
