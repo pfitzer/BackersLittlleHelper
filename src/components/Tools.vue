@@ -26,49 +26,16 @@
     </div>
 
     <!-- Backup Directory Tools -->
-    <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('tools.backupDir') }}</h3>
-        <p class="text-sm opacity-70 mb-4">{{ settings.backupDirectory || $t('tools.noPathSet') }}</p>
-
-        <!-- Existing Backups -->
-        <div v-if="existingBackups.length > 0" class="mb-4">
-          <h4 class="text-sm font-semibold mb-2">{{ $t('tools.existingBackups') }}:</h4>
-          <div class="space-y-2">
-            <div v-for="backup in existingBackups" :key="backup.name" class="flex items-center justify-between p-2 bg-base-200 rounded">
-              <div class="flex items-center gap-2">
-                <span class="badge badge-sm" :class="getUniverseBadgeClass(backup.universe)">{{ backup.universe }}</span>
-                <span class="text-sm">{{ backup.age }}</span>
-              </div>
-              <div class="flex gap-1">
-                <button @click="restoreFromBackup(backup.name)" class="btn btn-xs btn-secondary" :title="$t('tools.restore')">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-                <button @click="deleteBackup(backup.name)" class="btn btn-xs btn-error" :title="$t('tools.delete')">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else-if="settings.backupDirectory" class="text-sm opacity-70 mb-4">
-          {{ $t('tools.noBackupsFound') }}
-        </div>
-
-        <div v-if="existingBackups.length > 0" class="flex gap-2 flex-wrap">
-          <button @click="deleteDirectory('backup')" class="btn btn-error btn-sm" :disabled="!settings.backupDirectory">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-            {{ $t('tools.delete') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <BackupListSection
+      :backup-directory="settings.backupDirectory"
+      :existing-backups="existingBackups"
+      :get-universe-badge-class="getUniverseBadgeClass"
+      @backup="backupDirectory('user')"
+      @restore="restoreDirectory('user')"
+      @delete="deleteDirectory('backup')"
+      @restore-backup="restoreFromBackup"
+      @delete-backup="deleteBackup"
+    />
 
     <!-- User Directory Tools -->
     <div class="card bg-base-300/50 backdrop-blur-md shadow-xl mb-6 border border-primary/20">
@@ -116,111 +83,36 @@
     </div>
 
     <!-- Copy Between Environments -->
-    <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl mb-6" style="background: rgba(0, 11, 17, 0.85);">
-      <div class="card-body">
-        <h3 class="card-title text-secondary mb-4">{{ $t('tools.copyFromTo') }}</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <!-- Source Environment -->
-          <div>
-            <label class="label">
-              <span class="label-text font-bold">{{ $t('tools.copySource') }}</span>
-            </label>
-            <div class="flex flex-col gap-2">
-              <button
-                  v-for="env in environments"
-                  :key="env"
-                  @click="copySourceEnv = env"
-                  :class="[
-                  'btn btn-sm justify-start transition-all duration-200',
-                  copySourceEnv === env
-                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105 shadow-lg bg-primary/10 border-primary hover:bg-primary/20'
-                    : 'btn-outline hover:scale-102'
-                ]"
-              >
-                <svg v-if="copySourceEnv === env" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                <span :class="['badge', getUniverseBadgeClass(env)]">{{ env }}</span>
-                <span v-if="environmentStatus[env]" class="text-xs opacity-70">({{ $t('tools.folderExists') }})</span>
-                <span v-else class="text-xs opacity-70">({{ $t('tools.folderMissing') }})</span>
-              </button>
-            </div>
-          </div>
-          <!-- Target Environment -->
-          <div>
-            <label class="label">
-              <span class="label-text font-bold">{{ $t('tools.copyTarget') }}</span>
-            </label>
-            <div class="flex flex-col gap-2">
-              <button
-                  v-for="env in environments"
-                  :key="env"
-                  @click="copyTargetEnv = env"
-                  :class="[
-                  'btn btn-sm justify-start transition-all duration-200',
-                  copyTargetEnv === env
-                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105 shadow-lg bg-primary/10 border-primary hover:bg-primary/20'
-                    : 'btn-outline hover:scale-102'
-                ]"
-              >
-                <svg v-if="copyTargetEnv === env" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                <span :class="['badge', getUniverseBadgeClass(env)]">{{ env }}</span>
-                <span v-if="environmentStatus[env]" class="text-xs opacity-70">({{ $t('tools.folderExists') }})</span>
-                <span v-else class="text-xs opacity-70">({{ $t('tools.folderMissing') }})</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <button
-            @click="copyBetweenEnvironments"
-            class="btn btn-primary"
-            :disabled="!settings.installationDirectory || copySourceEnv === copyTargetEnv"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
-            <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
-          </svg>
-          {{ $t('tools.copy') }}
-        </button>
-      </div>
-    </div>
+    <CopyEnvironmentsSection
+      :environments="environments"
+      v-model:source-env="copySourceEnv"
+      v-model:target-env="copyTargetEnv"
+      :environment-status="environmentStatus"
+      :install-dir-set="!!settings.installationDirectory"
+      :get-universe-badge-class="getUniverseBadgeClass"
+      @copy="copyBetweenEnvironments"
+    />
 
     <!-- Shader and Log Directory Tools Row -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <!-- Shader Directory Tools -->
-      <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
-        <div class="card-body">
-          <h3 class="card-title text-secondary mb-4">{{ $t('tools.shaderDir') }}</h3>
-          <p class="text-sm opacity-70 mb-4">{{ settings.shaderDirectory || $t('tools.noPathSet') }}</p>
-          <div class="flex gap-2 flex-wrap">
-            <button @click="deleteDirectory('shader')" class="btn btn-error btn-sm" :disabled="!settings.shaderDirectory">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-              {{ $t('tools.delete') }}
-            </button>
-          </div>
-        </div>
-      </div>
+      <DirectoryCard
+        :title="$t('tools.shaderDir')"
+        :path="settings.shaderDirectory"
+        :no-path-text="$t('tools.noPathSet')"
+        :delete-text="$t('tools.delete')"
+        @delete="deleteDirectory('shader')"
+      />
 
       <!-- Log Directory Tools -->
-      <div class="card bg-base-300/50 backdrop-blur-md shadow-xl border border-primary/20">
-        <div class="card-body">
-          <h3 class="card-title text-secondary mb-4">{{ $t('tools.logDir') }}</h3>
-          <p class="text-sm opacity-70 mb-4">{{ settings.logDirectory || $t('tools.noPathSet') }}</p>
-          <div class="flex gap-2 flex-wrap items-center">
-            <button @click="deleteDirectory('log')" class="btn btn-error btn-sm" :disabled="!settings.logDirectory">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-              {{ $t('tools.delete') }}
-            </button>
-            <span v-if="logSize" class="badge badge-neutral">{{ logSize }}</span>
-          </div>
-        </div>
-      </div>
+      <DirectoryCard
+        :title="$t('tools.logDir')"
+        :path="settings.logDirectory"
+        :no-path-text="$t('tools.noPathSet')"
+        :delete-text="$t('tools.delete')"
+        :extra-info="logSize"
+        @delete="deleteDirectory('log')"
+      />
     </div>
 
     <!-- Status Messages -->
@@ -241,6 +133,9 @@ import {useI18n} from "vue-i18n"
 import {BaseDirectory, copyFile, exists, mkdir, readDir, readTextFile, remove, stat} from '@tauri-apps/plugin-fs'
 import {dirname, homeDir, localDataDir} from '@tauri-apps/api/path'
 import {ask} from '@tauri-apps/plugin-dialog'
+import BackupListSection from './tools/BackupListSection.vue'
+import CopyEnvironmentsSection from './tools/CopyEnvironmentsSection.vue'
+import DirectoryCard from './tools/DirectoryCard.vue'
 
 const { t: $t } = useI18n()
 
@@ -269,6 +164,20 @@ const copySourceEnv = ref('LIVE')
 const copyTargetEnv = ref('PTU')
 
 const SETTINGS_FILE = 'settings.json'
+
+// Helper function to format error messages
+function formatError(error) {
+  return error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+}
+
+// Helper function to show status message
+function showStatus(message, type = 'info', duration = 3000) {
+  statusMessage.value = message
+  statusType.value = type
+  if (duration > 0) {
+    setTimeout(() => { statusMessage.value = '' }, duration)
+  }
+}
 
 // Watch for environment changes and update directories
 watch(selectedEnvironment, (newEnv) => {
@@ -397,8 +306,7 @@ async function scanExistingBackups() {
               age: formatAge(stats.mtime),
               timestamp: stats.mtime
             })
-          } catch (error) {
-            console.error('Error reading backup stats:', error, 'for path:', backupPath)
+          } catch {
             // Skip if can't read stats
           }
         }
@@ -408,8 +316,7 @@ async function scanExistingBackups() {
     // Sort by timestamp (newest first)
     backups.sort((a, b) => b.timestamp - a.timestamp)
     existingBackups.value = backups
-  } catch (error) {
-    console.error('Error scanning existing backups:', error)
+  } catch {
     existingBackups.value = []
   }
 }
@@ -434,8 +341,7 @@ function formatAge(timestamp) {
     } else {
       return $t('tools.justNow')
     }
-  } catch (error) {
-    console.error('Error formatting age:', error, 'timestamp:', timestamp)
+  } catch {
     return $t('tools.justNow')
   }
 }
@@ -474,7 +380,6 @@ async function restoreFromBackup(backupName) {
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
   } catch (error) {
-    console.error('Restore from backup error:', error)
     const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
     statusMessage.value = $t('tools.restoreError') + ': ' + errorMsg
     statusType.value = 'error'
@@ -510,7 +415,6 @@ async function deleteBackup(backupName) {
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
   } catch (error) {
-    console.error('Delete backup error:', error)
     const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
     statusMessage.value = $t('tools.deleteError') + ': ' + errorMsg
     statusType.value = 'error'
@@ -536,31 +440,25 @@ function getDirectoryPath(type) {
 
 async function copyDirectoryRecursive(sourcePath, destPath) {
   try {
-    console.log('copyDirectoryRecursive: creating directory', destPath)
     // Create destination directory
     await mkdir(destPath, { recursive: true })
 
-    console.log('copyDirectoryRecursive: reading source directory', sourcePath)
     // Read source directory contents
     const entries = await readDir(sourcePath)
-    console.log('copyDirectoryRecursive: found', entries.length, 'entries')
 
     for (const entry of entries) {
       const sourceFile = `${sourcePath}/${entry.name}`
       const destFile = `${destPath}/${entry.name}`
 
       if (entry.isDirectory) {
-        console.log('copyDirectoryRecursive: copying subdirectory', entry.name)
         // Recursively copy subdirectories
         await copyDirectoryRecursive(sourceFile, destFile)
       } else {
-        console.log('copyDirectoryRecursive: copying file', entry.name)
         // Copy file
         await copyFile(sourceFile, destFile)
       }
     }
   } catch (error) {
-    console.error('Error in copyDirectoryRecursive:', error, 'sourcePath:', sourcePath, 'destPath:', destPath)
     throw error
   }
 }
@@ -569,8 +467,7 @@ async function backupDirectory(type) {
   const path = getDirectoryPath(type)
   if (!path) return
 
-  statusMessage.value = $t('tools.backingUp')
-  statusType.value = 'info'
+  showStatus($t('tools.backingUp'), 'info', 0)
 
   try {
     let backupPath
@@ -579,9 +476,7 @@ async function backupDirectory(type) {
       const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
       backupPath = `${normalizedBackupDir}/user_${selectedEnvironment.value}`
       if (!settings.value.backupDirectory) {
-        statusMessage.value = $t('tools.backupError') + ': No backup directory set'
-        statusType.value = 'error'
-        setTimeout(() => { statusMessage.value = '' }, 5000)
+        showStatus($t('tools.backupError') + ': No backup directory set', 'error', 5000)
         return
       }
     } else {
@@ -593,29 +488,20 @@ async function backupDirectory(type) {
 
     // Normalize source path
     const normalizedPath = path.replace(/\\/g, '/')
-    console.log('Backup: copying from', normalizedPath, 'to', backupPath)
 
     // Check if source directory exists
     const sourceExists = await exists(normalizedPath)
     if (!sourceExists) {
-      statusMessage.value = $t('tools.backupError') + ': ' + $t('tools.sourceNotFound', { path: normalizedPath })
-      statusType.value = 'error'
-      setTimeout(() => { statusMessage.value = '' }, 5000)
+      showStatus($t('tools.backupError') + ': ' + $t('tools.sourceNotFound', { path: normalizedPath }), 'error', 5000)
       return
     }
 
     // Copy directory recursively using filesystem API
     await copyDirectoryRecursive(normalizedPath, backupPath)
 
-    statusMessage.value = $t('tools.backupSuccess')
-    statusType.value = 'success'
-    setTimeout(() => { statusMessage.value = '' }, 3000)
+    showStatus($t('tools.backupSuccess'), 'success')
   } catch (error) {
-    console.error('Backup error:', error)
-    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
-    statusMessage.value = $t('tools.backupError') + ': ' + errorMsg
-    statusType.value = 'error'
-    setTimeout(() => { statusMessage.value = '' }, 5000)
+    showStatus($t('tools.backupError') + ': ' + formatError(error), 'error', 5000)
   } finally {
     // Always refresh backup list after attempting backup
     if (import.meta.env.MODE !== 'test') {
@@ -668,7 +554,6 @@ async function restoreDirectory(type) {
       setTimeout(() => { statusMessage.value = '' }, 3000)
     }
   } catch (error) {
-    console.error('Restore error:', error)
     const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
     statusMessage.value = $t('tools.restoreError') + ': ' + errorMsg
     statusType.value = 'error'
@@ -733,7 +618,6 @@ async function copyBetweenEnvironments() {
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
   } catch (error) {
-    console.error('Copy between environments error:', error)
     const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
     statusMessage.value = $t('tools.copyError') + ': ' + errorMsg
     statusType.value = 'error'
@@ -825,7 +709,6 @@ async function deleteDirectory(type) {
         for (const entry of entries) {
           if (entry.isDirectory && entry.name.startsWith('user_')) {
             const backupPath = `${normalizedPath}/${entry.name}`
-            console.log('Deleting backup:', backupPath)
             await remove(backupPath, { recursive: true })
           }
         }
@@ -859,7 +742,6 @@ async function deleteDirectory(type) {
       await calculateLogSize()
     }
   } catch (error) {
-    console.error('Delete directory error:', error)
     const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
     statusMessage.value = $t('tools.deleteError') + ': ' + errorMsg
     statusType.value = 'error'
