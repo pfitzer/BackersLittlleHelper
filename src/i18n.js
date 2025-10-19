@@ -55,7 +55,8 @@ const messages = {
       resetDefaults: 'Reset to Defaults',
       saveSettings: 'Save Settings',
       savedSuccessfully: 'Settings saved successfully!',
-      errorSaving: 'Error saving settings'
+      errorSaving: 'Error saving settings',
+      confirmReset: 'Are you sure you want to reset all settings to default values? This action cannot be undone!'
     },
     tools: {
       title: 'Tools',
@@ -79,6 +80,7 @@ const messages = {
       deleteSuccess: 'Directory deleted successfully!',
       deleteError: 'Error deleting directory',
       confirmDelete: 'Are you sure you want to delete this directory? This action cannot be undone!',
+      confirmDeleteAllBackups: 'Are you sure you want to delete all backups? This action cannot be undone!',
       environmentFolders: 'Game Universe',
       folderExists: 'Installed',
       folderMissing: 'Not installed',
@@ -93,7 +95,8 @@ const messages = {
       minutesAgo: '{count} minutes ago',
       justNow: 'Just now',
       confirmRestoreFrom: 'Are you sure you want to restore from {universe} backup? This will overwrite current data!',
-      confirmDeleteBackup: 'Are you sure you want to delete backup {name}?'
+      confirmDeleteBackup: 'Are you sure you want to delete backup {name}?',
+      sourceNotFound: 'Source directory does not exist: {path}'
     },
     vehicles: {
       title: 'Vehicles',
@@ -228,7 +231,8 @@ const messages = {
       resetDefaults: 'Auf Standardwerte zurücksetzen',
       saveSettings: 'Einstellungen speichern',
       savedSuccessfully: 'Einstellungen erfolgreich gespeichert!',
-      errorSaving: 'Fehler beim Speichern der Einstellungen'
+      errorSaving: 'Fehler beim Speichern der Einstellungen',
+      confirmReset: 'Bist du sicher, dass du alle Einstellungen auf die Standardwerte zurücksetzen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!'
     },
     tools: {
       title: 'Werkzeuge',
@@ -252,6 +256,7 @@ const messages = {
       deleteSuccess: 'Verzeichnis erfolgreich gelöscht!',
       deleteError: 'Fehler beim Löschen des Verzeichnisses',
       confirmDelete: 'Bist du sicher, dass du dieses Verzeichnis löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!',
+      confirmDeleteAllBackups: 'Bist du sicher, dass du alle Sicherungen löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!',
       environmentFolders: 'Spiel-Universum',
       folderExists: 'Installiert',
       folderMissing: 'Nicht installiert',
@@ -266,7 +271,8 @@ const messages = {
       minutesAgo: 'Vor {count} Minuten',
       justNow: 'Gerade eben',
       confirmRestoreFrom: 'Bist du sicher, dass du von der {universe}-Sicherung wiederherstellen möchtest? Dies überschreibt die aktuellen Daten!',
-      confirmDeleteBackup: 'Bist du sicher, dass du die Sicherung {name} löschen möchtest?'
+      confirmDeleteBackup: 'Bist du sicher, dass du die Sicherung {name} löschen möchtest?',
+      sourceNotFound: 'Quellverzeichnis existiert nicht: {path}'
     },
     vehicles: {
       title: 'Fahrzeuge',
@@ -401,7 +407,8 @@ const messages = {
       resetDefaults: 'Réinitialiser par défaut',
       saveSettings: 'Enregistrer les paramètres',
       savedSuccessfully: 'Paramètres enregistrés avec succès !',
-      errorSaving: 'Erreur lors de l\'enregistrement des paramètres'
+      errorSaving: 'Erreur lors de l\'enregistrement des paramètres',
+      confirmReset: 'Êtes-vous sûr de vouloir réinitialiser tous les paramètres aux valeurs par défaut ? Cette action ne peut pas être annulée !'
     },
     tools: {
       title: 'Outils',
@@ -425,6 +432,7 @@ const messages = {
       deleteSuccess: 'Répertoire supprimé avec succès !',
       deleteError: 'Erreur lors de la suppression du répertoire',
       confirmDelete: 'Êtes-vous sûr de vouloir supprimer ce répertoire ? Cette action ne peut pas être annulée !',
+      confirmDeleteAllBackups: 'Êtes-vous sûr de vouloir supprimer toutes les sauvegardes ? Cette action ne peut pas être annulée !',
       environmentFolders: 'Univers du jeu',
       folderExists: 'Installé',
       folderMissing: 'Non installé',
@@ -439,7 +447,8 @@ const messages = {
       minutesAgo: 'Il y a {count} minutes',
       justNow: 'À l\'instant',
       confirmRestoreFrom: 'Êtes-vous sûr de vouloir restaurer depuis la sauvegarde {universe} ? Cela écrasera les données actuelles !',
-      confirmDeleteBackup: 'Êtes-vous sûr de vouloir supprimer la sauvegarde {name} ?'
+      confirmDeleteBackup: 'Êtes-vous sûr de vouloir supprimer la sauvegarde {name} ?',
+      sourceNotFound: 'Le répertoire source n\'existe pas : {path}'
     },
     vehicles: {
       title: 'Véhicules',

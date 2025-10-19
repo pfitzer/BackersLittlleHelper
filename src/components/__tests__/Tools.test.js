@@ -22,6 +22,10 @@ vi.mock('@tauri-apps/api/path', () => ({
   localDataDir: vi.fn()
 }))
 
+vi.mock('@tauri-apps/plugin-dialog', () => ({
+  ask: vi.fn()
+}))
+
 const i18n = createI18n({
   legacy: false,
   locale: 'en',
@@ -48,6 +52,7 @@ const i18n = createI18n({
         deleteSuccess: 'Directory deleted successfully!',
         deleteError: 'Error deleting directory',
         confirmDelete: 'Are you sure you want to delete this directory?',
+        confirmDeleteAllBackups: 'Are you sure you want to delete all backups?',
         environmentFolders: 'Game Universe',
         folderExists: 'Installed',
         folderMissing: 'Not installed',
@@ -278,8 +283,9 @@ describe('Tools.vue', () => {
   })
 
   it('deletes backup directory completely', async () => {
-    const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
+    const { exists, readTextFile, remove, readDir } = await import('@tauri-apps/plugin-fs')
     const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
+    const { ask } = await import('@tauri-apps/plugin-dialog')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -290,8 +296,15 @@ describe('Tools.vue', () => {
     localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     remove.mockResolvedValue()
 
-    // Mock window.confirm
-    global.confirm = vi.fn().mockReturnValue(true)
+    // Mock readDir to return some backup folders
+    readDir.mockResolvedValue([
+      { name: 'user_LIVE', isDirectory: true },
+      { name: 'user_PTU', isDirectory: true },
+      { name: 'otherfile.txt', isDirectory: false }
+    ])
+
+    // Mock Tauri ask dialog to return true
+    ask.mockResolvedValue(true)
 
     const wrapper = mount(Tools, {
       global: {
@@ -304,7 +317,10 @@ describe('Tools.vue', () => {
 
     await wrapper.vm.deleteDirectory('backup')
 
-    expect(remove).toHaveBeenCalledWith('C:/test/backup', { recursive: true })
+    // Should delete only user_* folders, not the whole directory
+    expect(remove).toHaveBeenCalledWith('C:/test/backup/user_LIVE', { recursive: true })
+    expect(remove).toHaveBeenCalledWith('C:/test/backup/user_PTU', { recursive: true })
+    expect(remove).not.toHaveBeenCalledWith('C:/test/backup', { recursive: true })
     expect(wrapper.vm.statusMessage).toBe('Directory deleted successfully!')
     expect(wrapper.vm.statusType).toBe('success')
   })
@@ -312,6 +328,7 @@ describe('Tools.vue', () => {
   it('deletes user directory completely', async () => {
     const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
     const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
+    const { ask } = await import('@tauri-apps/plugin-dialog')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -322,8 +339,8 @@ describe('Tools.vue', () => {
     localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     remove.mockResolvedValue()
 
-    // Mock window.confirm
-    global.confirm = vi.fn().mockReturnValue(true)
+    // Mock Tauri ask dialog to return true
+    ask.mockResolvedValue(true)
 
     const wrapper = mount(Tools, {
       global: {
@@ -344,6 +361,7 @@ describe('Tools.vue', () => {
   it('cancels delete when confirmation is rejected', async () => {
     const { exists, readTextFile, remove } = await import('@tauri-apps/plugin-fs')
     const { homeDir, localDataDir } = await import('@tauri-apps/api/path')
+    const { ask } = await import('@tauri-apps/plugin-dialog')
 
     exists.mockResolvedValue(true)
     readTextFile.mockResolvedValue(JSON.stringify({
@@ -354,8 +372,8 @@ describe('Tools.vue', () => {
     localDataDir.mockResolvedValue('C:\\Users\\test\\AppData\\Local\\')
     remove.mockResolvedValue()
 
-    // Mock window.confirm to return false
-    global.confirm = vi.fn().mockReturnValue(false)
+    // Mock Tauri ask dialog to return false
+    ask.mockResolvedValue(false)
 
     const wrapper = mount(Tools, {
       global: {

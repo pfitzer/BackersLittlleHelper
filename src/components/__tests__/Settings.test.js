@@ -5,7 +5,8 @@ import { createI18n } from 'vue-i18n'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/plugin-dialog', () => ({
-  open: vi.fn()
+  open: vi.fn(),
+  ask: vi.fn()
 }))
 
 vi.mock('@tauri-apps/plugin-fs', () => ({
@@ -36,7 +37,8 @@ const i18n = createI18n({
         resetDefaults: 'Reset to Defaults',
         saveSettings: 'Save Settings',
         savedSuccessfully: 'Settings saved successfully',
-        errorSaving: 'Error saving settings'
+        errorSaving: 'Error saving settings',
+        confirmReset: 'Are you sure you want to reset all settings to default values? This action cannot be undone!'
       }
     }
   }
@@ -111,8 +113,10 @@ describe('Settings.vue', () => {
 
   it('resets settings to defaults', async () => {
     const { writeTextFile, mkdir } = await import('@tauri-apps/plugin-fs')
+    const { ask } = await import('@tauri-apps/plugin-dialog')
     mkdir.mockResolvedValue()
     writeTextFile.mockResolvedValue()
+    ask.mockResolvedValue(true)
 
     const wrapper = mount(Settings, {
       global: {
@@ -125,6 +129,7 @@ describe('Settings.vue', () => {
 
     await wrapper.vm.resetSettings()
 
+    expect(ask).toHaveBeenCalled()
     expect(wrapper.vm.settings.installationDirectory).toBe('')
     expect(wrapper.vm.settings.backupDirectory).toBe('')
   })

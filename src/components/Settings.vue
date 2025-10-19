@@ -76,7 +76,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { open } from '@tauri-apps/plugin-dialog'
+import { open, ask } from '@tauri-apps/plugin-dialog'
 import { BaseDirectory, writeTextFile, readTextFile, exists, mkdir } from '@tauri-apps/plugin-fs'
 import { homeDir } from '@tauri-apps/api/path'
 
@@ -149,7 +149,14 @@ async function saveSettings() {
   }
 }
 
-function resetSettings() {
+async function resetSettings() {
+  const confirmed = await ask($t('settings.confirmReset'), {
+    title: $t('settings.resetDefaults'),
+    kind: 'warning'
+  })
+
+  if (!confirmed) return
+
   settings.value = { ...defaultSettings }
   saveSettings()
 }

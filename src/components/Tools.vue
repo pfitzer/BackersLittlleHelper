@@ -168,6 +168,7 @@ import {onActivated, onMounted, ref, watch} from 'vue'
 import {useI18n} from "vue-i18n"
 import {BaseDirectory, copyFile, exists, mkdir, readDir, readTextFile, remove, stat} from '@tauri-apps/plugin-fs'
 import {dirname, homeDir, localDataDir} from '@tauri-apps/api/path'
+import {ask} from '@tauri-apps/plugin-dialog'
 
 const { t: $t } = useI18n()
 
@@ -191,6 +192,7 @@ const existingBackups = ref([])
 const logSize = ref('')
 const statusMessage = ref('')
 const statusType = ref('info')
+const isOperationInProgress = ref(false)
 
 const SETTINGS_FILE = 'settings.json'
 
@@ -212,6 +214,9 @@ onMounted(async () => {
 // Recalculate log size every time the component is activated/shown
 onActivated(async () => {
   if (import.meta.env.MODE !== 'test') {
+    // Don't scan if an operation is in progress to prevent UI flicker during confirmations
+    if (isOperationInProgress.value) return
+
     if (settings.value.logDirectory) {
       await calculateLogSize()
     }
@@ -318,7 +323,8 @@ async function scanExistingBackups() {
               age: formatAge(stats.mtime),
               timestamp: stats.mtime
             })
-          } catch {
+          } catch (error) {
+            console.error('Error reading backup stats:', error, 'for path:', backupPath)
             // Skip if can't read stats
           }
         }
@@ -328,26 +334,34 @@ async function scanExistingBackups() {
     // Sort by timestamp (newest first)
     backups.sort((a, b) => b.timestamp - a.timestamp)
     existingBackups.value = backups
-  } catch {
+  } catch (error) {
+    console.error('Error scanning existing backups:', error)
     existingBackups.value = []
   }
 }
 
 function formatAge(timestamp) {
-  const now = Date.now()
-  const diffMs = now - timestamp
-  const diffSec = Math.floor(diffMs / 1000)
-  const diffMin = Math.floor(diffSec / 60)
-  const diffHour = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHour / 24)
+  try {
+    // Convert timestamp to milliseconds if it's in seconds
+    const timestampMs = timestamp > 10000000000 ? timestamp : timestamp * 1000
+    const now = Date.now()
+    const diffMs = now - timestampMs
+    const diffSec = Math.floor(diffMs / 1000)
+    const diffMin = Math.floor(diffSec / 60)
+    const diffHour = Math.floor(diffMin / 60)
+    const diffDay = Math.floor(diffHour / 24)
 
-  if (diffDay > 0) {
-    return diffDay === 1 ? $t('tools.oneDay') : $t('tools.daysAgo', { count: diffDay })
-  } else if (diffHour > 0) {
-    return diffHour === 1 ? $t('tools.oneHour') : $t('tools.hoursAgo', { count: diffHour })
-  } else if (diffMin > 0) {
-    return diffMin === 1 ? $t('tools.oneMinute') : $t('tools.minutesAgo', { count: diffMin })
-  } else {
+    if (diffDay > 0) {
+      return diffDay === 1 ? $t('tools.oneDay') : $t('tools.daysAgo', { count: diffDay })
+    } else if (diffHour > 0) {
+      return diffHour === 1 ? $t('tools.oneHour') : $t('tools.hoursAgo', { count: diffHour })
+    } else if (diffMin > 0) {
+      return diffMin === 1 ? $t('tools.oneMinute') : $t('tools.minutesAgo', { count: diffMin })
+    } else {
+      return $t('tools.justNow')
+    }
+  } catch (error) {
+    console.error('Error formatting age:', error, 'timestamp:', timestamp)
     return $t('tools.justNow')
   }
 }
@@ -362,16 +376,20 @@ function getUniverseBadgeClass(universe) {
 }
 
 async function restoreFromBackup(backupName) {
-  const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
-  const backupPath = `${normalizedBackupDir}/${backupName}`
-  const universe = backupName.replace('user_', '')
-
-  if (!confirm($t('tools.confirmRestoreFrom', { universe }))) return
-
-  statusMessage.value = $t('tools.restoring')
-  statusType.value = 'info'
+  // Set operation in progress flag BEFORE confirmation to prevent UI updates
+  isOperationInProgress.value = true
 
   try {
+    const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+    const backupPath = `${normalizedBackupDir}/${backupName}`
+    const universe = backupName.replace('user_', '')
+
+    const confirmed = await ask($t('tools.confirmRestoreFrom', { universe }), { title: $t('tools.restore'), kind: 'warning' })
+    if (!confirmed) return
+
+    statusMessage.value = $t('tools.restoring')
+    statusType.value = 'info'
+
     const normalizedInstallDir = settings.value.installationDirectory.replace(/\\/g, '/')
     const userPath = `${normalizedInstallDir}/${universe}/user/..`
     const parentPath = await dirname(userPath)
@@ -381,40 +399,54 @@ async function restoreFromBackup(backupName) {
     statusMessage.value = $t('tools.restoreSuccess')
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
-
-    // Refresh backup list
+  } catch (error) {
+    console.error('Restore from backup error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.restoreError') + ': ' + errorMsg
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
+  } finally {
+    // Always clear the operation flag and refresh backup list
+    isOperationInProgress.value = false
     if (import.meta.env.MODE !== 'test') {
       await scanExistingBackups()
     }
-  } catch (error) {
-    statusMessage.value = $t('tools.restoreError') + ': ' + (error?.message || 'Unknown error')
-    statusType.value = 'error'
-    setTimeout(() => { statusMessage.value = '' }, 5000)
   }
 }
 
 async function deleteBackup(backupName) {
-  if (!confirm($t('tools.confirmDeleteBackup', { name: backupName }))) return
-
-  const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
-  const backupPath = `${normalizedBackupDir}/${backupName}`
-
-  statusMessage.value = $t('tools.deleting')
-  statusType.value = 'info'
+  // Set operation in progress flag BEFORE confirmation to prevent UI updates
+  isOperationInProgress.value = true
 
   try {
+    // Show confirmation FIRST before doing anything else
+    const confirmed = await ask($t('tools.confirmDeleteBackup', { name: backupName }), { title: $t('tools.delete'), kind: 'warning' })
+    if (!confirmed) return
+
+    const normalizedBackupDir = settings.value.backupDirectory.replace(/\\/g, '/')
+    const backupPath = `${normalizedBackupDir}/${backupName}`
+
+    // Only set status after confirmation
+    statusMessage.value = $t('tools.deleting')
+    statusType.value = 'info'
+
     await remove(backupPath, { recursive: true })
 
     statusMessage.value = $t('tools.deleteSuccess')
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
-
-    // Refresh backup list
-    await scanExistingBackups()
   } catch (error) {
-    statusMessage.value = $t('tools.deleteError') + ': ' + (error?.message || 'Unknown error')
+    console.error('Delete backup error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.deleteError') + ': ' + errorMsg
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
+  } finally {
+    // Always clear the operation flag and refresh backup list
+    isOperationInProgress.value = false
+    if (import.meta.env.MODE !== 'test') {
+      await scanExistingBackups()
+    }
   }
 }
 
@@ -429,23 +461,33 @@ function getDirectoryPath(type) {
 }
 
 async function copyDirectoryRecursive(sourcePath, destPath) {
-  // Create destination directory
-  await mkdir(destPath, { recursive: true })
+  try {
+    console.log('copyDirectoryRecursive: creating directory', destPath)
+    // Create destination directory
+    await mkdir(destPath, { recursive: true })
 
-  // Read source directory contents
-  const entries = await readDir(sourcePath)
+    console.log('copyDirectoryRecursive: reading source directory', sourcePath)
+    // Read source directory contents
+    const entries = await readDir(sourcePath)
+    console.log('copyDirectoryRecursive: found', entries.length, 'entries')
 
-  for (const entry of entries) {
-    const sourceFile = `${sourcePath}/${entry.name}`
-    const destFile = `${destPath}/${entry.name}`
+    for (const entry of entries) {
+      const sourceFile = `${sourcePath}/${entry.name}`
+      const destFile = `${destPath}/${entry.name}`
 
-    if (entry.isDirectory) {
-      // Recursively copy subdirectories
-      await copyDirectoryRecursive(sourceFile, destFile)
-    } else {
-      // Copy file
-      await copyFile(sourceFile, destFile)
+      if (entry.isDirectory) {
+        console.log('copyDirectoryRecursive: copying subdirectory', entry.name)
+        // Recursively copy subdirectories
+        await copyDirectoryRecursive(sourceFile, destFile)
+      } else {
+        console.log('copyDirectoryRecursive: copying file', entry.name)
+        // Copy file
+        await copyFile(sourceFile, destFile)
+      }
     }
+  } catch (error) {
+    console.error('Error in copyDirectoryRecursive:', error, 'sourcePath:', sourcePath, 'destPath:', destPath)
+    throw error
   }
 }
 
@@ -477,6 +519,17 @@ async function backupDirectory(type) {
 
     // Normalize source path
     const normalizedPath = path.replace(/\\/g, '/')
+    console.log('Backup: copying from', normalizedPath, 'to', backupPath)
+
+    // Check if source directory exists
+    const sourceExists = await exists(normalizedPath)
+    if (!sourceExists) {
+      statusMessage.value = $t('tools.backupError') + ': ' + $t('tools.sourceNotFound', { path: normalizedPath })
+      statusType.value = 'error'
+      setTimeout(() => { statusMessage.value = '' }, 5000)
+      return
+    }
+
     // Copy directory recursively using filesystem API
     await copyDirectoryRecursive(normalizedPath, backupPath)
 
@@ -484,7 +537,9 @@ async function backupDirectory(type) {
     statusType.value = 'success'
     setTimeout(() => { statusMessage.value = '' }, 3000)
   } catch (error) {
-    statusMessage.value = $t('tools.backupError') + ': ' + (error?.message || 'Unknown error')
+    console.error('Backup error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.backupError') + ': ' + errorMsg
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   } finally {
@@ -539,7 +594,9 @@ async function restoreDirectory(type) {
       setTimeout(() => { statusMessage.value = '' }, 3000)
     }
   } catch (error) {
-    statusMessage.value = $t('tools.restoreError') + ': ' + (error?.message || 'Unknown error')
+    console.error('Restore error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.restoreError') + ': ' + errorMsg
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   }
@@ -610,17 +667,39 @@ async function deleteDirectory(type) {
   const path = getDirectoryPath(type)
   if (!path) return
 
-  if (!confirm($t('tools.confirmDelete'))) return
-
-  statusMessage.value = $t('tools.deleting')
-  statusType.value = 'info'
+  // Set operation in progress flag BEFORE confirmation to prevent UI updates
+  isOperationInProgress.value = true
 
   try {
+    // Show confirmation FIRST before doing anything else
+    const confirmMessage = type === 'backup' ? $t('tools.confirmDeleteAllBackups') : $t('tools.confirmDelete')
+    const confirmed = await ask(confirmMessage, { title: $t('tools.delete'), kind: 'warning' })
+    if (!confirmed) return
+
+    // Only set status after confirmation
+    statusMessage.value = $t('tools.deleting')
+    statusType.value = 'info'
+
     // Normalize path to use forward slashes
     const normalizedPath = path.replace(/\\/g, '/')
 
-    // Delete the entire directory recursively
-    await remove(normalizedPath, { recursive: true })
+    if (type === 'backup') {
+      // For backup directory, only delete the user_* folders inside, not the directory itself
+      const backupDirExists = await exists(normalizedPath)
+      if (backupDirExists) {
+        const entries = await readDir(normalizedPath)
+        for (const entry of entries) {
+          if (entry.isDirectory && entry.name.startsWith('user_')) {
+            const backupPath = `${normalizedPath}/${entry.name}`
+            console.log('Deleting backup:', backupPath)
+            await remove(backupPath, { recursive: true })
+          }
+        }
+      }
+    } else {
+      // For other directories, delete the entire directory recursively
+      await remove(normalizedPath, { recursive: true })
+    }
 
     // If deleting user directory, also delete the corresponding backup
     // if (type === 'user' && settings.value.backupDirectory) {
@@ -646,11 +725,14 @@ async function deleteDirectory(type) {
       await calculateLogSize()
     }
   } catch (error) {
-    statusMessage.value = $t('tools.deleteError') + ': ' + (error?.message || 'Unknown error')
+    console.error('Delete directory error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.deleteError') + ': ' + errorMsg
     statusType.value = 'error'
     setTimeout(() => { statusMessage.value = '' }, 5000)
   } finally {
-    // Always refresh backup list after attempting delete
+    // Always clear the operation flag and refresh backup list
+    isOperationInProgress.value = false
     if (import.meta.env.MODE !== 'test') {
       await scanExistingBackups()
     }
