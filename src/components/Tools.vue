@@ -115,6 +115,78 @@
       </div>
     </div>
 
+    <!-- Copy Between Environments -->
+    <div class="card rsi-border rsi-corners backdrop-blur-md shadow-xl mb-6" style="background: rgba(0, 11, 17, 0.85);">
+      <div class="card-body">
+        <h3 class="card-title text-secondary mb-4">{{ $t('tools.copyFromTo') }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Source Environment -->
+          <div>
+            <label class="label">
+              <span class="label-text font-bold">{{ $t('tools.copySource') }}</span>
+            </label>
+            <div class="flex flex-col gap-2">
+              <button
+                  v-for="env in environments"
+                  :key="env"
+                  @click="copySourceEnv = env"
+                  :class="[
+                  'btn btn-sm justify-start transition-all duration-200',
+                  copySourceEnv === env
+                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105 shadow-lg bg-primary/10 border-primary hover:bg-primary/20'
+                    : 'btn-outline hover:scale-102'
+                ]"
+              >
+                <svg v-if="copySourceEnv === env" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span :class="['badge', getUniverseBadgeClass(env)]">{{ env }}</span>
+                <span v-if="environmentStatus[env]" class="text-xs opacity-70">({{ $t('tools.folderExists') }})</span>
+                <span v-else class="text-xs opacity-70">({{ $t('tools.folderMissing') }})</span>
+              </button>
+            </div>
+          </div>
+          <!-- Target Environment -->
+          <div>
+            <label class="label">
+              <span class="label-text font-bold">{{ $t('tools.copyTarget') }}</span>
+            </label>
+            <div class="flex flex-col gap-2">
+              <button
+                  v-for="env in environments"
+                  :key="env"
+                  @click="copyTargetEnv = env"
+                  :class="[
+                  'btn btn-sm justify-start transition-all duration-200',
+                  copyTargetEnv === env
+                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105 shadow-lg bg-primary/10 border-primary hover:bg-primary/20'
+                    : 'btn-outline hover:scale-102'
+                ]"
+              >
+                <svg v-if="copyTargetEnv === env" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span :class="['badge', getUniverseBadgeClass(env)]">{{ env }}</span>
+                <span v-if="environmentStatus[env]" class="text-xs opacity-70">({{ $t('tools.folderExists') }})</span>
+                <span v-else class="text-xs opacity-70">({{ $t('tools.folderMissing') }})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+            @click="copyBetweenEnvironments"
+            class="btn btn-primary"
+            :disabled="!settings.installationDirectory || copySourceEnv === copyTargetEnv"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+            <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+          </svg>
+          {{ $t('tools.copy') }}
+        </button>
+      </div>
+    </div>
+
     <!-- Shader and Log Directory Tools Row -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <!-- Shader Directory Tools -->
@@ -193,6 +265,8 @@ const logSize = ref('')
 const statusMessage = ref('')
 const statusType = ref('info')
 const isOperationInProgress = ref(false)
+const copySourceEnv = ref('LIVE')
+const copyTargetEnv = ref('PTU')
 
 const SETTINGS_FILE = 'settings.json'
 
@@ -604,6 +678,66 @@ async function restoreDirectory(type) {
   // Refresh backup list after restore
   if (import.meta.env.MODE !== 'test') {
     await scanExistingBackups()
+  }
+}
+
+async function copyBetweenEnvironments() {
+  if (!settings.value.installationDirectory) {
+    statusMessage.value = $t('tools.copyError') + ': ' + $t('tools.noInstallDirSet')
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
+    return
+  }
+
+  if (copySourceEnv.value === copyTargetEnv.value) {
+    statusMessage.value = $t('tools.copyError') + ': ' + $t('tools.sameEnvironment')
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
+    return
+  }
+
+  const normalizedInstallDir = settings.value.installationDirectory.replace(/\\/g, '/')
+  const sourcePath = `${normalizedInstallDir}/${copySourceEnv.value}/user`
+  const targetPath = `${normalizedInstallDir}/${copyTargetEnv.value}/user`
+
+  try {
+    // Check if source exists
+    const sourceExists = await exists(sourcePath)
+    if (!sourceExists) {
+      statusMessage.value = $t('tools.copyError') + ': ' + $t('tools.sourceNotFound', { path: sourcePath })
+      statusType.value = 'error'
+      setTimeout(() => { statusMessage.value = '' }, 5000)
+      return
+    }
+
+    // Ask for confirmation
+    const confirmed = await ask(
+      $t('tools.confirmCopy', { source: copySourceEnv.value, target: copyTargetEnv.value }),
+      { title: $t('tools.copy'), kind: 'warning' }
+    )
+    if (!confirmed) return
+
+    statusMessage.value = $t('tools.copying')
+    statusType.value = 'info'
+
+    // If target exists, remove it first
+    const targetExists = await exists(targetPath)
+    if (targetExists) {
+      await remove(targetPath, { recursive: true })
+    }
+
+    // Copy from source to target
+    await copyDirectoryRecursive(sourcePath, targetPath)
+
+    statusMessage.value = $t('tools.copySuccess')
+    statusType.value = 'success'
+    setTimeout(() => { statusMessage.value = '' }, 3000)
+  } catch (error) {
+    console.error('Copy between environments error:', error)
+    const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error'
+    statusMessage.value = $t('tools.copyError') + ': ' + errorMsg
+    statusType.value = 'error'
+    setTimeout(() => { statusMessage.value = '' }, 5000)
   }
 }
 

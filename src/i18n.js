@@ -96,7 +96,17 @@ const messages = {
       justNow: 'Just now',
       confirmRestoreFrom: 'Are you sure you want to restore from {universe} backup? This will overwrite current data!',
       confirmDeleteBackup: 'Are you sure you want to delete backup {name}?',
-      sourceNotFound: 'Source directory does not exist: {path}'
+      sourceNotFound: 'Source directory does not exist: {path}',
+      copy: 'Copy',
+      copying: 'Copying user files...',
+      copySuccess: 'User files copied successfully!',
+      copyError: 'Error copying user files',
+      confirmCopy: 'Copy user files from {source} to {target}? This will overwrite existing {target} data!',
+      copyFromTo: 'Copy User Files Between Environments',
+      copySource: 'Source Environment',
+      copyTarget: 'Target Environment',
+      sameEnvironment: 'Source and target environments must be different',
+      noInstallDirSet: 'No installation directory set'
     },
     vehicles: {
       title: 'Vehicles',
@@ -272,7 +282,17 @@ const messages = {
       justNow: 'Gerade eben',
       confirmRestoreFrom: 'Bist du sicher, dass du von der {universe}-Sicherung wiederherstellen möchtest? Dies überschreibt die aktuellen Daten!',
       confirmDeleteBackup: 'Bist du sicher, dass du die Sicherung {name} löschen möchtest?',
-      sourceNotFound: 'Quellverzeichnis existiert nicht: {path}'
+      sourceNotFound: 'Quellverzeichnis existiert nicht: {path}',
+      copy: 'Kopieren',
+      copying: 'Kopiere Benutzerdateien...',
+      copySuccess: 'Benutzerdateien erfolgreich kopiert!',
+      copyError: 'Fehler beim Kopieren der Benutzerdateien',
+      confirmCopy: 'Benutzerdateien von {source} nach {target} kopieren? Dies überschreibt vorhandene {target}-Daten!',
+      copyFromTo: 'Benutzerdateien zwischen Universen kopieren',
+      copySource: 'Quell-Universum',
+      copyTarget: 'Ziel-Universum',
+      sameEnvironment: 'Quell- und Ziel-Universum müssen unterschiedlich sein',
+      noInstallDirSet: 'Kein Installationsverzeichnis festgelegt'
     },
     vehicles: {
       title: 'Fahrzeuge',
@@ -448,7 +468,17 @@ const messages = {
       justNow: 'À l\'instant',
       confirmRestoreFrom: 'Êtes-vous sûr de vouloir restaurer depuis la sauvegarde {universe} ? Cela écrasera les données actuelles !',
       confirmDeleteBackup: 'Êtes-vous sûr de vouloir supprimer la sauvegarde {name} ?',
-      sourceNotFound: 'Le répertoire source n\'existe pas : {path}'
+      sourceNotFound: 'Le répertoire source n\'existe pas : {path}',
+      copy: 'Copier',
+      copying: 'Copie des fichiers utilisateur...',
+      copySuccess: 'Fichiers utilisateur copiés avec succès !',
+      copyError: 'Erreur lors de la copie des fichiers utilisateur',
+      confirmCopy: 'Copier les fichiers utilisateur de {source} vers {target} ? Cela écrasera les données {target} existantes !',
+      copyFromTo: 'Copier les fichiers utilisateur entre les univers',
+      copySource: 'Univers source',
+      copyTarget: 'Univers cible',
+      sameEnvironment: 'Les univers source et cible doivent être différents',
+      noInstallDirSet: 'Aucun répertoire d\'installation défini'
     },
     vehicles: {
       title: 'Véhicules',
