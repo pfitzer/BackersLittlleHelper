@@ -25,59 +25,9 @@ html {
     }
 }
 
-/* RSI-style dark background */
+/* RSI-style dark background - fallback for 3D canvas */
 body {
-    background: #000b11;
-}
-
-/* Noise texture overlay similar to RSI */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: repeating-linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(255, 255, 255, 0.03) 3px
-    ),
-    repeating-linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(255, 255, 255, 0.03) 3px
-    );
-    background-size: 4px 4px;
-    opacity: 0.15;
-    pointer-events: none;
-    z-index: 1;
-}
-
-#background {
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
-    background-image: url('./assets/img/MadeByTheCommunity_Black.png');
-    background-size: 50%;
-    background-repeat: no-repeat;
-    background-position: 50% 75%;
-    opacity: 0.08;
-    z-index: 0;
-}
-
-#background2 {
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
-    background-size: 150%;
-    background-repeat: no-repeat;
-    background-image: radial-gradient(ellipse at 50% 50%, rgba(45, 12, 232, 0.15) 0%, rgba(2, 0, 36, 0.8) 50%, #000b11 100%);
-    z-index: 0;
+    background: #000000;
 }
 
 /* RSI-style corner elements */
