@@ -16,6 +16,7 @@ let planetTextures = [];
 let ceresTexture;
 let asteroidModels = [];
 let coin, coinModel;
+let coinTexture;
 
 const initThreeJS = () => {
   // Scene setup
@@ -62,7 +63,7 @@ const initThreeJS = () => {
 
   // Track loading progress
   let assetsLoaded = 0;
-  const totalAssets = 5 + 8 + 1; // 5 textures (4 planets + 1 asteroid) + 8 asteroid models + 1 coin model
+  const totalAssets = 5 + 8 + 1 + 1; // 5 textures (4 planets + 1 asteroid) + 8 asteroid models + 1 coin model + 1 coin texture
 
   const onAssetLoad = () => {
     assetsLoaded++;
@@ -119,12 +120,27 @@ const initThreeJS = () => {
     }
   );
 
-  // Load coin model
+  // Load coin texture with alpha
+  coinTexture = textureLoader.load(
+    '/src/assets/img/MadeByTheCommunity_Alpha.png',
+    (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      console.log('Loaded coin texture');
+      onAssetLoad();
+    },
+    undefined,
+    (error) => {
+      console.error('Failed to load coin texture:', error);
+      onAssetLoad();
+    }
+  );
+
+  // Load thick coin model
   objLoader.load(
-    '/src/assets/models/coin_extruded.obj',
+    '/src/assets/models/coin_thick.obj',
     (object) => {
       coinModel = object;
-      console.log('Loaded coin model');
+      console.log('Loaded thick coin model');
       onAssetLoad();
     },
     undefined,
@@ -152,42 +168,76 @@ const initThreeJS = () => {
 };
 
 const createCoin = () => {
-  if (!coinModel) {
-    console.error('Coin model not loaded');
+  if (!coinModel || !coinTexture) {
+    console.error('Coin model or texture not loaded');
     return;
   }
 
-  // Clone the loaded coin model
+  // Clone the model
   coin = coinModel.clone();
 
-  // Create gold metallic material
+  // Single material with alpha transparency
   const coinMaterial = new THREE.MeshStandardMaterial({
-    color: 0xd4af37, // Gold color
+    alphaMap: coinTexture,
+    transparent: true,
+    alphaTest: 0.5,
+    side: THREE.DoubleSide, // Render both sides
+    depthWrite: true,
+    color: 0xe0e5ea,
     metalness: 0.95,
     roughness: 0.15,
-    emissive: 0x806020,
-    emissiveIntensity: 0.3
+    emissive: 0x606060,
+    emissiveIntensity: 0.2
   });
 
-  // Apply material to all meshes in the model
+  // Apply material and fix UV mapping
   coin.traverse((child) => {
     if (child instanceof THREE.Mesh) {
+      const geometry = child.geometry;
+      const positionAttr = geometry.getAttribute('position');
+      const uvAttr = geometry.getAttribute('uv');
+
+      if (positionAttr && uvAttr) {
+        const positions = positionAttr.array;
+        const uvs = uvAttr.array;
+
+        // Remap UVs for circular projection on cylinder caps
+        for (let i = 0; i < positions.length; i += 3) {
+          const x = positions[i];
+          const y = positions[i + 1];
+          const z = positions[i + 2];
+
+          // For top and bottom faces (y = ±0.075), use circular UV mapping
+          if (Math.abs(Math.abs(y) - 0.075) < 0.01) {
+            const u = (x / 1.0 + 1.0) / 2.0;
+            const v = (z / 1.0 + 1.0) / 2.0;
+            uvs[i / 3 * 2] = u;
+            uvs[i / 3 * 2 + 1] = v;
+          }
+        }
+
+        uvAttr.needsUpdate = true;
+      }
+
+      child.geometry.computeVertexNormals();
       child.material = coinMaterial;
+      child.castShadow = true;
+      child.receiveShadow = true;
     }
   });
 
-  // Scale up the coin (Blender model has radius 1, we want it bigger)
-  const scale = 45; // Scale to match previous size
+  // Scale up - coin_thick has radius 1, thickness 0.15
+  const scale = 45;
   coin.scale.set(scale, scale, scale);
 
-  // Position at center
+  // Position
   coin.position.set(0, 0, 0);
 
-  // Rotate to vertical position (90 degrees around Z axis)
+  // Rotate to vertical
   coin.rotation.z = Math.PI / 2;
 
   scene.add(coin);
-  console.log('Extruded coin badge added to scene at center position');
+  console.log('Textured coin with alpha cutouts added to scene');
 };
 
 const createStarField = () => {
@@ -446,8 +496,18 @@ const cleanup = () => {
   });
 
   if (ceresTexture) ceresTexture.dispose();
+  if (coinTexture) coinTexture.dispose();
 
-  // Dispose coin model
+  // Dispose coin
+  if (coin) {
+    coin.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      }
+    });
+  }
+
   if (coinModel) {
     coinModel.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -471,6 +531,7 @@ const cleanup = () => {
   planetTextures = [];
   coin = null;
   coinModel = null;
+  coinTexture = null;
 };
 
 onMounted(() => {
