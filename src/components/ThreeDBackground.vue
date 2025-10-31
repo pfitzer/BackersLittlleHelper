@@ -44,9 +44,10 @@ const initThreeJS = () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
-  scene.add(ambientLight);
+  // Lighting - Sun from viewer's perspective
+  const mainLight = new THREE.DirectionalLight(0xffffff, 2.0);
+  mainLight.position.set(0, 100, 0); // Near camera position
+  scene.add(mainLight);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
   directionalLight.position.set(100, 100, 50);
@@ -135,17 +136,17 @@ const initThreeJS = () => {
     }
   );
 
-  // Load thick coin model
+  // Load sccm model
   objLoader.load(
-    '/src/assets/models/coin_thick.obj',
+    '/src/assets/models/sccm.obj',
     (object) => {
       coinModel = object;
-      console.log('Loaded thick coin model');
+      console.log('Loaded sccm model');
       onAssetLoad();
     },
     undefined,
     (error) => {
-      console.error('Failed to load coin model:', error);
+      console.error('Failed to load sccm model:', error);
       onAssetLoad();
     }
   );
@@ -227,14 +228,15 @@ const createCoin = () => {
   });
 
   // Scale up - coin_thick has radius 1, thickness 0.15
-  const scale = 45;
+  const scale = 1.2;
   coin.scale.set(scale, scale, scale);
 
   // Position
   coin.position.set(0, 0, 0);
 
-  // Rotate to vertical
+  // Rotate to vertical and 90 degrees clockwise
   coin.rotation.z = Math.PI / 2;
+  coin.rotation.y = -Math.PI / 2; // 90 degrees clockwise
 
   scene.add(coin);
   console.log('Textured coin with alpha cutouts added to scene');
