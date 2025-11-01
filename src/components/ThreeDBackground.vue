@@ -43,19 +43,42 @@ const initThreeJS = () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.9;
 
-  // Lighting - Sun from viewer's perspective
-  const mainLight = new THREE.DirectionalLight(0xffffff, 2.0);
-  mainLight.position.set(0, 100, 0); // Near camera position
+  // Ambient light for overall brightness
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+  scene.add(ambientLight);
+
+  // Lighting - Sun positioned right in front of coin from camera perspective
+  const mainLight = new THREE.DirectionalLight(0xffffff, 5.0);
+  mainLight.position.set(0, 50, 200); // At camera position
   scene.add(mainLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5);
   directionalLight.position.set(100, 100, 50);
   scene.add(directionalLight);
 
-  const backLight = new THREE.DirectionalLight(0x4080ff, 0.8);
+  const backLight = new THREE.DirectionalLight(0x4080ff, 1.0);
   backLight.position.set(-100, -50, -100);
   scene.add(backLight);
+
+  // Spotlight from 30 degrees to the right
+  const spotlight = new THREE.SpotLight(0xffffff, 8.0);
+  const angle = -Math.PI / 6; // 30 degrees to the right (clockwise)
+  const distance = 150;
+  spotlight.position.set(
+    Math.sin(angle) * distance, // X position (right)
+    80, // Y position (above)
+    Math.cos(angle) * distance  // Z position
+  );
+  spotlight.target.position.set(0, 0, 0); // Point at coin
+  spotlight.angle = Math.PI / 4; // 45 degree cone
+  spotlight.penumbra = 0.3; // Soft edges
+  spotlight.decay = 1.5;
+  spotlight.distance = 300;
+  scene.add(spotlight);
+  scene.add(spotlight.target);
 
   // Loading manager setup
   const loadingManager = new THREE.LoadingManager();
@@ -177,18 +200,18 @@ const createCoin = () => {
   // Clone the model
   coin = coinModel.clone();
 
-  // Single material with alpha transparency
+  // Single material with alpha transparency - bright metallic
   const coinMaterial = new THREE.MeshStandardMaterial({
     alphaMap: coinTexture,
     transparent: true,
     alphaTest: 0.5,
     side: THREE.DoubleSide, // Render both sides
     depthWrite: true,
-    color: 0xe0e5ea,
-    metalness: 0.95,
+    color: 0xf5f5f5,
+    metalness: 0.8,
     roughness: 0.15,
-    emissive: 0x606060,
-    emissiveIntensity: 0.2
+    emissive: 0x888888,
+    emissiveIntensity: 0.15
   });
 
   // Apply material and fix UV mapping
@@ -234,9 +257,9 @@ const createCoin = () => {
   // Position
   coin.position.set(0, 0, 0);
 
-  // Rotate to vertical and 90 degrees clockwise
+  // Rotate to vertical and 180 degrees (90 + 90 clockwise)
   coin.rotation.z = Math.PI / 2;
-  coin.rotation.y = -Math.PI / 2; // 90 degrees clockwise
+  coin.rotation.y = Math.PI; // 180 degrees total (90 + 90 clockwise)
 
   scene.add(coin);
   console.log('Textured coin with alpha cutouts added to scene');
@@ -305,8 +328,16 @@ const createPlanets = () => {
     metalness: 0.2
   });
   const planet1 = new THREE.Mesh(planet1Geometry, planet1Material);
+  const planet1Angle = Math.atan2(-400, -300);
+  const planet1Radius = Math.sqrt(300 * 300 + 400 * 400);
   planet1.position.set(-300, -100, -400);
-  planet1.userData = { rotationSpeed: 0.002 };
+  planet1.userData = {
+    rotationSpeed: 0.002,
+    orbitSpeed: 0.0001,
+    orbitAngle: planet1Angle,
+    orbitRadius: planet1Radius,
+    orbitHeight: -100
+  };
   scene.add(planet1);
   planets.push(planet1);
 
@@ -320,8 +351,16 @@ const createPlanets = () => {
     metalness: 0.1
   });
   const planet2 = new THREE.Mesh(planet2Geometry, planet2Material);
+  const planet2Angle = Math.atan2(-300, 250);
+  const planet2Radius = Math.sqrt(250 * 250 + 300 * 300);
   planet2.position.set(250, 80, -300);
-  planet2.userData = { rotationSpeed: 0.003 };
+  planet2.userData = {
+    rotationSpeed: 0.003,
+    orbitSpeed: 0.00015,
+    orbitAngle: planet2Angle,
+    orbitRadius: planet2Radius,
+    orbitHeight: 80
+  };
   scene.add(planet2);
   planets.push(planet2);
 
@@ -335,8 +374,16 @@ const createPlanets = () => {
     metalness: 0.15
   });
   const planet3 = new THREE.Mesh(planet3Geometry, planet3Material);
+  const planet3Angle = Math.atan2(-600, 100);
+  const planet3Radius = Math.sqrt(100 * 100 + 600 * 600);
   planet3.position.set(100, -150, -600);
-  planet3.userData = { rotationSpeed: 0.0025 };
+  planet3.userData = {
+    rotationSpeed: 0.0025,
+    orbitSpeed: 0.00008,
+    orbitAngle: planet3Angle,
+    orbitRadius: planet3Radius,
+    orbitHeight: -150
+  };
   scene.add(planet3);
   planets.push(planet3);
 };
@@ -402,7 +449,12 @@ const createAsteroids = () => {
         x: (Math.random() - 0.5) * 0.01,
         y: (Math.random() - 0.5) * 0.01,
         z: (Math.random() - 0.5) * 0.01
-      }
+      },
+      orbitSpeed: 0.0002 + Math.random() * 0.0003,
+      orbitAngle: angle,
+      orbitRadius: radius,
+      orbitHeight: height,
+      orbitOffset: -200
     };
 
     scene.add(asteroidClone);
@@ -413,26 +465,41 @@ const createAsteroids = () => {
 const animate = () => {
   animationFrameId = requestAnimationFrame(animate);
 
-  // Slow camera rotation
-  camera.position.x = Math.cos(Date.now() * 0.00005) * 200;
-  camera.position.z = Math.sin(Date.now() * 0.00005) * 200 + 50;
-  camera.position.y = 50 + Math.sin(Date.now() * 0.00003) * 30;
-  camera.lookAt(0, 0, 0);
+  // Camera remains stationary - no rotation
+  // camera stays at position (0, 50, 200) looking at (0, 0, 0)
 
   // Stars remain static - no rotation
 
-  // Rotate coin around its own Y axis - faster than planets
+  // Rotate coin around its own Y axis
   if (coin) {
     coin.rotation.y += 0.005; // Rotate around Y axis (vertical)
   }
 
-  // Rotate planets
+  // Orbit and rotate planets around the coin
   planets.forEach(planet => {
-    planet.rotation.y += planet.userData.rotationSpeed;
-  });
+    // Update orbital angle
+    planet.userData.orbitAngle += planet.userData.orbitSpeed;
 
-  // Rotate asteroids
+    // Calculate new position based on orbit
+    planet.position.x = Math.cos(planet.userData.orbitAngle) * planet.userData.orbitRadius;
+    planet.position.y = planet.userData.orbitHeight;
+    planet.position.z = Math.sin(planet.userData.orbitAngle) * planet.userData.orbitRadius;
+
+    // Rotate planet on its own axis
+    planet.rotation.y += planet.userData.rotationSpeed;
+});
+
+  // Orbit and rotate asteroids around the coin
   asteroids.forEach(asteroid => {
+    // Update orbital angle
+    asteroid.userData.orbitAngle += asteroid.userData.orbitSpeed;
+
+    // Calculate new position based on orbit
+    asteroid.position.x = Math.cos(asteroid.userData.orbitAngle) * asteroid.userData.orbitRadius;
+    asteroid.position.y = asteroid.userData.orbitHeight;
+    asteroid.position.z = Math.sin(asteroid.userData.orbitAngle) * asteroid.userData.orbitRadius + asteroid.userData.orbitOffset;
+
+    // Rotate asteroid on its own axes
     asteroid.rotation.x += asteroid.userData.rotationSpeed.x;
     asteroid.rotation.y += asteroid.userData.rotationSpeed.y;
     asteroid.rotation.z += asteroid.userData.rotationSpeed.z;
