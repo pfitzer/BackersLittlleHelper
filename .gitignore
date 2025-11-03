@@ -33,8 +33,5 @@ lerna-debug.log*
 Thumbs.db
 nul
 
-# AI
-.claude
-
 # Build outputs
 /src-tauri/target

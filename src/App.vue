@@ -1,7 +1,5 @@
 <template>
   <div class="h-screen flex flex-col overflow-hidden relative">
-    <!-- 3D Space Background -->
-    <ThreeDBackground />
 
     <!-- Navigation -->
     <div class="navbar backdrop-blur-md border-b border-blue-500/20 flex-shrink-0 rsi-border relative z-10" style="background: rgba(0, 11, 17, 0.85);">
@@ -45,7 +43,7 @@
     </div>
 
     <!-- Content -->
-    <div class="flex-1 overflow-y-auto relative z-10">
+    <div class="flex-1 overflow-y-auto">
       <div class="container mx-auto px-1 py-1">
         <Home v-if="currentView === 'home'" @navigate-to="navigateTo" />
         <Vehicles v-if="currentView === 'vehicles'" />
@@ -63,8 +61,7 @@ import Home from './components/Home.vue'
 import Settings from './components/Settings.vue'
 import Tools from './components/Tools.vue'
 import Vehicles from './components/Vehicles.vue'
-import Commlink from "./components/Commlink.vue"
-import ThreeDBackground from './components/ThreeDBackground.vue'
+import Commlink from "./components/Commlink.vue";
 
 const currentView = ref('home')
 
