@@ -31,7 +31,21 @@ export function useApiCache() {
       }
 
       const content = await readTextFile(filePath, { baseDir: BaseDirectory.AppData })
-      const cached = JSON.parse(content)
+
+      // Validate content is not empty
+      if (!content || content.trim().length === 0) {
+        console.warn(`Empty cache file for key: ${key}`)
+        return null
+      }
+
+      let cached
+      try {
+        cached = JSON.parse(content)
+      } catch (parseError) {
+        console.error(`Corrupted cache file for key: ${key}`, parseError)
+        // Return null to trigger fresh fetch
+        return null
+      }
 
       // Check if cache is expired
       const now = Date.now()

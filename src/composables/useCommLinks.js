@@ -37,9 +37,73 @@ export function useCommLinks() {
         // Read as text and manually parse to handle escape sequences
         const text = await response.text()
 
-        // Fix the invalid escape sequences in the JSON
-        // The JSON contains \& which is not a valid JSON escape sequence
-        const cleanText = text.replace(/\\&/g, '&')
+        // Check if response is empty or incomplete
+        if (!text || text.trim().length === 0) {
+          throw new Error('Empty response from API')
+        }
+
+
+        // Clean up the response:
+        // The API returns JSON that is improperly encoded as a string
+        let cleanText = text.trim()
+
+        // The response starts with leading garbage (en-dash) then a quoted JSON string
+        // Don't strip the leading quote - we need it to detect double-encoding
+        // Only strip non-quote, non-brace characters
+        let leadingGarbage = 0
+        for (let i = 0; i < cleanText.length; i++) {
+          const code = cleanText.charCodeAt(i)
+          // Stop at first quote (34), brace (123), or bracket (91)
+          if (code === 34 || code === 123 || code === 91) {
+            break
+          }
+          leadingGarbage++
+        }
+
+        if (leadingGarbage > 0) {
+          cleanText = cleanText.substring(leadingGarbage)
+        }
+
+        // Check if the JSON is wrapped in quotes
+        // Pattern: "{ ... }" where the quotes are part of the encoding, not the JSON
+        const startsWithQuotedJson = cleanText.charCodeAt(0) === 34 && // " quote
+                                      (cleanText.charCodeAt(1) === 123 || cleanText.charCodeAt(1) === 91) && // { or [
+                                      (cleanText.endsWith('}"') || cleanText.endsWith(']"'))
+
+        if (startsWithQuotedJson) {
+          // Remove outer quotes
+          cleanText = cleanText.slice(1, -1)
+        }
+
+        // Fix invalid escape sequences and malformed content
+        // The API returns malformed JSON with various issues
+
+        // 1. Fix HTML entities that are improperly escaped
+        cleanText = cleanText.replace(/\\&/g, '&')
+
+        // 2. Remove other invalid escape sequences
+        // Only match backslashes not followed by valid JSON escape chars (", \, /, b, f, n, r, t, u)
+        const invalidEscapes = /\\(?!["\\/bfnrtu])/g
+        cleanText = cleanText.replace(invalidEscapes, '')
+
+        // 2.5. Fix literal control characters in HTML content values
+        // The API has literal newlines/tabs in the HTML content which breaks JSON
+        // We need to escape these, but ONLY in content_html values, not in the JSON structure
+        cleanText = cleanText.replace(/"content_html":\s*"([\s\S]*?)(?="[\s,\n\r]*[}\]])/g, (match, htmlContent) => {
+          // Escape control characters in the HTML content
+          const escaped = htmlContent
+            .replace(/\\/g, '\\\\')  // Escape backslashes first
+            .replace(/\n/g, '\\n')   // Escape newlines
+            .replace(/\r/g, '\\r')   // Escape carriage returns
+            .replace(/\t/g, '\\t')   // Escape tabs
+          return `"content_html": "${escaped}`
+        })
+
+        // 3. Fix malformed ending: The last content_html field is missing its closing quote
+        // Pattern: ...&quot;&gt;\n\t}\t]\n}
+        // Should be: ...&quot;&gt;"\n\t}\t]\n}
+        // Add the missing closing quote for the content_html value
+        cleanText = cleanText.replace(/(&quot;&gt;)\s*\n\s*\}\s*\]\s*\n\s*\}\s*$/, '$1"\n\t}\t]\n}')
 
         return JSON.parse(cleanText)
       })
