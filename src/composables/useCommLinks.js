@@ -85,8 +85,11 @@ export function useCommLinks() {
         cleanText = cleanText.replace(/"content_html":\s*"([\s\S]*?)(?="[\s,\n\r]*[}\]])/g, (match, htmlContent) => {
           // Escape literal control characters (actual bytes, not escape sequences)
           const escaped = htmlContent
+            // eslint-disable-next-line no-control-regex
             .replace(/\x0A/g, '\\n')   // Escape literal newline (LF) char code 10
+            // eslint-disable-next-line no-control-regex
             .replace(/\x0D/g, '\\r')   // Escape literal carriage return (CR) char code 13
+            // eslint-disable-next-line no-control-regex
             .replace(/\x09/g, '\\t')   // Escape literal tab char code 9
           return `"content_html": "${escaped}`
         })
