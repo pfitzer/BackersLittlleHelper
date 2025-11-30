@@ -110,17 +110,8 @@ describe('useCommLinks', () => {
   })
 
   it('handles escaped characters in JSON', async () => {
-    const mockDataWithEscapes = {
-      items: [
-        {
-          id: '1',
-          title: 'Test \\& Title',
-          summary: 'Summary with \\& character',
-          date_published: '2025-01-01',
-          content_html: '<p>Content</p>'
-        }
-      ]
-    }
+    // Create a JSON string with the invalid \& escape sequence that the API returns
+    const malformedJSON = '{"items":[{"id":"1","title":"Test \\& Title","summary":"Summary with \\& character","date_published":"2025-01-01","content_html":"<p>Content</p>"}]}'
 
     mockFetchWithCache.mockImplementation(async (cacheKey, cacheDuration, fetchFn) => {
       return await fetchFn()
@@ -128,14 +119,15 @@ describe('useCommLinks', () => {
 
     mockFetch.mockResolvedValue({
       ok: true,
-      text: () => Promise.resolve(JSON.stringify(mockDataWithEscapes).replace(/&/g, '\\&'))
+      text: () => Promise.resolve(malformedJSON)
     })
 
     const { commLinks, fetchCommLinks } = useCommLinks()
 
     await fetchCommLinks(1)
 
-    expect(commLinks.value[0].title).toContain('&')
+    expect(commLinks.value[0].title).toBe('Test & Title')
+    expect(commLinks.value[0].summary).toBe('Summary with & character')
   })
 
   it('handles HTTP errors', async () => {

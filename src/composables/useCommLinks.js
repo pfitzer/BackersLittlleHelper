@@ -78,26 +78,26 @@ export function useCommLinks() {
         // Fix invalid escape sequences and malformed content
         // The API returns malformed JSON with various issues
 
-        // 1. Fix HTML entities that are improperly escaped
+        // 1. Fix literal control characters in HTML content values FIRST
+        // The API has literal newlines/tabs in the HTML content which breaks JSON
+        // We need to escape these, but ONLY in content_html values, not in the JSON structure
+        // Use char codes to avoid confusion with escape sequences
+        cleanText = cleanText.replace(/"content_html":\s*"([\s\S]*?)(?="[\s,\n\r]*[}\]])/g, (match, htmlContent) => {
+          // Escape literal control characters (actual bytes, not escape sequences)
+          const escaped = htmlContent
+            .replace(/\x0A/g, '\\n')   // Escape literal newline (LF) char code 10
+            .replace(/\x0D/g, '\\r')   // Escape literal carriage return (CR) char code 13
+            .replace(/\x09/g, '\\t')   // Escape literal tab char code 9
+          return `"content_html": "${escaped}`
+        })
+
+        // 2. Fix HTML entities that are improperly escaped
         cleanText = cleanText.replace(/\\&/g, '&')
 
-        // 2. Remove other invalid escape sequences
+        // 3. Remove other invalid escape sequences
         // Only match backslashes not followed by valid JSON escape chars (", \, /, b, f, n, r, t, u)
         const invalidEscapes = /\\(?!["\\/bfnrtu])/g
         cleanText = cleanText.replace(invalidEscapes, '')
-
-        // 2.5. Fix literal control characters in HTML content values
-        // The API has literal newlines/tabs in the HTML content which breaks JSON
-        // We need to escape these, but ONLY in content_html values, not in the JSON structure
-        cleanText = cleanText.replace(/"content_html":\s*"([\s\S]*?)(?="[\s,\n\r]*[}\]])/g, (match, htmlContent) => {
-          // Escape control characters in the HTML content
-          const escaped = htmlContent
-            .replace(/\\/g, '\\\\')  // Escape backslashes first
-            .replace(/\n/g, '\\n')   // Escape newlines
-            .replace(/\r/g, '\\r')   // Escape carriage returns
-            .replace(/\t/g, '\\t')   // Escape tabs
-          return `"content_html": "${escaped}`
-        })
 
         // 3. Fix malformed ending: The last content_html field is missing its closing quote
         // Pattern: ...&quot;&gt;\n\t}\t]\n}
