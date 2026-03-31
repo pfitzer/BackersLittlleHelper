@@ -18,7 +18,7 @@
     "@tauri-apps/plugin-http": "^2.5.7",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "daisyui": "^5.5.19",
-    "vue": "^3.5.30",
+    "vue": "^3.5.31",
     "vue-i18n": "^11.3.0"
   },
   "devDependencies": {
