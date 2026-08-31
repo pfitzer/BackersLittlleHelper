@@ -18,8 +18,8 @@
     "@tauri-apps/plugin-http": "^2.5.9",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "daisyui": "^5.7.22",
-    "vue": "^3.5.41",
-    "vue-i18n": "^11.4.8"
+    "vue": "^3.5.42",
+    "vue-i18n": "^11.4.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
